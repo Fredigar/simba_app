@@ -1,0 +1,229 @@
+<template>
+    <div class="page" data-name="poll">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Poll</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block margin-vertical">
+                        <div class="margin-bottom-half">
+                            <a href="#" class="link badge color-pink no-margin">
+                                <i class="icon f7-icons">flame_fill</i>
+                                <span>Trending</span>
+                            </a>
+                            ${`\u0020`}
+                            <a href="#" class="link badge color-primary no-margin">App Development</a>
+                            ${`\u0020`}
+                            <a href="#" class="link badge color-primary no-margin">Cross Platform</a>
+                        </div>
+                        <div class="font-size-22 font-weight-bold">Which Is Your Favorite Cross Platform App Development Framework?</div>
+                        <div class="font-size-12 letter-spacing-1 margin-top-half text-color-gray text-uppercase">
+                            <span>Asked By</span>
+                            ${`\u0020`}
+                            <a href="#">${faker.name.firstName() + ' ' + faker.name.lastName()}</a>
+                            ${`\u0020`}
+                            ${`\u2022`}
+                            ${`\u0020`}
+                            <span>${moment(faker.date.recent(7)).fromNow()}</span>
+                        </div>
+                    </div>
+
+                    <form name="poll" action="#" method="POST" enctype="multipart/form-data" @submit="${submitVote}">
+                        <div class="list cards-list radio-list radio-outline inset margin-vertical-half">
+                            <ul>
+                                <li>
+                                    <label class="item-content item-radio color-bluegray">
+                                        <input type="radio" name="answer" value="cordova" />
+                                        <div class="item-inner item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell flex-shrink-0 width-auto">
+                                                    <span class="shape-container shape-rounded-square size-56" style="background-color: var(--color-bluegray-50);">
+                                                        <img src="https://cdn.svgporn.com/logos/cordova.svg" loading="lazy" alt="" />
+                                                    </span>
+                                                </div>
+                                                <div class="item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">Cordova</div>
+                                                        </div>
+                                                        ${voteSubmitted && $h`
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-18 font-weight-bold">8%</div>
+                                                        </div>
+                                                        `}
+                                                    </div>
+                                                    ${voteSubmitted && $h`
+                                                    <div class="item-row margin-top-half">
+                                                        <div class="item-cell">
+                                                            <div class="progressbar progressbar-round color-bluegray" data-progress="8"></div>
+                                                            <div class="font-size-10 letter-spacing-1 margin-top-half text-uppercase text-color-gray">8 Votes</div>
+                                                        </div>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="item-content item-radio color-blue">
+                                        <input type="radio" name="answer" value="flutter" />
+                                        <div class="item-inner item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell flex-shrink-0 width-auto">
+                                                    <span class="shape-container shape-rounded-square size-56" style="background-color: var(--color-blue-50);">
+                                                        <img src="https://cdn.svgporn.com/logos/flutter.svg" loading="lazy" alt="" />
+                                                    </span>
+                                                </div>
+                                                <div class="item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">Flutter</div>
+                                                        </div>
+                                                        ${voteSubmitted && $h`
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-18 font-weight-bold">42%</div>
+                                                        </div>
+                                                        `}
+                                                    </div>
+                                                    ${voteSubmitted && $h`
+                                                    <div class="item-row margin-top-half">
+                                                        <div class="item-cell">
+                                                            <div class="progressbar progressbar-round color-blue" data-progress="42"></div>
+                                                            <div class="font-size-10 letter-spacing-1 margin-top-half text-uppercase text-color-gray">42 Votes</div>
+                                                        </div>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="item-content item-radio color-indigo">
+                                        <input type="radio" name="answer" value="nativescript" />
+                                        <div class="item-inner item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell flex-shrink-0 width-auto">
+                                                    <span class="shape-container shape-rounded-square size-56" style="background-color: var(--color-indigo-50);">
+                                                        <img src="https://cdn.svgporn.com/logos/nativescript.svg" loading="lazy" alt="" />
+                                                    </span>
+                                                </div>
+                                                <div class="item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">NativeScript</div>
+                                                        </div>
+                                                        ${voteSubmitted && $h`
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-18 font-weight-bold">13%</div>
+                                                        </div>
+                                                        `}
+                                                    </div>
+                                                    ${voteSubmitted && $h`
+                                                    <div class="item-row margin-top-half">
+                                                        <div class="item-cell">
+                                                            <div class="progressbar progressbar-round color-indigo" data-progress="13"></div>
+                                                            <div class="font-size-10 letter-spacing-1 margin-top-half text-uppercase text-color-gray">13 Votes</div>
+                                                        </div>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="item-content item-radio color-cyan">
+                                        <input type="radio" name="answer" value="react-native" />
+                                        <div class="item-inner item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell flex-shrink-0 width-auto">
+                                                    <span class="shape-container shape-rounded-square size-56" style="background-color: var(--color-cyan-50);">
+                                                        <img src="https://cdn.svgporn.com/logos/react.svg" loading="lazy" alt="" />
+                                                    </span>
+                                                </div>
+                                                <div class="item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">React Native</div>
+                                                        </div>
+                                                        ${voteSubmitted && $h`
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-18 font-weight-bold">37%</div>
+                                                        </div>
+                                                        `}
+                                                    </div>
+                                                    ${voteSubmitted && $h`
+                                                    <div class="item-row margin-top-half">
+                                                        <div class="item-cell">
+                                                            <div class="progressbar progressbar-round color-cyan" data-progress="37"></div>
+                                                            <div class="font-size-10 letter-spacing-1 margin-top-half text-uppercase text-color-gray">37 Votes</div>
+                                                        </div>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                        ${!voteSubmitted && $h`
+                        <div class="block margin-bottom margin-top">
+                            <button type="submit" class="button button-fill button-large color-mono text-color-mono-invert">Submit Vote</button>
+                        </div>
+                        `}
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let voteSubmitted = false;
+
+        let submitVote = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            if ($(form).find('input[name=answer]:checked').length) {
+                $f7.toast.show({
+                    text: 'Thank you for your vote.',
+                    cssClass: 'color-green'
+                });
+                voteSubmitted = true;
+                $update(function() {
+                    $(form).find('input').prop('disabled', true);
+                });
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please select your answer.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        return $render;
+    }
+</script>

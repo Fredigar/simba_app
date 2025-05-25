@@ -1,0 +1,124 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Social Sharing</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to implement sharing functionality into the app using the device's native sharing capabilities.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <form name="share" action="#" method="POST" enctype="multipart/form-data" @submit="${onFormSubmit}">
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Subject</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="subject" value="${$f7.config.app.title + ' - ' + $f7.config.app.tagline}" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Message</div>
+                                            <div class="item-input-wrap">
+                                                <textarea name="message">${$f7.config.app.description}</textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">URL</div>
+                                            <div class="item-input-wrap">
+                                                <input type="url" name="url" value="${$f7.config.app.themeforestUrl}" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill">Share</button>
+                        </div>
+                    </form>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let onFormSubmit = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            share($f7.form.convertToData(form));
+        }
+
+        let share = function(data) {
+            window.plugins.socialsharing.shareWithOptions(
+                data,
+                function(result) {
+                    if (result.completed) {
+                        $f7.toast.show({
+                            text: 'Shared Successfully',
+                            cssClass: 'color-green'
+                        });
+                    }
+                    else {
+                        $f7.toast.show({
+                            text: 'Sharing Cancelled',
+                            cssClass: 'color-red'
+                        });
+                    }
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        return $render;
+    }
+</script>

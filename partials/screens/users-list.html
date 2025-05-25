@@ -1,0 +1,175 @@
+<template>
+    <div class="page" data-name="users-list">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Users - List</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${users ? $h`
+            ${users == 'error' ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops...</div>
+                <div class="empty-state-text">An error occured while loading data.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            ` : $h`
+            ${users.length ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row">
+                    ${users.map((item, index) => $h`
+                    <li class="col-50 small-33 large-25 xlarge-20">
+                        <div class="item-content">
+                            <div class="item-inner item-cell padding-vertical text-align-center">
+                                <div class="item-row">
+                                    <div class="item-cell">
+                                        ${item.following && $h`
+                                        <button type="button" class="state-toggle ${item.favorite ? 'state-toggle-active' : ''} button button-icon button-round button-small margin-half no-padding position-absolute ${$f7.rtl ? 'position-left-top' : 'position-right-top'} color-gray" @stateChange="${(event) => toggleFavorite(item.id, event.detail)}">
+                                            <i class="state-inactive icon material-icons font-size-20 color-gray">star</i>
+                                            <i class="state-active icon material-icons font-size-20 color-amber">star</i>
+                                        </button>
+                                        `}
+                                        <a href="/users-single/">
+                                            <img class="shape-auto" src="${item.avatar}" loading="lazy" height="64" width="64" alt="" />
+                                            <div class="font-size-16 font-weight-600 margin-top-half single-line-text text-color-body">${item.name}</div>
+                                            <div class="font-size-14 single-line-text text-color-gray">${item.country}</div>
+                                        </a>
+                                    </div>
+                                </div>
+                                <div class="item-row margin-top">
+                                    <div class="item-cell">
+                                        ${item.following ? $h`
+                                        <button type="button" class="button button-fade button-small" @click="${(event) => toggleFollow(item.id, 0)}">Unfollow</button>
+                                        ` : $h`
+                                        <button type="button" class="button button-fill button-small" @click="${(event) => toggleFollow(item.id, 1)}">Follow</button>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Data Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            `}
+            `}
+            ` : $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row">
+                    ${Array(15).fill().map((item, index) => $h`
+                    <li class="col-50 small-33 large-25 xlarge-20">
+                        <div class="item-content">
+                            <div class="item-inner item-cell skeleton-effect-wave padding-vertical text-align-center">
+                                <div class="item-row">
+                                    <div class="item-cell">
+                                        <div class="skeleton-block shape-container shape-auto size-64 vertical-align-middle"></div>
+                                        <div class="skeleton-text font-size-16 font-weight-600 margin-top-half single-line-text">User Name Here</div>
+                                        <div class="skeleton-text font-size-14 single-line-text">User Country</div>
+                                    </div>
+                                </div>
+                                <div class="item-row margin-top">
+                                    <div class="item-cell">
+                                        <div class="skeleton-block" style="border-radius: var(--f7-button-border-radius); height: var(--f7-button-small-height);"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let users = null
+
+        let loadData = function() {
+            users = null;
+            $update();
+            $f7.request({
+                url: 'assets/custom/dataset/users.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                users = response.data.length ? response.data : [];
+                $update();
+            })
+            .catch(function(response) {
+                users = 'error';
+                $update();
+            });
+        }
+
+        let toggleFavorite = function(id, state) {
+            users.forEach(function(user) {
+                if (user.id == id) {
+                    user.favorite = state ? true : false;
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? 'Added to Favorites' : 'Removed from Favorites',
+                            icon: state ? '<i class="icon material-icons color-amber">star</i>' : '<i class="icon material-icons color-gray">star</i>',
+                            position: 'center'
+                        });
+                    });
+                }
+            });
+        }
+
+        let toggleFollow = function(id, state) {
+            users.forEach(function(user) {
+                if (user.id == id) {
+                    user.following = state ? true : false;
+                    if (!user.following) {
+                        user.favorite = false;
+                    }
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? `You're now following ${user.name}.` : `You've unfollowed ${user.name}.`
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

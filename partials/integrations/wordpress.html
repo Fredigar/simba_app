@@ -1,0 +1,110 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">WordPress</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-bluegray-50);">
+                            <img src="https://cdn.svgporn.com/logos/wordpress-icon.svg" height="48" alt="" />
+                        </span>
+                        <p>Show the contents of any publicly accessible WordPress.org or WordPress.com website using their available REST APIs.</p>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="block-title">${$f7.renderUnicode('1F680')} Test Your WordPress Website ${$f7.renderUnicode('1F680')}</div>
+                        <div>Test your WordPress website by entering the URL (for example, https://techcrunch.com) and selecting the type (WordPress.org for self-hosted websites & WordPress.com for sites hosted on WordPress) in the form below and then proceed.</div>
+                    </div>
+
+                    <form name="wordpress">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">URL</div>
+                                        <div class="item-input-wrap">
+                                            <input type="text" name="url" inputmode="url" value="${$f7.wordpress.url}" required />
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Type</div>
+                                        <div class="item-input-wrap input-dropdown-wrap">
+                                            <select name="type" required>
+                                                <option value="org" selected="${$f7.wordpress.type == 'org'}">WordPress.org</option>
+                                                <option value="com" selected="${$f7.wordpress.type == 'com'}">WordPress.com</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill button-large">Proceed</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=wordpress]')).validate({
+                rules: {
+                    url: {
+                        required: true
+                    },
+                    type: {
+                        required: true
+                    }
+                },
+                messages: {
+                    url: {
+                        required: 'Please enter URL.'
+                    },
+                    type: {
+                        required: 'Please select type.'
+                    }
+                },
+                submitHandler: function(form) {
+                    localStorage.setItem('Nectar_WordPress_Site_URL', form.elements.namedItem('url').value);
+                    localStorage.setItem('Nectar_WordPress_Site_Type', form.elements.namedItem('type').value);
+                    $f7.wordpress.initialize(form.elements.namedItem('url').value, form.elements.namedItem('type').value);
+                    $f7router.navigate('/integrations/wordpress/home/');
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

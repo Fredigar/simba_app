@@ -1,0 +1,137 @@
+[
+    {
+        "id": 1,
+        "name": "Randal Gleichner",
+        "avatar": "https://source.unsplash.com/jzY0KRJopEI/128x128",
+        "role": "Internal Program Assistant",
+        "github": "https://github.com",
+        "linkedin": null,
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 2,
+        "name": "Vivian Conroy",
+        "avatar": "https://source.unsplash.com/ZHvM3XIOHoE/128x128",
+        "role": "National Markets Associate",
+        "github": null,
+        "linkedin": null,
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 3,
+        "name": "Jarvis Cremin",
+        "avatar": null,
+        "role": "Internal Directives Planner",
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 4,
+        "name": "Jamal Reilly",
+        "avatar": "https://source.unsplash.com/n4KewLKFOZw/128x128",
+        "role": "Regional Applications Supervisor",
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 5,
+        "name": "Robb Schumm",
+        "avatar": null,
+        "role": "Product Infrastructure Agent",
+        "github": "https://github.com",
+        "linkedin": null,
+        "twitter": null
+    },
+    {
+        "id": 6,
+        "name": "Ernesto Heidenreich",
+        "avatar": "https://source.unsplash.com/XHVpWcr5grQ/128x128",
+        "role": "Principal Marketing Officer",
+        "github": "https://github.com",
+        "linkedin": null,
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 7,
+        "name": "Gerry Hoppe",
+        "avatar": null,
+        "role": "Corporate Security Analyst",
+        "github": "https://github.com",
+        "linkedin": null,
+        "twitter": null
+    },
+    {
+        "id": 8,
+        "name": "Eugene Wiza",
+        "avatar": null,
+        "role": "Direct Program Specialist",
+        "github": null,
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 9,
+        "name": "Vivian Balistreri",
+        "avatar": "https://source.unsplash.com/vmBik4xv27s/128x128",
+        "role": "Investor Quality Representative",
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 10,
+        "name": "Violet Wintheiser",
+        "avatar": null,
+        "role": "Corporate Creative Architect",
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 11,
+        "name": "Quincy Turcotte",
+        "avatar": "https://source.unsplash.com/gw3cp6h5j0E/128x128",
+        "role": "Legacy Tactics Designer",
+        "github": null,
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 12,
+        "name": "Francisco Larson",
+        "avatar": "https://source.unsplash.com/ViyA5myhBVw/128x128",
+        "role": "Regional Brand Technician",
+        "github": null,
+        "linkedin": null,
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 13,
+        "name": "Anastacio Kulas",
+        "avatar": "https://source.unsplash.com/ASuIYgjnBFw/128x128",
+        "role": "Human Paradigm Manager",
+        "github": null,
+        "linkedin": "https://linkedin.com",
+        "twitter": null
+    },
+    {
+        "id": 14,
+        "name": "Elta Hirthe",
+        "avatar": null,
+        "role": "Internal Research Coordinator",
+        "github": "https://github.com",
+        "linkedin": "https://linkedin.com",
+        "twitter": "https://twitter.com"
+    },
+    {
+        "id": 15,
+        "name": "Susie Quitzon",
+        "avatar": null,
+        "role": "Legacy Group Planner",
+        "github": null,
+        "linkedin": null,
+        "twitter": "https://twitter.com"
+    }
+]

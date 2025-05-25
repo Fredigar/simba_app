@@ -1,0 +1,2447 @@
+
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="walkthrough">
+        <div class="page-content">
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-75 large-60 xlarge-50 medium-padding-vertical no-padding">
+                    <div class="swiper height-100">
+                        <div class="swiper-wrapper height-100">
+                            <!-- Slide de inicio -->
+                            <div class="swiper-slide height-100 color-theme-mono">
+                                <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding-vertical text-align-center">
+                                    <div class="font-weight-bold font-size-32 margin-top-auto margin-vertical">
+                                        ${procedure.name}
+                                    </div>
+                                    <div class="font-size-16 margin-vertical">
+                                        ${procedure.description}
+                                    </div>
+
+                                    <div class="margin-vertical">
+                                        <div class="list">
+                                            <ul>
+                                                ${equipments.map((equipment, idx) => $h`
+                                                <li class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="fa fa-wrench"></i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">${equipment.name}</div>
+                                                        <div class="item-after">${equipment.quantity} ${equipment.unit} </div>
+                                                    </div>
+                                                </li>
+
+                                                `)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="margin-top-auto margin-bottom">
+                                        <button type="button"
+                                                class="button button-fill button-large button-round text-color-mono-invert"
+                                                @click="${startProcedure}">Start
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Slides dinámicos de instrucciones -->
+                            ${instructions.map((instruction, idx) => $h`
+                            <div class="swiper-slide height-100 color-theme-mono" data-instruction-id="${instruction.guid}" data-instruction-index="${idx}">
+                                <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding-vertical">
+
+                                    <!-- Header con iconos de captura a la izquierda y tiempo a la derecha -->
+                                    <div class="float-right justify-content-space-between  margin-bottom margin">
+                                        <!-- Tiempo estimado a la derecha -->
+                                        ${instruction.estimatedTime ? $h`
+                                        <div class="display-flex float-right">
+                                            <i class="icon f7-icons margin-right-half color-gray">clock</i>
+                                            <span class="font-size-14 font-weight-bold">${instruction.estimatedTime} min</span>
+                                        </div>
+                                        ` : ''}
+                                    </div>
+
+
+                                    <div class="margin-top-auto font-weight-bold font-size-40 margin-vertical text-align-center">
+                                        ${instruction.text}
+                                        <div style="font-weight: lighter" class="font-size-20 margin-vertical text-align-center">
+                                            ${instruction.description}
+                                        </div>
+                                    </div>
+
+
+
+                                    ${instruction.equipments && instruction.equipments.length > 0 ? $h`
+                                    <div class="margin-vertical text-align-center">
+                                        <div class="text-align-center">
+                                                ${instruction.equipments.map(equipId => {
+                                                const equipment = getEquipmentById(equipId);
+                                                return equipment ? $h`
+                                                    <div class="chip">
+                                                        <div class="chip-media"><i class="fa fa-wrench"></i></div>
+                                                        <div class="chip-label">${equipment.name}</div>
+                                                    </div>
+                                                ` : '';
+                                                })}
+
+                                        </div>
+                                    </div>
+                                    ` : ''}
+
+                                    ${instruction.params ? $h`
+                                    <div class="margin-vertical">
+                                        <div class="block-title">Please register this information:</div>
+                                        <div class="list no-hairlines">
+                                            <ul>
+                                                ${Object.keys(instruction.params).map(paramKey => {
+                                                const param = instruction.params[paramKey];
+                                                // Obtener los valores específicos para este paso
+                                                const stepParams = paramValuesByStep[idx] || {};
+                                                return $h`
+                                                <li class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons">slider_horizontal_3</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">${param.name}</div>
+                                                        <div class="item-after">
+                                                            ${param.type === 'boolean' ? $h`
+                                                            <div class="segmented segmented-raised">
+                                                                <button class="button ${stepParams[param.alias] === true ? 'button-active' : ''}"
+                                                                        @click="${() => setParamValue(param.alias, true)}">Sí</button>
+                                                                <button class="button ${stepParams[param.alias] === false ? 'button-active' : ''}"
+                                                                        @click="${() => setParamValue(param.alias, false)}">No</button>
+                                                            </div>
+                                                            ` : param.type === 'decimal' || param.type === 'number' ? $h`
+                                                            <div class="item-input-wrap">
+                                                                <input type="number" placeholder="value in  ${param.unit}" value="${stepParams[param.alias] || ''}"
+                                                                       @input="${(e) => setParamValue(param.alias, parseFloat(e.target.value))}" />
+                                                            </div>
+                                                            ` : $h`
+                                                            <div class="item-input-wrap">
+                                                                <input type="text" placeholder="value in  ${param.unit}" value="${stepParams[param.alias] || ''}"
+                                                                       @input="${(e) => setParamValue(param.alias, e.target.value)}" />
+                                                            </div>
+                                                            `}
+
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                `;
+                                                })}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+                                    ${instruction.resources ? $h`
+                                    <div class="margin-vertical">
+                                        <div class="block-title">Resources:</div>
+                                        <div class="list">
+                                            <ul>
+                                                ${instruction.resources.map(resource => $h`
+                                                <li>
+                                                    <a href="${resource.url}" class="item-link item-content external" target="_blank">
+                                                        <div class="item-media">
+                                                            <i class="icon f7-icons">${resource.type === 'video' ? 'play_circle' : 'doc_text'}</i>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">${resource.title}</div>
+                                                            ${resource.mandatory ? $h`<div class="item-after text-color-red">*</div>` : ''}
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                `)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    ` : ''}
+
+                                    <div class="margin-top-auto margin-bottom">
+                                        ${instruction.capture ? $h`
+                                        <div id="fab-capture-menu" class="list inset margin-vertical no-chevron no-hairlines-between position-absolute ${$f7.rtl ? 'position-left-bottom' : 'position-right-bottom'} width-auto fab-morph-target" style="margin-bottom:100px!important">
+                                            ${instruction.capture ? $h`
+                                            <ul class="elevation-16">
+                                                ${instruction.capture.photo ? $h`
+                                                <li>
+                                                    <a href="#" class="item-link fab-close" @click="${() => handlePhotoClick(idx)}">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                        <span class="shape-container shape-circle size-40 ${hasStepMedia(idx, 'photo') ? 'bg-color-green' : 'bg-color-blue'}">
+                            <i class="icon f7-icons font-size-20 color-white">camera_fill  ${hasStepMedia(idx, 'photo') ? $h`<span class="badge badge-round color-white bg-color-blue">${hasStepMedia(idx, 'photo')}</span>` : ''}</i>
+
+                        </span>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title">Capture a picture</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                ` : ''}
+                                                ${instruction.capture.video ? $h`
+                                                <li>
+                                                    <a href="#" class="item-link fab-close" @click="${hasStepMedia(idx, 'video') ? showVideos : takePhotoHtml5}">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                        <span class="shape-container shape-circle size-40 ${hasStepMedia(idx, 'video') ? 'bg-color-green' : 'bg-color-orange'}">
+                            <i class="icon f7-icons font-size-20 color-white">videocam_fill
+                            ${hasStepMedia(idx, 'video') ? $h`<span class="badge badge-round color-white bg-color-blut">${hasStepMedia(idx, 'video')}</span>` : ''}</i>
+                        </span>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title">Capture a video</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                ` : ''}
+                                                ${instruction.capture.audio ? $h`
+                                                <li>
+                                                    <a href="#" class="item-link fab-close" @click="${() => handleAudioClick(idx)}">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                        <span class="shape-container shape-circle size-40 ${hasStepMedia(idx, 'audio') ? 'bg-color-green' : 'bg-color-deeppurple'}">
+                            <i class="icon f7-icons font-size-20 color-white">mic_fill
+                            ${hasStepMedia(idx, 'audio') ? $h`<span class="badge badge-round color-white bg-color-blue">${hasStepMedia(idx, 'audio')}</span>` : ''}</i>
+                        </span>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title">Capture an audio</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                ` : ''}
+                                                ${instruction.capture.comment ? $h`
+                                                <li>
+                                                    <a href="#" class="item-link fab-close" @click="${() => handleCommentClick(idx)}">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                        <span class="shape-container shape-circle size-40 ${hasStepMedia(idx, 'comment') ? 'bg-color-green' : 'bg-color-pink'}">
+                            <i class="icon f7-icons font-size-20 color-white">chat_bubble_fill ${hasStepMedia(idx, 'comment') ? $h`<span class="badge badge-round color-white bg-color-blue">${hasStepMedia(idx, 'comment')}</span>` : ''}</i>
+
+                        </span>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title">Create a comment</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                ` : ''}
+                                            </ul>
+                                            <div class="block margin-vertical-half text-align-center">
+                                                <a href="#" class="fab-close">
+            <span class="shape-container shape-circle elevation-8 color-gray" style="background-color: var(--f7-list-bg-color);">
+                <i class="icon material-icons color-mono font-size-24">close</i>
+            </span>
+                                                </a>
+                                            </div>
+                                            ` : ''}
+                                        </div>
+
+                                        <div style="margin-bottom:100px" class="fab fab-morph ${$f7.rtl ? 'fab-left-bottom' : 'fab-right-bottom'}" data-morph-to="#fab-capture-menu" data-idx="${idx}">
+                                            <a href="#">
+                                                <i class="color-black icon f7-icons">circle_grid_3x3_fill</i>
+                                            </a>
+                                        </div>
+                                        ` : ''}
+                                        <button type="button"
+                                                class="button button-fill button-large button-round text-color-mono-invert"
+                                                @click="${() => handleNextStep(idx)}"
+                                                ${isStepCompleted(idx) ? '' : 'disabled'}>
+                                        ${instruction.command || 'Next'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            `)}
+
+                            <!-- Slide final de completado -->
+                            <div class="swiper-slide height-100 color-theme-mono">
+                                <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding-vertical text-align-center">
+                                    <div class="margin-top-auto">
+                                        <div class="checkmark-circle">
+                                            <div class="background"></div>
+                                            <div class="checkmark draw"></div>
+                                        </div>
+                                    </div>
+                                    <div class="font-weight-bold font-size-24 margin-vertical">
+                                        ¡Procedimiento completado!
+                                    </div>
+                                    <div class="font-size-16 margin-vertical">
+                                        Has completado con éxito el procedimiento.
+                                    </div>
+                                    <div class="margin-vertical">
+                                        <p>Versión: 1.4 (Última actualización: 06/05/2025)</p>
+                                    </div>
+                                    <div class="margin-top-auto margin-bottom">
+                                        <button type="button"
+                                                class="button button-fill button-large button-round text-color-mono-invert"
+                                                @click="${restartProcedure}">Volver a inicio
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Swiper Pagination -->
+                        <div class="swiper-pagination swiper-pagination-pills color-mono" style="bottom: 88px;"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="popup-audio" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">Grabar audio</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" @click="${saveAudioRecording}">
+                                <i class="icon material-icons">check</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content display-flex flex-direction-column align-items-center justify-content-center">
+                    <div id="audio-recorder-status" class="text-align-center margin-bottom">
+                        Presiona el botón para iniciar la grabación
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <div id="audio-timer" class="text-align-center margin-bottom">00:00</div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col">
+                            <a href="#" id="btn-record-audio" class="button button-fill button-round button-large color-red" @click="${toggleAudioRecording}">
+                                <i class="icon material-icons">mic</i>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="margin-top" id="audio-player-container" style="display: none;">
+                        <audio id="audio-player" controls></audio>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="popup-camera" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">
+                            <div>Capture the moment</div>
+                            <div class="subtitle">Make a picture</div>
+                        </div>
+                        <div class="right">
+                            ${$f7.device.cordova ? $h`
+                            ${!imageTaken ? $h`
+                            <a href="#" data-tooltip='Use system camera' class="link tooltip-init icon-only"
+                               @click="${takePhoto}">
+                                <i class="icon material-icons">camera_enhance</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                            ${multipleCamera ? $h`
+                            ${!imageTaken ? $h`
+                            <a data-tooltip='Change picture' class="link tooltip-init icon-only"
+                               @click="${toggleCamera}">
+                                <i class="icon material-icons color-white">flip_camera_ios</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar messagebar">
+                    <div ${speechToText ? $h`` : $h`style="display:none" `}
+                         class="${speechToText ? $h`block` : $h``} mic-mode text-align-center">${speechToText}
+                    </div>
+
+                    <div class="toolbar-inner" style="min-height: 70px;">
+                        ${imageTaken ? $h`
+                        <a href="#" @click="${toggleCameraView}"
+                           class="link margin-left ripple-color-gray"><i
+                                class="icon material-icons">close</i></a>
+                        ` : $h` `}
+                        <div class="messagebar-area" style="overflow:visible">
+                            <div class="fab fab-center-center margin-bottom">
+                                <a id="btn-capture" @click="${captureAndSendImage}" href="#" data-tooltip='Take picture'
+                                   class="tooltip-init">
+                                    <i class="icon material-icons">camera</i>
+                                </a>
+                            </div>
+                        </div>
+                        ${imageTaken ? $h`<a @click="${sendImage}" data-tooltip='Use this picture' href="#"
+                                             class="link tooltip-init margin-right ripple-color-gray"><i
+                            class="icon material-icons">check</i></a>
+                        ` : $h` `}
+                    </div>
+                </div>
+                <div class="page-content">
+                    <video id="camera-preview" autoplay></video>
+                    <img id="captured-image" src="" style="display:none" alt="Imagen Capturada"/>
+                </div>
+            </div>
+        </div>
+
+        <!-- Popup para comentarios -->
+        <div id="popup-comment" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">Añadir comentario</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" @click="${saveUserComment}">
+                                <i class="icon material-icons">check</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="block">
+                        <div class="list no-hairlines-md">
+                            <ul>
+                                <li class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Comentario</div>
+                                        <div class="item-input-wrap">
+                                            <textarea id="comment-text" placeholder="Escribe tu comentario aquí"></textarea>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+
+<style>
+    @media (max-width: 767.98px) {
+        .page[data-name=walkthrough] {
+            background-color: var(--f7-block-strong-bg-color);
+        }
+    }
+
+    .checkmark-circle {
+        width: 100px;
+        height: 100px;
+        position: relative;
+        display: inline-block;
+        vertical-align: top;
+        margin: 2rem auto;
+    }
+
+    .checkmark-circle .background {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: #4CAF50;
+        position: absolute;
+    }
+
+    .checkmark-circle .checkmark {
+        border-radius: 5px;
+    }
+
+    .checkmark-circle .checkmark.draw:after {
+        animation-delay: 100ms;
+        animation-duration: 1s;
+        animation-timing-function: ease;
+        animation-name: checkmark;
+        transform: scaleX(-1) rotate(135deg);
+        animation-fill-mode: forwards;
+    }
+
+    .checkmark-circle .checkmark:after {
+        opacity: 1;
+        height: 50px;
+        width: 25px;
+        transform-origin: left top;
+        border-right: 5px solid white;
+        border-top: 5px solid white;
+        content: '';
+        left: 25px;
+        top: 50px;
+        position: absolute;
+    }
+
+    @keyframes checkmark {
+        0% {
+            height: 0;
+            width: 0;
+            opacity: 1;
+        }
+        20% {
+            height: 0;
+            width: 25px;
+            opacity: 1;
+        }
+        40% {
+            height: 50px;
+            width: 25px;
+            opacity: 1;
+        }
+        100% {
+            height: 50px;
+            width: 25px;
+            opacity: 1;
+        }
+    }
+</style>
+
+<script>
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        // Estado de la aplicación
+        let swiper = null;
+        let multipleCamera = false;
+        let popupCamera = null;
+        let popupComment = null;
+        let popupAudio = null;
+        let currentCommentStepIndex = null;
+        let currentAudioStepIndex = null;
+        let imageTaken = null;
+        let base64Image = null;
+        let speechToText = null;
+        let faceMode = 'environment'; //user
+        let videoStream = null;
+        let isTorchOn = false;
+
+        // Variables para grabación de audio
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioBlob = null;
+        let audioTimer = null;
+        let recordingStartTime = 0;
+        let isRecording = false;
+
+        // Configuración del procedimiento
+        let procedure = {
+            name: "Please load a procedure",
+            description: "No procedure has been found"
+        };
+
+        let paramValuesByStep = {};
+        let completedSteps = [];
+        let myProcedure = null;
+        let ff = new flowfollow();
+        // Gestor de audio para feedback sonoro
+        let audioManager = {
+            sounds: {},
+
+            // Cargar un sonido
+            loadSound: function (name, path) {
+                this.sounds[name] = new Audio(path);
+            },
+
+            playSound: function (name, loop = false) {
+                if (this.sounds[name]) {
+                    this.sounds[name].loop = loop;
+                    this.sounds[name].play();
+                }
+            },
+
+            // Detener un sonido
+            stopSound: function (name) {
+                if (this.sounds[name]) {
+                    this.sounds[name].pause();
+                    this.sounds[name].currentTime = 0;
+                }
+            }
+        };
+
+        // Definición del equipamiento
+        let equipments = [];
+
+        // Función para obtener equipamiento por ID
+        let getEquipmentById = function(id) {
+            return equipments.find(equipment => equipment.id === id);
+        };
+
+        // Definir las instrucciones del procedimiento
+        let instructions = [];
+
+        // ===== FUNCIONES DE TRACKING DE PROCEDIMIENTO =====
+
+        // Función para guardar el JSON inicial y configurar el tracking
+        function initializeProcedureTracking(procedure, instructions, equipments) {
+            try {
+                // Crear objeto de tracking con la información inicial
+                const trackingData = {
+                    procedure: procedure,
+                    instructions: [],
+                    equipments: equipments,
+                    startTime: new Date().toISOString(),
+                    steps: []
+                };
+
+                // Añadir campo para tracking en cada instrucción
+                instructions.forEach((instruction, index) => {
+                    trackingData.instructions[index] = {
+                        ...instruction,
+                        tracking: {
+                            startTime: null,
+                            endTime: null,
+                            paramValues: {},
+                            capturedMedia: []
+                        }
+                    };
+                });
+
+                // Guardar en localStorage
+                localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+
+                console.log("Procedimiento inicializado para tracking:", procedure.name);
+                console.log("Instrucciones inicializadas:", trackingData.instructions.length);
+
+                return trackingData;
+            } catch (error) {
+                console.error('Error al inicializar tracking:', error);
+                return null;
+            }
+        }
+
+        // Función para marcar el inicio de un paso
+        function startStepTracking(stepIndex) {
+            const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+            if (trackingData && trackingData.instructions[stepIndex]) {
+                // Registrar tiempo de inicio
+                trackingData.instructions[stepIndex].tracking.startTime = new Date().toISOString();
+
+                // Actualizar en localStorage
+                localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+                console.log(`Paso ${stepIndex + 1} iniciado a las ${new Date().toLocaleTimeString()}`);
+            }
+        }
+
+        // Función para marcar la finalización de un paso
+        function completeStepTracking(stepIndex, paramValues = {}) {
+            const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+            if (trackingData && trackingData.instructions[stepIndex]) {
+                const step = trackingData.instructions[stepIndex];
+
+                // Registrar tiempo de finalización
+                step.tracking.endTime = new Date().toISOString();
+
+                // Guardar valores de parámetros si existen
+                if (Object.keys(paramValues).length > 0) {
+                    step.tracking.paramValues = {...paramValues};
+                }
+
+                // Calcular duración
+                const startTime = new Date(step.tracking.startTime);
+                const endTime = new Date(step.tracking.endTime);
+                step.tracking.duration = (endTime - startTime) / 1000; // duración en segundos
+
+                // Añadir a la lista de pasos completados
+                trackingData.steps.push({
+                    stepIndex: stepIndex,
+                    guid: step.guid,
+                    startTime: step.tracking.startTime,
+                    endTime: step.tracking.endTime,
+                    duration: step.tracking.duration,
+                    paramValues: step.tracking.paramValues
+                });
+
+                // Actualizar en localStorage
+                localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+                console.log(`Paso ${stepIndex + 1} completado. Duración: ${step.tracking.duration} segundos`);
+            }
+        }
+
+        // Función para verificar si hay medios de un tipo específico
+        function hasStepMedia(stepIndex, mediaType) {
+            try {
+                console.log(`Contando medios de tipo ${mediaType} para paso ${stepIndex}`);
+                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                if (!trackingData || !trackingData.instructions || !trackingData.instructions[stepIndex]) {
+                    console.log('No hay datos de tracking o no existen instrucciones para este paso');
+                    return 0;
+                }
+
+                if (!trackingData.instructions[stepIndex].tracking ||
+                    !trackingData.instructions[stepIndex].tracking.capturedMedia ||
+                    !Array.isArray(trackingData.instructions[stepIndex].tracking.capturedMedia) ||
+                    trackingData.instructions[stepIndex].tracking.capturedMedia.length === 0) {
+                    console.log('No hay medios capturados para este paso');
+                    return 0;
+                }
+
+                // Contar medios del tipo específico
+                const mediaCount = trackingData.instructions[stepIndex].tracking.capturedMedia.filter(
+                    media => media.type === mediaType
+                ).length;
+
+                console.log(`Se encontraron ${mediaCount} medios de tipo ${mediaType}`);
+                return mediaCount;
+            } catch (error) {
+                console.error('Error al contar medios:', error);
+                return 0;
+            }
+        }
+
+        // Función para obtener todos los medios de un tipo específico
+        function getStepMedia(stepIndex, mediaType) {
+            try {
+                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                // Verificar que la ruta completa exista antes de acceder
+                if (trackingData &&
+                    trackingData.instructions &&
+                    trackingData.instructions[stepIndex] &&
+                    trackingData.instructions[stepIndex].tracking &&
+                    trackingData.instructions[stepIndex].tracking.capturedMedia &&
+                    Array.isArray(trackingData.instructions[stepIndex].tracking.capturedMedia)) {
+
+                    // Filtrar por tipo de medio
+                    return trackingData.instructions[stepIndex].tracking.capturedMedia.filter(
+                        media => media.type === mediaType
+                    );
+                }
+
+                return [];
+            } catch (error) {
+                console.error('Error al obtener medios:', error);
+                return [];
+            }
+        }
+
+        // Función para guardar media capturada (imágenes, videos, comentarios, audio)
+        // Corrección de la función saveStepMedia para manejar mejor casos donde tracking no está inicializado
+        function saveStepMedia(stepIndex, mediaType, content) {
+            try {
+                // Leer los datos existentes o crear un nuevo objeto si no existen
+                let trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                if (!trackingData) {
+                    // Si no hay datos de tracking, inicializarlos primero
+                    trackingData = initializeProcedureTracking(procedure, instructions, equipments);
+                }
+
+                // Asegurarse de que existe el array de instrucciones
+                if (!trackingData.instructions) {
+                    trackingData.instructions = [];
+                }
+
+                // Asegurarse de que existe el índice del paso
+                if (!trackingData.instructions[stepIndex]) {
+                    trackingData.instructions[stepIndex] = {
+                        tracking: {
+                            startTime: null,
+                            endTime: null,
+                            paramValues: {},
+                            capturedMedia: []
+                        }
+                    };
+                }
+
+                // Asegurarse de que existe la propiedad tracking
+                if (!trackingData.instructions[stepIndex].tracking) {
+                    trackingData.instructions[stepIndex].tracking = {
+                        startTime: null,
+                        endTime: null,
+                        paramValues: {},
+                        capturedMedia: []
+                    };
+                }
+
+                // Asegurarse de que existe el array capturedMedia
+                if (!trackingData.instructions[stepIndex].tracking.capturedMedia) {
+                    trackingData.instructions[stepIndex].tracking.capturedMedia = [];
+                }
+
+                const mediaItem = {
+                    type: mediaType,
+                    timestamp: new Date().toISOString(),
+                    content: content
+                };
+
+                // Añadir el media item al tracking de este paso
+                trackingData.instructions[stepIndex].tracking.capturedMedia.push(mediaItem);
+
+                // Actualizar en localStorage
+                localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+                console.log(`Media tipo "${mediaType}" guardado para el paso ${stepIndex + 1}`);
+
+                // Forzar actualización de la UI para refrescar iconos
+                $update();
+
+                return true;
+            } catch (error) {
+                console.error('Error al guardar media:', error);
+                return false;
+            }
+        }
+
+        // Función para obtener el informe completo
+        function getProcedureReport() {
+            return JSON.parse(localStorage.getItem('procedureTrackingData'));
+        }
+
+        // Función para exportar el informe en formato JSON
+        function exportProcedureReport() {
+            const report = getProcedureReport();
+            if (!report) return null;
+
+            // Añadir metadata adicional
+            const exportData = {
+                ...report,
+                exportDate: new Date().toISOString(),
+                completionStatus: report.steps.length === report.instructions.length ? 'completed' : 'incomplete',
+                totalDuration: calculateTotalDuration(report)
+            };
+
+            return JSON.stringify(exportData, null, 2);
+        }
+
+        // Calcular la duración total del procedimiento
+        function calculateTotalDuration(report) {
+            if (!report || !report.steps || report.steps.length === 0) return 0;
+
+            let totalDuration = 0;
+            report.steps.forEach(step => {
+                if (step.duration) {
+                    totalDuration += step.duration;
+                }
+            });
+
+            return totalDuration;
+        }
+
+        // Función para reiniciar el tracking al comenzar un nuevo procedimiento
+        function resetProcedureTracking() {
+            localStorage.removeItem('procedureTrackingData');
+            console.log("Tracking de procedimiento reiniciado");
+        }
+
+        // Función para procesar y guardar una imagen en el tracking
+        function processAndSaveImage(base64Image, stepIndex) {
+            // Guardar la imagen capturada en el tracking
+            saveStepMedia(stepIndex, 'photo', base64Image);
+
+            // También puedes retornar la imagen para usarla en la UI
+            return base64Image;
+        }
+
+        // Función para guardar videos
+        function processAndSaveVideo(base64Video, stepIndex) {
+            saveStepMedia(stepIndex, 'video', base64Video);
+            return base64Video;
+        }
+
+        // Función para guardar comentarios
+        function saveComment(stepIndex, commentText) {
+            saveStepMedia(stepIndex, 'comment', commentText);
+        }
+
+        // Función para mostrar el estado actual del tracking en consola
+        function showTrackingState() {
+            try {
+                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+                console.log('Estado completo del tracking:', trackingData);
+
+                if (trackingData && trackingData.instructions) {
+                    trackingData.instructions.forEach((instruction, idx) => {
+                        if (instruction.tracking && instruction.tracking.capturedMedia && instruction.tracking.capturedMedia.length > 0) {
+                            console.log(`Paso ${idx} tiene ${instruction.tracking.capturedMedia.length} medios:`);
+                            instruction.tracking.capturedMedia.forEach((media, i) => {
+                                console.log(`  - Media ${i+1}: Tipo ${media.type}, timestamp ${media.timestamp}`);
+                            });
+                        }
+                    });
+                }
+            } catch (error) {
+                console.error('Error al mostrar estado:', error);
+            }
+        }
+
+        // ===== FUNCIONES DE INTERFAZ Y MANIPULACIÓN DE IMÁGENES =====
+
+        let base64ToBlob = function (base64Image, mime) {
+            mime = mime || 'image/jpeg';
+            var sliceSize = 1024;
+            var base64 = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+
+            var byteChars = window.atob(base64);
+            var byteArrays = [];
+
+            for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+                var slice = byteChars.slice(offset, offset + sliceSize);
+
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                var byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            return new Blob(byteArrays, {type: mime});
+        }
+
+        // Función para enviar/guardar la imagen capturada
+        let sendImage = function () {
+            var image = base64ToBlob(base64Image);
+            let formData = new FormData();
+            formData.append('image0', image);
+
+            // Usar el índice del paso activo o el que se guardó al hacer clic
+            const stepIndex = currentAudioStepIndex !== null ?
+                currentAudioStepIndex :
+                (swiper.activeIndex - 1);
+
+            if (stepIndex >= 0 && stepIndex < instructions.length) {
+                processAndSaveImage(base64Image, stepIndex);
+
+                // Mostrar confirmación al usuario
+                $f7.toast.create({
+                    text: 'Imagen guardada correctamente',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            } else {
+                console.error('Índice de paso inválido:', stepIndex);
+            }
+
+            // Cerramos el popup de la cámara
+            popupCamera.close();
+
+            // Reiniciar el índice
+            currentAudioStepIndex = null;
+
+            // Forzar actualización de la UI
+            $update();
+        }
+
+        // Capturar y enviar la imagen
+        let captureAndSendImage = function () {
+            if (!videoStream) {
+                console.error("No hay transmisión de video activa.");
+                return;
+            }
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            // Obtener el ancho y alto del elemento .page-content dentro de #popup-camera
+            var pageContentWidth = pageContent.clientWidth;
+            var pageContentHeight = pageContent.clientHeight;
+
+            var video = document.querySelector('#camera-preview');
+            var aspectRatio = video.videoWidth / video.videoHeight;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = pageContentWidth;  // o cualquier ancho deseado
+            canvas.height = canvas.width / aspectRatio;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var dataURL = canvas.toDataURL('image/jpeg');
+            // Asignar la imagen capturada como la fuente del elemento img
+            var imgElement = document.querySelector('#captured-image');
+
+            imgElement.src = dataURL;
+            imgElement.style.display = 'block';
+            video.style.display = 'none';
+
+            audioManager.playSound('camera', false);
+            imageTaken = true;
+            $update();
+            console.log("send image");
+            base64Image = dataURL;
+
+            // Opcional: Detener la transmisión de video después de tomar la foto
+            videoStream.getTracks().forEach(function (track) {
+                track.stop();
+            });
+        };
+
+        // Verificar permisos de cámara
+        let checkCameraPermissions = async function checkCameraPermissions() {
+            return new Promise((resolve, reject) => {
+                console.log("Checking Camera Permissions");
+                if ($f7.device.cordova) {
+                    var permissions = cordova.plugins.permissions;
+                    var permissionList = [permissions.CAMERA];
+
+                    permissions.checkPermission(permissionList, function (status) {
+                        if (!status.hasPermission) {
+                            permissions.requestPermissions(
+                                permissionList,
+                                function (status) {
+                                    if (!status.hasPermission) {
+                                        console.error("Camera permissions not granted: " + JSON.stringify(status));
+                                        reject("Camera permissions not granted.");
+                                    } else {
+                                        console.log("Camera permissions granted");
+                                        resolve();
+                                    }
+                                },
+                                function (error) {
+                                    console.error("Error requesting camera permissions: " + JSON.stringify(error));
+                                    reject("Error requesting camera permissions.");
+                                }
+                            );
+                        } else {
+                            console.log("Camera permissions already granted");
+                            resolve();
+                        }
+                    }, function (error) {
+                        console.error("Error checking camera permissions: " + JSON.stringify(error));
+                        reject("Error checking camera permissions.");
+                    });
+                } else {
+                    // No es Cordova, resuelve de inmediato (puede ajustarse según tus necesidades)
+                    resolve();
+                }
+            });
+        }
+
+        // Verificar si hay múltiples cámaras disponibles
+        let checkMultipleCamerasAvailable = function () {
+            return navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const videoInputs = devices.filter(device => device.kind === 'videoinput');
+                    return videoInputs.length > 1; // Devuelve true si hay más de una cámara
+                })
+                .catch(error => {
+                    console.error("Error al enumerar los dispositivos:", error);
+                    return false; // Devuelve false si hay un error
+                });
+        }
+
+        // Inicializar el video de la cámara
+        let initVideo = function () {
+            imageTaken = null;
+            $update()
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            var constraints = {
+                video: {
+                    width: {ideal: 1920},
+                    height: {ideal: 1080},
+                    facingMode: faceMode
+                },
+                audio: false
+            };
+
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function (stream) {
+                    videoStream = stream;
+                    var video = document.getElementById('camera-preview');
+                    video.srcObject = stream;
+
+                    // Intenta aplicar el mínimo zoom después de que el stream haya comenzado
+                    const videoTrack = stream.getVideoTracks()[0];
+                    const capabilities = videoTrack.getCapabilities && videoTrack.getCapabilities();
+
+                    if (capabilities && capabilities.zoom) {
+                        const settings = videoTrack.getSettings();
+                        const constraints = {
+                            advanced: [{zoom: Math.max(capabilities.zoom.min, settings.zoom || 0)}]
+                        };
+                        videoTrack.applyConstraints(constraints).then(() => {
+                            console.log('Aplicado el mínimo zoom disponible');
+                        }).catch(error => {
+                            console.error('Error al aplicar el mínimo zoom:', error);
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    console.error("Error al acceder a la cámara:", err);
+                });
+        }
+
+        // Cambiar entre cámara frontal y trasera
+        function toggleCamera() {
+            faceMode = faceMode === 'user' ? 'environment' : 'user';
+            initVideo();
+        }
+
+        // Alternar entre vista de cámara e imagen capturada
+        function toggleCameraView() {
+            var videoElement = document.getElementById('camera-preview');
+            var imgElement = document.getElementById('captured-image');
+
+            // Verificar si el video está visible o no
+            var isVideoVisible = videoElement.style.display === 'block';
+
+            // Si el video está visible, ocultar el video y mostrar la imagen
+            // Si la imagen está visible, ocultar la imagen y mostrar el video
+            if (isVideoVisible) {
+                videoElement.style.display = 'none';
+                imgElement.style.display = 'block';
+            } else {
+                videoElement.style.display = 'block';
+                imgElement.style.display = 'none';
+                initVideo();
+            }
+        }
+
+        // Encender/apagar la linterna de la cámara
+        let toggleCameraTorch = async function () {
+            if (window.cordova) {
+                if (window.plugins.flashlight) {
+                    window.plugins.flashlight.toggle(
+                        function () {
+                            isTorchOn = window.plugins.flashlight.isSwitchedOn()
+                            $update();
+                        }, // optional success callback
+                        function () {
+                        }, // optional error callback
+                        {intensity: 0.3} // optional as well, used on iOS when switching on
+                    );
+                }
+            }
+        }
+
+        // Inicializar el popup de la cámara
+        let initializePopupCamera = function () {
+            console.log('initialize Popup');
+            popupCamera = $f7.popup.create({
+                el: '#popup-camera',
+                push: false,
+                on: {
+                    closed: function (popup) {
+                        console.log('Popup closed');
+                        // Detener el video cuando el popup se cierra
+                        if (videoStream) {
+                            var tracks = videoStream.getTracks();
+                            tracks.forEach(function (track) {
+                                track.stop();
+                            });
+                        }
+                        // Opcional: limpiar srcObject del elemento de video
+                        var video = document.getElementById('camera-preview');
+                        if (video) {
+                            video.srcObject = null;
+                        }
+                    }
+                }
+            });
+        };
+
+        // Inicializar el popup de comentarios
+        let initializePopupComment = function() {
+            popupComment = $f7.popup.create({
+                el: '#popup-comment',
+                push: false,
+                on: {
+                    opened: function() {
+                        // Limpiar el textarea cuando se abre el popup
+                        $('#comment-text').val('');
+                    }
+                }
+            });
+        };
+
+        // Inicializar el popup de audio
+        let initializePopupAudio = function() {
+            popupAudio = $f7.popup.create({
+                el: '#popup-audio',
+                push: false,
+                on: {
+                    opened: function() {
+                        // Resetear el estado al abrir el popup
+                        isRecording = false;
+                        audioChunks = [];
+                        audioBlob = null;
+                        document.getElementById('audio-recorder-status').textContent = 'Presiona el botón para iniciar la grabación';
+                        document.getElementById('audio-timer').textContent = '00:00';
+                        document.getElementById('audio-player-container').style.display = 'none';
+                        document.getElementById('btn-record-audio').classList.add('color-red');
+                        document.getElementById('btn-record-audio').classList.remove('color-gray');
+                    },
+                    closed: function() {
+                        // Detener la grabación si está activa
+                        if (isRecording && mediaRecorder) {
+                            mediaRecorder.stop();
+                            isRecording = false;
+                        }
+
+                        // Limpiar el timer
+                        if (audioTimer) {
+                            clearInterval(audioTimer);
+                            audioTimer = null;
+                        }
+                    }
+                }
+            });
+        };
+
+        // ===== FUNCIONES DE MANEJO DE UI =====
+
+
+
+        // Función para manejar clic en el botón de comentario
+        function handleCommentClick(idx) {
+            if (hasStepMedia(idx, 'comment')) {
+                // Si hay comentarios, mostrarlos
+                showComments(idx);
+            } else {
+                // Si no hay comentarios, abrir el diálogo para añadir uno
+                currentCommentStepIndex = idx;
+
+                if (!popupComment) {
+                    initializePopupComment();
+                }
+
+                popupComment.open();
+            }
+        }
+
+        // Función para abrir comentarios existentes
+        function showComments(idx) {
+            const comments = getStepMedia(idx, 'comment');
+
+            if (comments.length === 0) {
+                $f7.dialog.alert('No comments in this step');
+                return;
+            }
+
+            // Create HTML for the comments popup
+            let commentsHTML = '';
+            comments.forEach((comment, i) => {
+                const date = new Date(comment.timestamp);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+
+                commentsHTML += `
+        <div class="card" data-comment-index="${i}">
+            <div class="card-content card-content-padding">
+                <div class="display-flex justify-content-space-between align-items-center">
+                    <div class="comment-text">${comment.content}</div>
+                    <a href="#" class="link icon-only delete-comment-btn" data-comment-index="${i}" data-step-index="${idx}">
+                        <i class="icon f7-icons color-red">trash</i>
+                    </a>
+                </div>
+            </div>
+            <div class="card-footer"><small>${formattedDate}</small></div>
+        </div>
+    `;
+            });
+
+            // Create and open the popup
+            const commentsPopup = $f7.popup.create({
+                content: `
+        <div class="popup" data-close-on-escape="true">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link popup-close">
+                                <i class="icon material-icons">close</i>
+                            </a>
+                        </div>
+                        <div class="title">Comments</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" id="add-new-comment">
+                                <i class="icon material-icons">add</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="block">
+                        ${commentsHTML}
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+                on: {
+                    opened: function () {
+                        // Add listener for the delete comment button
+                        $('.delete-comment-btn').on('click', function() {
+                            const commentIndex = $(this).data('comment-index');
+                            const stepIndex = $(this).data('step-index');
+
+                            // Confirm before deleting
+                            $f7.dialog.confirm('Are you sure you want to delete this comment?', 'Confirm Deletion', function() {
+                                // Get current tracking data
+                                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                                if (trackingData &&
+                                    trackingData.instructions &&
+                                    trackingData.instructions[stepIndex] &&
+                                    trackingData.instructions[stepIndex].tracking &&
+                                    trackingData.instructions[stepIndex].tracking.capturedMedia) {
+
+                                    // Filter to find and remove the specific comment
+                                    const capturedMedia = trackingData.instructions[stepIndex].tracking.capturedMedia;
+                                    const commentEntries = capturedMedia.filter(media => media.type === 'comment');
+
+                                    if (commentEntries && commentEntries.length > commentIndex) {
+                                        // Find the real index in the capturedMedia array
+                                        const targetTimestamp = commentEntries[commentIndex].timestamp;
+                                        const realIndex = capturedMedia.findIndex(media =>
+                                            media.type === 'comment' && media.timestamp === targetTimestamp
+                                        );
+
+                                        if (realIndex !== -1) {
+                                            // Remove the element
+                                            capturedMedia.splice(realIndex, 1);
+
+                                            // Save updated data
+                                            localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+                                            $update();
+                                            // Remove the card from UI
+                                            $(`[data-comment-index="${commentIndex}"]`).remove();
+
+                                            // If no comments left, close the popup
+                                            if (capturedMedia.filter(media => media.type === 'comment').length === 0) {
+                                                commentsPopup.close();
+                                                $f7.toast.show({
+                                                    text: 'No comments remaining',
+                                                    position: 'center',
+                                                    closeTimeout: 2000
+                                                });
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+                        });
+
+                        // Add listener for the add new comment button
+                        $('#add-new-comment').on('click', function() {
+                            commentsPopup.close();
+                            currentCommentStepIndex = idx;
+
+                            if (!popupComment) {
+                                initializePopupComment();
+                            }
+
+                            popupComment.open();
+                        });
+                    }
+                }
+            });
+
+            commentsPopup.open();
+        }
+
+        // Guardar el comentario del usuario
+        // Guardar el comentario del usuario
+        let saveUserComment = function() {
+            const commentText = $('#comment-text').val().trim();
+
+            if (commentText && currentCommentStepIndex !== null) {
+                // Guardar el comentario en el tracking
+                saveComment(currentCommentStepIndex, commentText);
+
+                // Mostrar confirmación al usuario
+                $f7.toast.create({
+                    text: 'Comentario guardado',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+
+                // Cerrar el popup
+                popupComment.close();
+
+                // Forzar actualización de la UI para refrescar iconos
+                $update();
+            }
+        };
+
+        // Función para iniciar la grabación de audio
+        let startAudioRecording = function(idx) {
+            currentAudioStepIndex = idx;
+
+            if (!popupAudio) {
+                initializePopupAudio();
+            }
+
+            popupAudio.open();
+        };
+
+        // Función para manejar clic en el botón de audio
+        function handleAudioClick(idx) {
+            if (hasStepMedia(idx, 'audio')) {
+                // Si hay audios, mostrarlos
+                playAudios(idx);
+            } else {
+                // Si no hay audios, abrir el diálogo para grabar uno
+                startAudioRecording(idx);
+            }
+        }
+
+        function debugCurrentStepMedia() {
+            const currentStepIndex = swiper.activeIndex - 1;
+            if (currentStepIndex < 0 || currentStepIndex >= instructions.length) {
+                console.log('No hay paso actual válido');
+                return;
+            }
+
+            try {
+                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+                console.log('Datos completos de tracking:', trackingData);
+
+                if (!trackingData || !trackingData.instructions || !trackingData.instructions[currentStepIndex]) {
+                    console.log('No hay datos para el paso actual');
+                    return;
+                }
+
+                const currentStep = trackingData.instructions[currentStepIndex];
+                console.log('Datos del paso actual:', currentStep);
+
+                if (currentStep.tracking && currentStep.tracking.capturedMedia) {
+                    console.log('Medios capturados:', currentStep.tracking.capturedMedia);
+
+                    // Mostrar detalles de cada tipo de medio
+                    ['photo', 'audio', 'video', 'comment'].forEach(mediaType => {
+                        const mediaItems = currentStep.tracking.capturedMedia.filter(
+                            media => media.type === mediaType
+                        );
+                        console.log(`Medios de tipo ${mediaType}:`, mediaItems.length);
+                    });
+                } else {
+                    console.log('No hay medios capturados para este paso');
+                }
+            } catch (error) {
+                console.error('Error al debuggear medios:', error);
+            }
+        }
+
+        // Función para reproducir audios guardados
+        function playAudios(idx) {
+            console.log(`Reproduciendo audios del paso ${idx}`);
+            const audios = getStepMedia(idx, 'audio');
+            console.log(`Se encontraron ${audios.length} audios`);
+
+            if (audios.length === 0) {
+                $f7.dialog.alert('No hay grabaciones de audio en este paso');
+                return;
+            }
+
+            // Crear el HTML para el popup de audios
+            let audiosHTML = '';
+            audios.forEach((audio, i) => {
+                const date = new Date(audio.timestamp);
+                const formattedDate = `${date.toLocaleDateString()} ${date.toLocaleTimeString()}`;
+                const audioId = `audio-${idx}-${i}`;
+
+                audiosHTML += `
+        <li>
+            <div class="item-content">
+                <div class="item-inner">
+                    <div class="item-title">
+                        <div class="item-header">Record ${i+1} - ${formattedDate}</div>
+                    </div>
+                    <div class="item-after display-flex align-items-center">
+                        <audio id="${audioId}" src="${audio.content}" style="display: none;"></audio>
+                        <div class="audio-controls display-flex">
+                            <a href="#" class="link icon-only play-btn margin-right-half" data-audio-id="${audioId}">
+                                <i class="icon f7-icons color-green">play_fill</i>
+                            </a>
+                            <a href="#" class="link icon-only stop-btn margin-right-half" data-audio-id="${audioId}" style="display: none;">
+                                <i class="icon f7-icons color-red">stop_fill</i>
+                            </a>
+                            <a href="#" class="link icon-only delete-btn" data-audio-index="${i}" data-step-index="${idx}">
+                                <i class="icon f7-icons color-red">trash</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </li>
+        `;
+            });
+
+            // Crear y abrir el popup
+            const audiosPopup = $f7.popup.create({
+                content: `
+        <div class="popup" data-close-on-escape="true">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link popup-close">
+                                <i class="icon material-icons">close</i>
+                            </a>
+                        </div>
+                        <div class="title">Grabaciones de audio</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" id="add-new-audio">
+                                <i class="icon material-icons">add</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                     <div class="list inset margin-vertical">
+                        <ul>
+                            ${audiosHTML}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        `,
+                on: {
+                    opened: function () {
+                        // Inicializar los eventos para los botones de reproducción
+                        $('.play-btn').on('click', function() {
+                            const audioId = $(this).data('audio-id');
+                            const audioElement = document.getElementById(audioId);
+
+                            // Detener cualquier audio que esté reproduciéndose
+                            $('audio').each(function() {
+                                if (this.id !== audioId && !this.paused) {
+                                    this.pause();
+                                    this.currentTime = 0;
+                                    $(`[data-audio-id="${this.id}"].stop-btn`).hide();
+                                    $(`[data-audio-id="${this.id}"].play-btn`).show();
+                                }
+                            });
+
+                            // Reproducir el audio seleccionado
+                            audioElement.play();
+
+                            // Cambiar los botones
+                            $(this).hide();
+                            $(`[data-audio-id="${audioId}"].stop-btn`).show();
+
+                            // Evento para cuando termine la reproducción
+                            audioElement.onended = function() {
+                                $(`[data-audio-id="${audioId}"].stop-btn`).hide();
+                                $(`[data-audio-id="${audioId}"].play-btn`).show();
+                            };
+                        });
+
+                        $('.stop-btn').on('click', function() {
+                            const audioId = $(this).data('audio-id');
+                            const audioElement = document.getElementById(audioId);
+
+                            // Detener la reproducción
+                            audioElement.pause();
+                            audioElement.currentTime = 0;
+
+                            // Cambiar los botones
+                            $(this).hide();
+                            $(`[data-audio-id="${audioId}"].play-btn`).show();
+                        });
+
+                        // Añadir listener para el botón de borrar audio
+                        $('.delete-btn').on('click', function() {
+                            const audioIndex = $(this).data('audio-index');
+                            const stepIndex = $(this).data('step-index');
+
+                            // Confirmar antes de borrar
+                            $f7.dialog.confirm('Are you sure you want to delete the selected record?', 'Confirm deletion', function() {
+                                // Obtener los datos de tracking actuales
+                                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                                if (trackingData &&
+                                    trackingData.instructions &&
+                                    trackingData.instructions[stepIndex] &&
+                                    trackingData.instructions[stepIndex].tracking &&
+                                    trackingData.instructions[stepIndex].tracking.capturedMedia) {
+
+                                    // Filtrar para encontrar y eliminar el audio específico
+                                    const capturedMedia = trackingData.instructions[stepIndex].tracking.capturedMedia;
+                                    const audioEntries = capturedMedia.filter(media => media.type === 'audio');
+
+                                    if (audioEntries && audioEntries.length > audioIndex) {
+                                        // Encontrar el índice real en el array capturedMedia
+                                        const targetTimestamp = audioEntries[audioIndex].timestamp;
+                                        const realIndex = capturedMedia.findIndex(media =>
+                                            media.type === 'audio' && media.timestamp === targetTimestamp
+                                        );
+
+                                        if (realIndex !== -1) {
+                                            // Eliminar el elemento
+                                            capturedMedia.splice(realIndex, 1);
+
+                                            // Guardar los datos actualizados
+                                            localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+
+                                            // Actualizar la interfaz
+                                            $(this).closest('li').remove();
+
+                                            // Si no quedan audios, cerrar el popup
+                                            if (capturedMedia.filter(media => media.type === 'audio').length === 0) {
+                                                audiosPopup.close();
+                                                $f7.toast.show({
+                                                    text: 'There are any record',
+                                                    position: 'center',
+                                                    closeTimeout: 2000
+                                                });
+                                            } else {
+                                                // Recargar el popup para reflejar los cambios
+                                                audiosPopup.close();
+                                                playAudios(stepIndex);
+                                            }
+                                            $update();
+                                        }
+                                    }
+                                }
+                            });
+                        });
+
+                        // Añadir listener para el botón de añadir nuevo audio
+                        $('#add-new-audio').on('click', function() {
+                            audiosPopup.close();
+                            startAudioRecording(idx);
+                        });
+                    }
+                }
+            });
+
+            audiosPopup.open();
+        }
+
+        // Actualizar el timer durante la grabación
+        let updateAudioTimer = function() {
+            const elapsed = Math.floor((Date.now() - recordingStartTime) / 1000);
+            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
+            const seconds = (elapsed % 60).toString().padStart(2, '0');
+            document.getElementById('audio-timer').textContent = `${minutes}:${seconds}`;
+        };
+
+        // Función para iniciar/detener la grabación
+        let toggleAudioRecording = function() {
+            if (isRecording) {
+                // Detener la grabación
+                if (mediaRecorder) {
+                    mediaRecorder.stop();
+                }
+
+                // Actualizar la UI
+                isRecording = false;
+                document.getElementById('audio-recorder-status').textContent = 'Record completed';
+                document.getElementById('btn-record-audio').classList.remove('color-red');
+                document.getElementById('btn-record-audio').classList.add('color-gray');
+
+                // Detener el timer
+                if (audioTimer) {
+                    clearInterval(audioTimer);
+                    audioTimer = null;
+                }
+            } else {
+                // Iniciar la grabación
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(function(stream) {
+                        audioChunks = [];
+
+                        mediaRecorder = new MediaRecorder(stream);
+
+                        mediaRecorder.ondataavailable = function(e) {
+                            if (e.data.size > 0) {
+                                audioChunks.push(e.data);
+                            }
+                        };
+
+                        mediaRecorder.onstop = function() {
+                            // Crear el blob de audio
+                            audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+
+                            // Crear URL para reproducir
+                            const audioURL = URL.createObjectURL(audioBlob);
+                            const audioPlayer = document.getElementById('audio-player');
+                            audioPlayer.src = audioURL;
+
+                            // Mostrar el reproductor
+                            document.getElementById('audio-player-container').style.display = 'block';
+
+                            // Detener todas las pistas del stream para liberar el micrófono
+                            stream.getTracks().forEach(track => track.stop());
+                        };
+
+                        // Iniciar la grabación
+                        mediaRecorder.start();
+                        isRecording = true;
+                        recordingStartTime = Date.now();
+
+                        // Iniciar el timer
+                        audioTimer = setInterval(updateAudioTimer, 1000);
+
+                        // Actualizar la UI
+                        document.getElementById('audio-recorder-status').textContent = 'Grabando...';
+                        document.getElementById('btn-record-audio').classList.add('color-red');
+                        document.getElementById('btn-record-audio').classList.remove('color-gray');
+                    })
+                    .catch(function(err) {
+                        $f7.dialog.alert('Error al acceder al micrófono: ' + err.message);
+                    });
+            }
+        };
+
+        // Función para guardar la grabación de audio
+        let saveAudioRecording = function() {
+            if (!audioBlob) {
+                $f7.dialog.alert('There are any record to save');
+                return;
+            }
+
+            // Convertir blob a base64
+            const reader = new FileReader();
+            reader.readAsDataURL(audioBlob);
+
+            reader.onloadend = function() {
+                const base64Audio = reader.result;
+
+                // Guardar el audio en el tracking
+                if (currentAudioStepIndex !== null) {
+                    saveStepMedia(currentAudioStepIndex, 'audio', base64Audio);
+
+                    // Mostrar confirmación
+                    $f7.toast.create({
+                        text: 'Audio guardado correctamente',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    }).open();
+
+                    // Cerrar el popup
+                    popupAudio.close();
+                }
+            };
+        };
+
+        // Mostrar las fotos del paso actual
+        // Función mejorada para mostrar fotos
+        function showPhotos(idx) {
+            // Convert index to number if possible
+            idx = parseInt(idx);
+
+            if (isNaN(idx)) {
+                console.error('showPhotos received an invalid parameter:', idx);
+                return;
+            }
+
+            console.log(`Showing photos from step ${idx}`);
+            const photos = getStepMedia(idx, 'photo');
+            console.log(`Found ${photos.length} photos`);
+
+            if (!photos || photos.length === 0) {
+                $f7.dialog.alert('No photos captured in this step');
+                return;
+            }
+
+            // Create HTML for the photos popup
+            let photosHTML = '';
+            photos.forEach((photo, i) => {
+                photosHTML += `
+        <div class="swiper-slide" data-photo-index="${i}">
+            <div class="slide-content display-flex flex-direction-column justify-content-center align-items-center">
+                <img src="${photo.content}" alt="Photo ${i+1}" style="max-width: 100%; max-height: 75vh;">
+                <div class="margin-top width-100">
+                    <a href="#" class="button color-red delete-photo-btn float-right" data-photo-index="${i}" data-step-index="${idx}">
+                        <i class="icon f7-icons margin-right-half">trash</i>
+                        Delete Photo
+                    </a>
+                </div>
+            </div>
+        </div>
+    `;
+            });
+
+            // Create and open the popup
+            const photosPopup = $f7.popup.create({
+                content: `
+        <div class="popup" data-close-on-escape="true">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link popup-close">
+                                <i class="icon material-icons">close</i>
+                            </a>
+                        </div>
+                        <div class="title">Captured Photos</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" id="add-new-photo">
+                                <i class="icon material-icons">add</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="swiper">
+                        <div class="swiper-wrapper">
+                            ${photosHTML}
+                        </div>
+                        <div class="swiper-pagination"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `,
+                on: {
+                    opened: function () {
+                        // Initialize the swiper within the popup
+                        const swiper = $f7.swiper.create('.popup .swiper', {
+                            pagination: {
+                                el: '.popup .swiper-pagination',
+                                type: 'bullets',
+                            },
+                            spaceBetween: 30,
+                            centeredSlides: true
+                        });
+
+                        // Add listener for the delete photo button
+                        $('.delete-photo-btn').on('click', function() {
+                            const photoIndex = $(this).data('photo-index');
+                            const stepIndex = $(this).data('step-index');
+
+                            // Confirm before deleting
+                            $f7.dialog.confirm('Are you sure you want to delete this photo?', 'Confirm Deletion', function() {
+                                // Get current tracking data
+                                const trackingData = JSON.parse(localStorage.getItem('procedureTrackingData'));
+
+                                if (trackingData &&
+                                    trackingData.instructions &&
+                                    trackingData.instructions[stepIndex] &&
+                                    trackingData.instructions[stepIndex].tracking &&
+                                    trackingData.instructions[stepIndex].tracking.capturedMedia) {
+
+                                    // Filter to find and remove the specific photo
+                                    const capturedMedia = trackingData.instructions[stepIndex].tracking.capturedMedia;
+                                    const photoEntries = capturedMedia.filter(media => media.type === 'photo');
+
+                                    if (photoEntries && photoEntries.length > photoIndex) {
+                                        // Find the real index in the capturedMedia array
+                                        const targetTimestamp = photoEntries[photoIndex].timestamp;
+                                        const realIndex = capturedMedia.findIndex(media =>
+                                            media.type === 'photo' && media.timestamp === targetTimestamp
+                                        );
+
+                                        if (realIndex !== -1) {
+                                            // Remove the element
+                                            capturedMedia.splice(realIndex, 1);
+
+                                            // Save updated data
+                                            localStorage.setItem('procedureTrackingData', JSON.stringify(trackingData));
+
+                                            // If no photos left, close the popup
+                                            if (capturedMedia.filter(media => media.type === 'photo').length === 0) {
+                                                photosPopup.close();
+                                                $f7.toast.show({
+                                                    text: 'No photos remaining',
+                                                    position: 'center',
+                                                    closeTimeout: 2000
+                                                });
+                                            } else {
+                                                // Remove the current slide and update the swiper
+                                                swiper.removeSlide(swiper.activeIndex);
+
+                                                // If we removed the last slide, go to the previous one
+                                                if (swiper.activeIndex >= swiper.slides.length) {
+                                                    swiper.slideTo(swiper.slides.length - 1);
+                                                }
+
+                                                $update();
+                                                // If no slides left after removal, close the popup
+                                                if (swiper.slides.length === 0) {
+                                                    photosPopup.close();
+                                                    $f7.toast.show({
+                                                        text: 'No photos remaining',
+                                                        position: 'center',
+                                                        closeTimeout: 2000
+                                                    });
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            });
+
+                        });
+
+                        // Add listener for the add new photo button
+                        $('#add-new-photo').on('click', function() {
+                            photosPopup.close();
+                            takePhotoHtml5();
+                        });
+                    }
+                }
+            });
+
+            photosPopup.open();
+        }
+
+        // Función para manejar clic en el botón de foto
+        // Función para manejar clic en el botón de foto (corregida)
+        function handlePhotoClick(idx) {
+            // Asegurarse de que idx es un número, no un evento
+            if (typeof idx !== 'number') {
+                if (idx && idx.currentTarget) {
+                    // Si es un evento, obtener el índice del elemento más cercano con data-idx
+                    idx = parseInt($(idx.currentTarget).closest('[data-idx]').data('idx'));
+                } else {
+                    console.error('Índice inválido', idx);
+                    return;
+                }
+            }
+
+            console.log(`Manejando clic en foto para paso ${idx}`);
+
+            if (hasStepMedia(idx, 'photo')) {
+                // Si hay fotos, mostrarlas
+                showPhotos(idx);
+            } else {
+                // Si no hay fotos, abrir la cámara
+                currentAudioStepIndex = idx; // Guardamos el índice para usarlo al guardar la foto
+                takePhotoHtml5();
+            }
+        }
+
+        // Abrir la cámara HTML5
+        let takePhotoHtml5 = async function (idx) {
+            // Si se pasa un índice, guardarlo
+            if (typeof idx === 'number') {
+                currentAudioStepIndex = idx;
+            } else if (idx && idx.currentTarget) {
+                // Si es un evento, obtener el índice
+                currentAudioStepIndex = parseInt($(idx.currentTarget).closest('[data-idx]').data('idx'));
+            }
+
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Tu navegador no soporta la API de getUserMedia.");
+                return;
+            }
+            await checkCameraPermissions();
+            multipleCamera = await checkMultipleCamerasAvailable();
+            $update();
+
+            if (!popupCamera) {
+                initializePopupCamera();
+            }
+
+            initVideo();
+            popupCamera.open();
+        };
+
+        // Usar la cámara del sistema (para Cordova)
+        let takePhoto = function () {
+            checkCameraPermissions();
+            navigator.camera.getPicture(
+                function (base64Image) {
+                    const currentStepIndex = swiper.activeIndex - 1;
+                    processAndSaveImage("data:image/jpeg;base64," + base64Image, currentStepIndex);
+
+                    $f7.toast.create({
+                        text: 'Imagen guardada',
+                        position: 'center',
+                        closeTimeout: 2000,
+                    }).open();
+                },
+                function (error) {
+                    $f7.toast.show({
+                        text: 'Error: ' + error,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    sourceType: Camera.PictureSourceType.CAMERA,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    quality: 100,
+                    saveToPhotoAlbum: true
+                }
+            );
+        };
+
+        // Verificar si un paso está completado (todos los parámetros tienen valor)
+        let isStepCompleted = function(idx) {
+            const instruction = instructions[idx];
+
+            if (!instruction) return false;
+
+            // Si no es una condición, siempre está completo
+            if (instruction.type !== 'condition') return true;
+
+            // Verificar que todos los parámetros tengan valor para este paso específico
+            if (instruction.params) {
+                const stepParams = paramValuesByStep[idx] || {};
+
+                for (const key in instruction.params) {
+                    const param = instruction.params[key];
+                    if (param.record && stepParams[param.alias] === undefined) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
+        };
+
+        // Función para establecer un valor de parámetro
+        let setParamValue = function(alias, value) {
+            // Obtener el paso actual
+            const currentStepIndex = swiper.activeIndex - 1;
+
+            // Inicializar el objeto para este paso si no existe
+            if (!paramValuesByStep[currentStepIndex]) {
+                paramValuesByStep[currentStepIndex] = {};
+            }
+
+            // Guardar el valor específicamente para este paso
+            paramValuesByStep[currentStepIndex][alias] = value;
+            $update();
+        };
+
+        // Manejar el avance al siguiente paso
+        // Manejar el avance al siguiente paso con evaluateCondition
+        let handleNextStep = function(idx) {
+            const instruction = instructions[idx];
+
+            if (!instruction) {
+                return;
+            }
+
+            // Obtener los parámetros del paso actual
+            const stepParams = paramValuesByStep[idx] || {};
+
+            // VERIFICAR CONDICIONES ANTES DE AVANZAR
+
+            // 1. Si hay parámetros requeridos, verificar que estén completos
+            if (instruction.type === 'condition') {
+                let missingParams = [];
+
+                if (instruction.params) {
+                    for (const key in instruction.params) {
+                        const param = instruction.params[key];
+                        if (param.record && stepParams[param.alias] === undefined) {
+                            missingParams.push(param.name);
+                        }
+                    }
+                }
+
+                if (missingParams.length > 0) {
+                    $f7.dialog.alert(`Por favor, complete los siguientes campos antes de continuar:<br>- ${missingParams.join('<br>- ')}`);
+                    return; // No permitir avanzar
+                }
+            }
+
+            // 2. Si hay medios obligatorios, verificar que se hayan capturado
+            const requiredMedia = [];
+
+            if (instruction.capture) {
+                if (instruction.capture.photo === 'required' && !hasStepMedia(idx, 'photo')) {
+                    requiredMedia.push('una fotografía');
+                }
+                if (instruction.capture.video === 'required' && !hasStepMedia(idx, 'video')) {
+                    requiredMedia.push('un video');
+                }
+                if (instruction.capture.audio === 'required' && !hasStepMedia(idx, 'audio')) {
+                    requiredMedia.push('una grabación de audio');
+                }
+                if (instruction.capture.comment === 'required' && !hasStepMedia(idx, 'comment')) {
+                    requiredMedia.push('un comentario');
+                }
+            }
+
+            if (requiredMedia.length > 0) {
+                $f7.dialog.alert(`Antes de continuar, debe capturar:<br>- ${requiredMedia.join('<br>- ')}`);
+                return; // No permitir avanzar
+            }
+
+            // Completar el tracking del paso actual antes de avanzar
+            completeStepTracking(idx, stepParams);
+
+            // Marcar el paso actual como completado
+            if (!completedSteps.includes(idx)) {
+                completedSteps.push(idx);
+            }
+
+            // Determinar el siguiente paso según el tipo de instrucción
+            let nextStepIndex;
+
+            if (instruction.type === 'condition') {
+                // Usar la función evaluateCondition de FlowFollow
+                try {
+                    // La función evaluateCondition puede devolver un objeto con una promesa
+                    const result = ff.evaluateCondition(idx, stepParams);
+
+                    if (result && result.__asyncEvaluation) {
+                        // Es un resultado asíncrono, debemos esperar a que se resuelva
+                        result.promise.then(resolvedIndex => {
+                            nextStepIndex = resolvedIndex;
+                            console.log(`evaluateCondition determinó que el siguiente paso es: ${nextStepIndex}`);
+                            // Continuar con el flujo después de resolver
+                            handleNextStep(nextStepIndex);
+                        });
+
+                        // Retornar aquí para no continuar con el flujo normal
+                        return;
+                    } else {
+                        // Es un resultado síncrono
+                        nextStepIndex = result;
+                        console.log(`evaluateCondition determinó que el siguiente paso es: ${nextStepIndex}`);
+                    }
+                } catch (error) {
+                    console.error('Error al evaluar condición:', error);
+
+                    // Fallback: usar el método original si falla evaluateCondition
+                    const condition = instruction.conditions.conditionQuery.replace(/#(\w+)#/g, (match, variable) => {
+                        return stepParams[variable];
+                    });
+
+                    // Evaluar condición
+                    const result = eval(condition);
+                    const nextInstructionId = instruction.conditions.goToInstruction[result.toString()];
+
+                    // Buscar el índice en el array por nextInstruction
+                    nextStepIndex = instructions.findIndex(instr =>
+                        (typeof nextInstructionId === 'number' && instr.index === nextInstructionId) ||
+                        (typeof nextInstructionId === 'string' && instr.index === parseInt(nextInstructionId))
+                    );
+
+                    // Si no se encuentra, usar el número de índice directamente
+                    if (nextStepIndex === -1) {
+                        nextStepIndex = nextInstructionId;
+                    }
+                }
+            } else {
+                // Usar el siguiente paso definido en la instrucción
+                const nextInstructionId = instruction.nextInstruction;
+
+                if (nextInstructionId !== undefined) {
+                    nextStepIndex = nextInstructionId;
+                } else {
+                    // Si no hay siguiente paso definido, ir al slide final
+                    nextStepIndex = instructions.length;
+                }
+            }
+
+            // Ir al siguiente paso si es válido
+            if (nextStepIndex !== undefined && nextStepIndex >= 0) {
+                currentStep = nextStepIndex;
+                // +1 porque el primer slide es la introducción
+                swiper.slideTo(nextStepIndex + 1, 300);
+
+                // Iniciar el tracking del siguiente paso
+                startStepTracking(nextStepIndex);
+            } else {
+                // Si es el paso final, ir al slide de completado
+                swiper.slideTo(instructions.length + 1, 300);
+                // Generar y guardar el informe final
+                onProcedureComplete();
+            }
+        };
+
+        // Función que se ejecuta cuando se completa todo el procedimiento
+        let onProcedureComplete = function() {
+            const report = getProcedureReport();
+            console.log('Procedimiento completado:', report);
+
+            // Opcional: crear un resumen para mostrar al usuario
+            let totalDuration = calculateTotalDuration(report);
+            let totalSteps = report.steps.length;
+
+            // Mostrar un toast con el resumen
+            $f7.toast.create({
+                text: `Procedimiento completado en ${Math.round(totalDuration/60)} minutos. Se han completado ${totalSteps} pasos.`,
+                position: 'center',
+                closeTimeout: 3000,
+            }).open();
+
+            // Opcional: enviar datos a un servidor
+            // sendReportToServer(report);
+        };
+
+        // Inicializar y configurar el swiper
+        let initializeSwiper = function() {
+            if (swiper) {
+                // Si ya existe un swiper, destruirlo primero
+                swiper.destroy();
+                swiper = null;
+            }
+
+            // Crear nuevo swiper
+            swiper = $f7.swiper.create($el.value.find('.swiper'), {
+                pagination: {
+                    el: $el.value.find('.swiper-pagination'),
+                    type: 'bullets',
+                    clickable: true
+                },
+                allowTouchMove: false,
+                speed: 300,
+                spaceBetween: 10,
+                observer: true,
+                observeParents: true,
+                watchSlidesProgress: true,
+                on: {
+                    slideChange: function() {
+                        // El primer slide es la intro, por lo que restamos 1 para obtener el índice del paso
+                        const stepIndex = swiper.activeIndex - 1;
+
+                        // Solo registrar si es un paso válido (no la intro ni la conclusión)
+                        if (stepIndex >= 0 && stepIndex < instructions.length) {
+                            // Iniciar tracking del paso actual
+                            startStepTracking(stepIndex);
+                        }
+                    }
+                }
+            });
+        };
+
+        // Variable para el paso actual
+        let currentStep = 0;
+
+        // Iniciar el procedimiento (slide inicial)
+        let startProcedure = function() {
+            // Reiniciar el tracking e inicializar uno nuevo
+            resetProcedureTracking();
+            initializeProcedureTracking(procedure, instructions, equipments);
+
+            // Ir al primer paso
+            swiper.slideTo(1);
+
+            // Iniciar tracking del primer paso
+            startStepTracking(0);
+        };
+
+        // Reiniciar el procedimiento
+        let restartProcedure = function() {
+            currentStep = 0;
+            paramValuesByStep = {};
+            completedSteps = [];
+
+            // Reiniciar el tracking
+            resetProcedureTracking();
+
+            // Volver al slide inicial
+            swiper.slideTo(0);
+            $update();
+        };
+
+        // Configurar event listeners para los botones de captura
+        // Configurar event listeners para los botones de captura (versión corregida)
+        let setupCaptureListeners = function() {
+            // Para fotos
+            $el.value.on('click', '.capture-photo', function(e) {
+                e.preventDefault();
+                const idx = parseInt($(this).closest('[data-idx]').data('idx'));
+                console.log("Click en foto para índice:", idx);
+
+                if (hasStepMedia(idx, 'photo')) {
+                    showPhotos(idx); // Pasamos directamente el índice numérico
+                } else {
+                    currentAudioStepIndex = idx; // Guardamos el índice para usarlo al guardar
+                    takePhotoHtml5();
+                }
+            });
+
+            // Para videos (misma lógica)
+            $el.value.on('click', '.capture-video', function(e) {
+                e.preventDefault();
+                const idx = parseInt($(this).closest('[data-idx]').data('idx'));
+                // Por ahora usamos foto como placeholder
+                if (hasStepMedia(idx, 'photo')) {
+                    showPhotos(idx);
+                } else {
+                    currentAudioStepIndex = idx;
+                    takePhotoHtml5();
+                }
+            });
+
+            // Para audio
+            $el.value.on('click', '.capture-audio', function(e) {
+                e.preventDefault();
+                const idx = parseInt($(this).closest('[data-idx]').data('idx'));
+
+                if (hasStepMedia(idx, 'audio')) {
+                    playAudios(idx);
+                } else {
+                    currentAudioStepIndex = idx;
+                    startAudioRecording(idx);
+                }
+            });
+
+            // Para comentarios
+            $el.value.on('click', '.capture-comment', function(e) {
+                e.preventDefault();
+                const idx = parseInt($(this).closest('[data-idx]').data('idx'));
+
+                if (hasStepMedia(idx, 'comment')) {
+                    showComments(idx);
+                } else {
+                    currentCommentStepIndex = idx;
+
+                    if (!popupComment) {
+                        initializePopupComment();
+                    }
+
+                    popupComment.open();
+                }
+            });
+        }
+
+        let loadProcedure = function(guid) {
+            // Inicializar el flowfollow
+            // ff = new flowfollow();
+
+            // Primero intentar cargar del localStorage si existe
+            let staskData = localStorage.getItem('stask');
+
+            if (staskData) {
+                try {
+                    // Parsear el JSON del localStorage
+                    console.log(staskData);
+                    let myStaskData = JSON.parse(staskData);
+                    // Cargar el procedimiento usando el método loadFromObject
+                    console.log(myStaskData.procedure)
+                    myProcedure = ff.loadFromObject(myStaskData.procedure);
+                    console.log('Procedimiento cargado desde localStorage:', myProcedure);
+                } catch (error) {
+                    console.error('Error al cargar el procedimiento desde localStorage:', error);
+
+                    // Si hay un error, cargar el procedimiento por defecto usando init
+                    myProcedure = ff.init(guid);
+                    console.log('Se cargó el procedimiento por defecto:', myProcedure);
+                }
+            } else {
+                // Si no hay datos en localStorage, usar el método init con el guid
+                myProcedure = ff.init(guid);
+                console.log('No hay datos en localStorage, usando procedimiento por defecto:', myProcedure);
+            }
+
+            // Continuar con el procesamiento normal
+            procedure = {
+                name: myProcedure.procedure.name,
+                description: myProcedure.procedure.description
+            };
+
+            console.log(myProcedure.procedure.instructions);
+            instructions = Object.values(myProcedure.procedure.instructions);
+
+            if (myProcedure.procedure.equipments) {
+                equipments = Object.values(myProcedure.procedure.equipments);
+            }
+
+            $update();
+        }
+
+
+        // Inicializar cuando se carga la página
+        $on('pageInit', function() {
+            loadProcedure('myflow');
+            initializeSwiper();
+            setupCaptureListeners();
+
+            // Inicializar los popups
+            initializePopupCamera();
+            initializePopupComment();
+            initializePopupAudio();
+            window.addEventListener('storage', function(e) {
+                if (e.key === 'stask' && e.newValue) {
+                    console.log('Detectado cambio en localStorage');
+                    loadProcedure(''); // Recargar con el nuevo procedimiento
+                }
+            });
+            // Preparar para el tracking de procedimiento
+            initializeProcedureTracking(procedure, instructions, equipments);
+
+            console.log("Página de procedimiento inicializada con tracking");
+
+            // Para depuración
+            window.showTrackingState = showTrackingState;
+        });
+
+        // Función para exportar el informe como un archivo JSON
+        let exportReportAsFile = function() {
+            const report = getProcedureReport();
+            if (!report) {
+                $f7.dialog.alert('No hay informe disponible para exportar');
+                return;
+            }
+
+            // Añadir metadata adicional
+            const exportData = {
+                ...report,
+                exportDate: new Date().toISOString(),
+                completionStatus: report.steps.length === report.instructions.length ? 'completed' : 'incomplete',
+                totalDuration: calculateTotalDuration(report)
+            };
+
+            // Convertir a JSON
+            const jsonStr = JSON.stringify(exportData, null, 2);
+
+            // Crear un blob
+            const blob = new Blob([jsonStr], {type: 'application/json'});
+
+            // Crear un enlace para descargar
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `procedure_report_${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
+
+            // Añadir temporalmente al DOM y hacer clic
+            document.body.appendChild(a);
+            a.click();
+
+            // Limpiar
+            setTimeout(() => {
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+            }, 0);
+        };
+
+        // Función opcional para enviar el informe a un servidor
+        let sendReportToServer = function() {
+            const report = getProcedureReport();
+            if (!report) {
+                $f7.dialog.alert('No hay informe disponible para enviar');
+                return;
+            }
+
+            // Mostrar preloader
+            $f7.preloader.show();
+
+            // Ejemplo de envío (ajustar URL y formato según necesidades)
+            fetch('https://tu-servidor.com/api/procedure-reports', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(report)
+            })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Error al enviar el informe');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    $f7.preloader.hide();
+                    $f7.dialog.alert('Informe enviado correctamente');
+                })
+                .catch(error => {
+                    $f7.preloader.hide();
+                    $f7.dialog.alert('Error al enviar el informe: ' + error.message);
+                });
+        };
+
+        return $render;
+    }
+</script>

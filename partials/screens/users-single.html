@@ -1,0 +1,723 @@
+<template>
+    <div class="page" data-name="users-single">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Users - Single</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong medium-inset medium-margin-top no-hairlines no-margin-vertical">
+                <div class="responsive-wrapper margin-bottom shape-rounded-square" style="max-height: 256px;">
+                    <div class="responsive-container">
+                        <img class="responsive-content" src="https://source.unsplash.com/9XngoIpxcEo/1920x1080" loading="lazy" alt="" />
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col flex-shrink-0 width-auto ${$f7.rtl ? 'margin-left-half' : 'margin-right-half'}">
+                        <img class="shape-rounded-square" src="https://source.unsplash.com/bYODySpLIhE/128x128" loading="lazy" height="84" width="84" alt="" />
+                    </div>
+                    <div class="col flex-grow-1 ${$f7.rtl ? 'margin-left-half' : 'margin-right-half'}">
+                        <div class="multi-line-text lines-2">
+                            <i class="icon material-icons color-green tooltip-init" data-tooltip="Verified">verified</i>
+                            ${`\u0020`}
+                            <span class="font-size-22 font-weight-bold vertical-align-middle">Praveen Mujawdiya</span>
+                        </div>
+                        <div class="font-size-14 single-line-text text-color-gray">India</div>
+                    </div>
+                    <div class="col flex-shrink-0">
+                        <div class="row" style="--f7-grid-gap: 8px;">
+                            <div class="col-100 small-50">
+                                <button type="button" class="button button-fill button-round font-size-12 margin-bottom-half text-uppercase color-mono text-color-mono-invert">Follow</button>
+                            </div>
+                            <div class="col-100 small-50">
+                                <button type="button" class="button button-fade button-outline button-round font-size-12 text-uppercase color-mono">Message</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row margin-top">
+                    <a href="#" class="col link shape-container shape-rounded-square padding-half text-align-center bg-color-chrome color-mono">
+                        <div class="font-size-10 letter-spacing-1 text-uppercase">Followers</div>
+                        <div class="font-size-22 font-weight-bold">10.5K</div>
+                    </a>
+                    <a href="#" class="col link shape-container shape-rounded-square padding-half text-align-center bg-color-chrome color-mono">
+                        <div class="font-size-10 letter-spacing-1 text-uppercase">Following</div>
+                        <div class="font-size-22 font-weight-bold">95</div>
+                    </a>
+                    <a href="#" class="col link shape-container shape-rounded-square padding-half text-align-center bg-color-chrome color-mono">
+                        <div class="font-size-10 letter-spacing-1 text-uppercase">Posts</div>
+                        <div class="font-size-22 font-weight-bold">150</div>
+                    </a>
+                </div>
+            </div>
+
+            <div class="block block-strong medium-hide no-hairlines no-margin-vertical sticky sticky-top">
+                <div class="segmented segmented-strong">
+                    <a href="#tab-overview" class="button font-size-12 tab-link tab-link-active">Overview</a>
+                    <a href="#tab-work" class="button font-size-12 tab-link">Work</a>
+                    <a href="#tab-posts" class="button font-size-12 tab-link">Posts</a>
+                    <span class="segmented-highlight"></span>
+                </div>
+            </div>
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 medium-35 large-30 xlarge-35 medium-show sticky sticky-top">
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content">
+                            <div class="list media-list menu-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="#tab-overview" class="item-link tab-link tab-link-active color-blue">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon f7-icons">person</i>
+                                                        <i class="icon icon-active f7-icons">person_fill</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Overview</div>
+                                                    </div>
+                                                    <div class="item-text">Your Personal Information</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-work" class="item-link tab-link color-green">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon f7-icons">briefcase</i>
+                                                        <i class="icon icon-active f7-icons">briefcase_fill</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Work</div>
+                                                    </div>
+                                                    <div class="item-text">Your Professional Information</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-posts" class="item-link tab-link color-red">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon f7-icons">square_list</i>
+                                                        <i class="icon icon-active f7-icons">square_list_fill</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Posts</div>
+                                                    </div>
+                                                    <div class="item-text">Your Published Articles</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-100 medium-65 large-70 xlarge-65">
+
+                    <div class="tabs">
+
+                        <div id="tab-overview" class="tab tab-active">
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">About</div>
+                                <div class="card-content card-content-padding">
+                                    <p>${faker.lorem.sentences(10)}</p>
+                                </div>
+                            </div>
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">General</div>
+                                <div class="card-content">
+                                    <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <span class="shape-container shape-auto size-48 bg-color-chrome">
+                                                            <i class="icon material-icons">person</i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Name</div>
+                                                            <div>Praveen Mujawdiya</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <span class="shape-container shape-auto size-48 bg-color-chrome">
+                                                            <i class="icon material-icons">cake</i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Birthday</div>
+                                                            <div>${moment('1991-12-22').format('DD MMMM YYYY')}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <span class="shape-container shape-auto size-48 bg-color-chrome">
+                                                            <i class="icon material-icons">place</i>
+                                                        </span>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Location</div>
+                                                            <div>India</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <a href="tel:+91-9876543210" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48 bg-color-chrome">
+                                                                <i class="icon material-icons">phone</i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Phone</div>
+                                                                <div>+91-9876543210</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="mailto:praveen.mujawdiya@gmail.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48 bg-color-chrome">
+                                                                <i class="icon material-icons">email</i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Email</div>
+                                                                <div>praveen.mujawdiya@gmail.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">Social</div>
+                                <div class="card-content">
+                                    <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <a href="https://behance.net" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48" style="background-color: rgb(var(--brand-color-behance));">
+                                                                <i class="icon fa-brands fa-behance font-size-20 color-white"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Behance</div>
+                                                                <div>https://behance.net</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://dribbble.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48" style="background-color: rgb(var(--brand-color-dribbble));">
+                                                                <i class="icon fa-brands fa-dribbble font-size-20 color-white"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Dribbble</div>
+                                                                <div>https://dribbble.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://instagram.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48" style="background-color: rgb(var(--brand-color-instagram));">
+                                                                <i class="icon fa-brands fa-instagram font-size-20 color-white"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Instagram</div>
+                                                                <div>https://instagram.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a href="https://medium.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <span class="shape-container shape-auto size-48" style="background-color: rgb(var(--brand-color-medium));">
+                                                                <i class="icon fa-brands fa-medium font-size-20 color-white"></i>
+                                                            </span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title">
+                                                                <div class="item-header">Medium</div>
+                                                                <div>https://medium.com</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-work" class="tab">
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">Experience</div>
+                                <div class="card-content">
+                                    <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="https://logo.clearbit.com/amazon.com" loading="lazy" height="48" width="48" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Amazon</div>
+                                                            <div class="font-weight-600">AWS Specialist</div>
+                                                            <div class="item-footer">May 2018 - Present</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="https://logo.clearbit.com/stripe.com" loading="lazy" height="48" width="48" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Stripe</div>
+                                                            <div class="font-weight-600">Product Lead</div>
+                                                            <div class="item-footer">November 2017 - April 2018</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="https://logo.clearbit.com/airbnb.io" loading="lazy" height="48" width="48" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Airbnb</div>
+                                                            <div class="font-weight-600">Creative Lead</div>
+                                                            <div class="item-footer">March 2016 - October 2017</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="https://logo.clearbit.com/snapchat.com" loading="lazy" height="48" width="48" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Snapchat</div>
+                                                            <div class="font-weight-600">Product Designer</div>
+                                                            <div class="item-footer">January 2014 - February 2016</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="https://logo.clearbit.com/dribbble.com" loading="lazy" height="48" width="48" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Dribbble</div>
+                                                            <div class="font-weight-600">UI/UX Specialist</div>
+                                                            <div class="item-header">March 2012 - December 2013</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">Skills</div>
+                                <div class="card-content">
+                                    <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-orange">
+                                                                    <i class="icon fa-brands fa-html5 font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">HTML5</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">95%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-orange" data-progress="95"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-blue">
+                                                                    <i class="icon fa-brands fa-css3 font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">CSS3</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">85%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-blue" data-progress="85"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-amber">
+                                                                    <i class="icon fa-brands fa-js font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">JavaScript</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">80%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-amber" data-progress="80"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-green">
+                                                                    <i class="icon fa-brands fa-node-js font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">NodeJS</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">75%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-green" data-progress="75"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-purple">
+                                                                    <i class="icon fa-brands fa-php font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">PHP</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">90%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-purple" data-progress="90"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                                <span class="shape-container shape-auto size-48 bg-color-cyan">
+                                                                    <i class="icon fa-brands fa-react font-size-20 color-white"></i>
+                                                                </span>
+                                                            </div>
+                                                            <div class="item-cell">
+                                                                <div class="item-row">
+                                                                    <div class="item-cell">
+                                                                        <div class="font-weight-600">React Native</div>
+                                                                    </div>
+                                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                                        <div class="font-weight-600 text-color-gray">70%</div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-row margin-top-half">
+                                                                    <div class="item-cell">
+                                                                        <div class="progressbar progressbar-round color-cyan" data-progress="70"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">Portfolio</div>
+                                <div class="card-content">
+                                    <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas" style="--f7-list-item-padding-horizontal: 8px;">
+                                        <ul class="row padding-horizontal-half">
+                                            ${portfolio.map((item, index) => $h`
+                                            <li class="col-100 xsmall-50 small-33 medium-50" @click="${() => portfolioBrowser.open(index)}">
+                                                <div class="item-content">
+                                                    <div class="item-inner item-cell">
+                                                        <div class="item-row">
+                                                            <div class="item-cell">
+                                                                <div class="responsive-container">
+                                                                    ${item.type == 'image' && $h`
+                                                                    <img class="responsive-content shape-rounded-square" src="${item.url}" loading="lazy" alt="" />
+                                                                    `}
+                                                                    ${item.type == 'video' && $h`
+                                                                    <video class="responsive-content shape-rounded-square" controls playsinline preload="metadata" poster="${item.poster}">
+                                                                        <source src="${item.url}" type="${item.mime}" />
+                                                                    </video>
+                                                                    `}
+                                                                </div>
+                                                                <div class="font-size-16 font-weight-600 margin-top-half text-capitalize">${item.caption}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-posts" class="tab">
+                            <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                <div class="card-header">Articles</div>
+                                <div class="card-content">
+                                    <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                        <ul>
+                                            ${Array(5).fill().map((item, index) => $h`
+                                            <li>
+                                                <a href="#" class="item-link">
+                                                    <div class="item-content">
+                                                        <div class="item-media">
+                                                            <img class="shape-rounded-square" src="https://picsum.photos/192/192?r=${index}" loading="lazy" height="128" width="128" alt="" />
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title-row">
+                                                                <div class="item-title multi-line-text lines-2">${faker.lorem.sentence(10)}</div>
+                                                            </div>
+                                                            <div class="item-text">
+                                                                <div class="multi-line-text lines-4">${faker.lorem.sentences(5)}</div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let portfolio = [
+            {
+                url: 'https://source.unsplash.com/9hz5xn0S2qg/1920x1080',
+                caption: 'Bald Eagle',
+                type: 'image'
+            },
+            {
+                url: 'https://source.unsplash.com/5E5N49RWtbA/1920x1080',
+                caption: 'Yacare Caiman',
+                type: 'image'
+            },
+            {
+                url: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+                caption: 'Big Buck Bunny',
+                type: 'video',
+                mime: 'video/mp4',
+                poster: 'https://source.unsplash.com/_r2MWJrhzSQ/1920x1080'
+            },
+            {
+                url: 'https://source.unsplash.com/rKZRUrK2IjY/1920x1080',
+                caption: 'Pygmy Killer Whale',
+                type: 'image'
+            },
+            {
+                url: 'https://source.unsplash.com/MJabBHEtdSc/1920x1080',
+                caption: 'Baldfaced Hornet',
+                type: 'image'
+            },
+            {
+                url: 'https://source.unsplash.com/unt3066GV-E/1920x1080',
+                caption: 'Philippine Porcupine',
+                type: 'image'
+            }
+        ]
+
+        let portfolioBrowser = null;
+
+        let initializePortfolioBrowser = function() {
+            let photos = portfolio.map(function(item, index) {
+                let photo = {};
+                if (item.type == 'image') {
+                    photo = {
+                        url: item.url,
+                        caption: item.caption
+                    }
+                }
+                else if (item.type == 'video') {
+                    photo = {
+                        html: `
+                            <video controls playsinline preload="metadata" poster="${item.poster}">
+                                <source src="${item.url}" type="${item.mime}" />
+                            </video>
+                        `,
+                        caption: item.caption
+                    }
+                }
+                return photo;
+            });
+            portfolioBrowser = $f7.photoBrowser.create({
+                photos: photos
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePortfolioBrowser();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,236 @@
+<template>
+    <div class="page" data-name="articles-list">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Articles - List</div>
+                <div class="right">
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-layout-switcher" data-tooltip="Layout">
+                        <i class="icon material-icons">
+                            ${currentLayout == 'list' ? 'view_headline' : ''}
+                            ${currentLayout == 'grid' ? 'apps' : ''}
+                        </i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${articles ? $h`
+            ${articles == 'error' ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops...</div>
+                <div class="empty-state-text">An error occured while loading data.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            ` : $h`
+            ${articles.length ? $h`
+            ${currentLayout == 'list' ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${articles.map((item, index) => $h`
+                    <li class="col-100 medium-50 large-100 xlarge-50 overflow-hidden">
+                        <div class="item-content height-100 no-padding">
+                            <div class="item-inner item-cell height-100 no-padding">
+                                <div class="item-row" style="height: 132px;">
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <img src="${item.image}" loading="lazy" height="132" width="132" alt="" />
+                                        <button type="button" class="state-toggle ${item.bookmarked ? 'state-toggle-active' : ''} button button-fill button-icon button-round margin-half position-absolute ${$f7.rtl ? 'position-right-top' : 'position-left-top'} size-32 color-white" @stateChange="${(event) => toggleBookmark(item.id, event.detail)}">
+                                            <i class="state-inactive icon material-icons font-size-18 color-gray">bookmark</i>
+                                            <i class="state-active icon material-icons font-size-18 color-red">bookmark</i>
+                                        </button>
+                                    </div>
+                                    <div class="item-cell display-flex flex-direction-column align-self-stretch margin-horizontal-half padding-vertical-half">
+                                        <div class="padding-bottom single-line-text">
+                                            ${item.featured && $h`
+                                            <a href="#" class="link badge color-pink">Featured</a>
+                                            `}
+                                            ${item.categories.map((category, index) => $h`
+                                            <a href="#" class="link badge color-amber text-color-black">${category}</a>
+                                            `)}
+                                        </div>
+                                        <a href="/articles-single/" class="display-flex flex-direction-column height-100 text-color-gray">
+                                            <div class="font-size-16 font-weight-bold multi-line-text lines-2 text-color-body">${item.title}</div>
+                                            <div class="font-size-12 margin-top-auto padding-top-half single-line-text">
+                                                <img class="shape-circle size-24 vertical-align-middle" src="${item.author.avatar}" loading="lazy" alt="" />
+                                                <span class="margin-horizontal-half">${item.author.name}</span>
+                                                <span>${`\u2022`}</span>
+                                                <span class="margin-horizontal-half">${moment(item.date).format('MMMM DD, YYYY')}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+            ${currentLayout == 'grid' ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${articles.map((item, index) => $h`
+                    <li class="col-100 small-50 xlarge-33 overflow-hidden">
+                        <div class="item-content height-100 no-padding">
+                            <div class="item-inner item-cell height-100 no-padding">
+                                <div class="item-row height-100">
+                                    <div class="item-cell display-flex flex-direction-column align-self-stretch">
+                                        <div class="overlay-container responsive-container">
+                                            <img class="responsive-content" src="${item.image}" loading="lazy" alt="" />
+                                            <div class="overlay-content align-items-stretch justify-content-space-between text-align-start">
+                                                <button type="button" class="state-toggle ${item.bookmarked ? 'state-toggle-active' : ''} button button-fill button-icon button-round size-32 align-self-flex-end color-white" @stateChange="${(event) => toggleBookmark(item.id, event.detail)}">
+                                                    <i class="state-inactive icon material-icons font-size-20 color-gray">bookmark</i>
+                                                    <i class="state-active icon material-icons font-size-20 color-red">bookmark</i>
+                                                </button>
+                                                <div class="margin-top-half">
+                                                    ${item.featured && $h`
+                                                    <a href="#" class="link badge color-pink">Featured</a>
+                                                    `}
+                                                    ${item.categories.map((category, index) => $h`
+                                                    <a href="#" class="link badge color-amber text-color-black">${category}</a>
+                                                    `)}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <a href="/articles-single/" class="display-flex flex-direction-column height-100 padding-half text-color-gray">
+                                            <div class="font-size-16 font-weight-bold multi-line-text lines-2 text-color-body">${item.title}</div>
+                                            <div class="font-size-12 margin-top-auto padding-top-half single-line-text">
+                                                <img class="shape-circle size-24 vertical-align-middle" src="${item.author.avatar}" loading="lazy" alt="" />
+                                                <span class="margin-horizontal-half">${item.author.name}</span>
+                                                <span>${`\u2022`}</span>
+                                                <span class="margin-horizontal-half">${moment(item.date).format('MMMM DD, YYYY')}</span>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Data Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            `}
+            `}
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+        <div id="popover-layout-switcher" class="popover" style="min-width: 192px;">
+            <div class="popover-inner">
+                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                    <ul>
+                        ${layoutSwitcher.layouts.map((item, index) => $h`
+                        <li>
+                            <a href="#" class="popover-close" @click="${() => switchLayout(item.slug)}">
+                                <span>${item.name}</span>
+                                ${item.slug == currentLayout && $h`
+                                <i class="icon f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                `}
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let layoutSwitcher = {
+            layouts: [
+                {
+                    name: 'List View',
+                    slug: 'list'
+                },
+                {
+                    name: 'Grid View',
+                    slug: 'grid'
+                }
+            ],
+            defaultLayout: 'list'
+        }
+
+        let currentLayout = layoutSwitcher.defaultLayout;
+
+        let articles = null;
+
+        let loadData = function() {
+            articles = null;
+            $update();
+            $f7.request({
+                url: 'assets/custom/dataset/articles.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                articles = response.data.length ? response.data : [];
+                $update();
+            })
+            .catch(function(response) {
+                articles = 'error';
+                $update();
+            });
+        }
+
+        let switchLayout = function(layout) {
+            currentLayout = layout;
+            $update();
+        }
+
+        let toggleBookmark = function(id, state) {
+            articles.forEach(function(article) {
+                if (article.id == id) {
+                    article.bookmarked = state ? true : false;
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? 'Added to Bookmarks' : 'Removed from Bookmarks',
+                            icon: state ? '<i class="icon material-icons color-red">bookmark</i>' : '<i class="icon material-icons color-gray">bookmark</i>',
+                            position: 'center'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

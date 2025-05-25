@@ -1,0 +1,151 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Quota Estimation API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Quota Estimation API allows web apps to query the system for the size of storage space in bytes currently used and available for the app.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${storageInfo ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <div class="gauge"></div>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Total Storage</div>
+                                        <div class="item-after">${storageInfo.total} MB</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Used Storage</div>
+                                        <div class="item-after">${storageInfo.used} MB</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Available Storage</div>
+                                        <div class="item-after">${storageInfo.available} MB</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.quotaEstimation ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Quota Estimation API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Quota Estimation API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/StorageManager/estimate#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let storageInfo = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                getStorageInfo();
+            });
+        }
+
+        let getStorageInfo = function() {
+            navigator.storage.estimate().then(function(estimate) {
+                updateStorageInfo(estimate);
+            })
+            .catch(function(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        let updateStorageInfo = function(estimate) {
+            let storageData = {};
+            storageData.total = (estimate.quota / 1048576).toFixed(2);
+            storageData.used = (estimate.usage / 1048576).toFixed(2);
+            storageData.available = ((estimate.quota - estimate.usage) / 1048576).toFixed(2);
+            storageInfo = storageData;
+            $update(function() {
+                renderGauge();
+            });
+        }
+
+        let renderGauge = function() {
+            $f7.gauge.create({
+                el: $el.value.find('.gauge'),
+                type: 'circle',
+                size: 192,
+                value: storageInfo.available / storageInfo.total,
+                borderBgColor: $f7.stylesheet.getPropertyValue('--color-cyan-50').trim(),
+                borderColor: $f7.stylesheet.getPropertyValue('--color-cyan-500').trim(),
+                borderWidth: 16,
+                valueText: storageInfo.available + ' MB',
+                valueTextColor: $f7.stylesheet.getPropertyValue('--color-cyan-500').trim(),
+                valueFontSize: 20,
+                valueFontWeight: 'bold',
+                labelText: 'Available',
+                labelFontSize: 12
+            });
+        }
+
+        return $render;
+    }
+</script>

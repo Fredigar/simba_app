@@ -1,0 +1,157 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Web Share API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Web Share API allows web apps to implement sharing functionality using the device's native sharing capabilities instead of having to resort to scripts from the individual sharing platforms.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${$f7.device.ios || $f7.device.macos ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-message">In iOS and macOS, it might be possible that the Web Share API can only be invoked once for a loaded page. For subsequent calls, the page must be reloaded.</div>
+                            <div class="note-actions">
+                                <a href="#" class="note-action button button-fill button-round button-small" @click="${() => location.reload()}">Reload Page</a>
+                            </div>
+                        </div>
+                    </div>
+                    ` : $h` `}
+                    <form name="share" action="#" method="POST" enctype="multipart/form-data" @submit="${onFormSubmit}">
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Title</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="title" value="${$f7.config.app.title + ' - ' + $f7.config.app.tagline}" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Text</div>
+                                            <div class="item-input-wrap">
+                                                <textarea name="text">${$f7.config.app.description}</textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">URL</div>
+                                            <div class="item-input-wrap">
+                                                <input type="url" name="url" value="${$f7.config.app.themeforestUrl}" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill">Share</button>
+                        </div>
+                    </form>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Any one of the fields above must be non-empty. Otherwise, the Web Share API might not work properly.</div>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.webShare ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Web Share API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Web Share API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Web_Share_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let onFormSubmit = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            share($f7.form.convertToData(form));
+        }
+
+        let share = function(data) {
+            navigator.share({
+                title: data.title,
+                text: data.text,
+                url: data.url
+            })
+            .then(function() {
+
+            })
+            .catch(function(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        return $render;
+    }
+</script>

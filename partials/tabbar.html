@@ -1,0 +1,52 @@
+<template>
+    <div class="page" data-name="tabbar">
+
+        <div id="tabbar" class="toolbar toolbar-bottom tabbar tabbar-labels color-theme-mono">
+            <div class="toolbar-inner">
+                <a href="/home/" class="tab-link" data-route-tab-id="tab-main">
+                    <span class="icons">
+                        <i class="icon f7-icons">house</i>
+                        <i class="icon icon-active f7-icons">house_fill</i>
+                    </span>
+                    <span class="tabbar-label" data-i18n="home">Home</span>
+                </a>
+                <a href="/screens/conversation-list" class="tab-link" data-route-tab-id="tab-assistant">
+                    <span class="icons">
+                        <i class="icon material-icons">forum</i>
+                        <i class="icon icon-active material-icons">forum</i>
+                    </span>
+                    <span class="tabbar-label" data-i18n="assistant">Assistant</span>
+                </a>
+                <a href="/more/" class="tab-link" data-route-tab-id="tab-more">
+                    <span class="icons">
+                        <i class="icon f7-icons">circle_grid_3x3</i>
+                        <i class="icon icon-active f7-icons">circle_grid_3x3_fill</i>
+                    </span>
+                    <span class="tabbar-label" data-i18n="more">More</span>
+                </a>
+            </div>
+        </div>
+
+        <div class="tabs tabs-routable">
+            <div id="tab-main" class="tab"></div>
+            <div id="tab-assistant" class="tab"></div>
+            <div id="tab-more" class="tab"></div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        $on('pageInit', function() {
+            if ($f7route.url == '/') {
+                setTimeout(function() {
+                    $el.value.find('a[href="/home/"]').trigger('click');
+                }, 100);
+            }
+        });
+
+        return $render;
+    }
+</script>

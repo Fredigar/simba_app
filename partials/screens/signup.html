@@ -1,0 +1,322 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="signup">
+
+        <div class="page-content">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-65 large-50 xlarge-35 padding-vertical">
+
+                    <div class="block block-strong small-inset display-flex flex-direction-column align-items-stretch justify-content-flex-start height-100 no-hairlines no-margin-vertical">
+
+                        <div class="margin-bottom text-align-center">
+                            <img class="if-not-dark" src="${$f7.config.app.logos.logomarkLight}" height="96" alt="" />
+                            <img class="if-dark" src="${$f7.config.app.logos.logomarkDark}" height="96" alt="" />
+                        </div>
+
+                        <form name="signup" action="#" method="POST" enctype="multipart/form-data">
+
+                            <div class="list no-hairlines no-margin-vertical no-safe-areas" style="--f7-list-item-padding-horizontal: 0px;">
+                                <ul>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">person</i>
+                                                    </div>
+                                                    <input type="text" name="name" placeholder="Name" required />
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    ${countries ? $h`
+                                                    ${countries.length ? $h`
+                                                    <div class="flexbox-centered width-auto" style="height: var(--f7-input-height);">
+                                                        <a href="#" id="smart-select-country" class="smart-select">
+                                                            <select name="country" required>
+                                                                ${countries.map((item, index) => $h`
+                                                                <option value="${item.cca2.toLowerCase()}" data-code="${item.idd.root + item.idd.suffixes[0]}" data-option-image="https://flagcdn.com/32x24/${item.cca2.toLowerCase()}.png">${item.name.common} ${'(' + item.idd.root + item.idd.suffixes[0] + ')'}</option>
+                                                                `)}
+                                                            </select>
+                                                            <img id="country-flag" class="vertical-align-middle" src="" alt="" height="16" />
+                                                            ${`\u0020`}
+                                                            <span id="country-code" class="font-size-14 font-weight-600"></span>
+                                                        </a>
+                                                    </div>
+                                                    ${`\u0020`}
+                                                    <input type="text" name="mobile" inputmode="tel" required />
+                                                    <span class="input-clear-button"></span>
+                                                    ` : $h`
+                                                    <div class="display-flex align-items-center width-auto" style="height: var(--f7-input-height);">
+                                                        <a href="#" class="link icon-only color-red" @click="${loadCountries}">
+                                                            <i class="icon f7-icons">exclamationmark_triangle_fill</i>
+                                                        </a>
+                                                        ${`\u0020`}
+                                                        ${`\u0020`}
+                                                        <span class="font-size-12 text-color-red">An error occured while loading dialing codes. Tap the icon to retry.</span>
+                                                    </div>
+                                                    `}
+                                                    ` : $h`
+                                                    <div class="flexbox-centered width-auto" style="height: var(--f7-input-height);">
+                                                        <span key="preloader" class="preloader"></span>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">email</i>
+                                                    </div>
+                                                    <input type="email" name="email" inputmode="email" placeholder="Email" required />
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">lock</i>
+                                                    </div>
+                                                    <input type="password" name="password" placeholder="Password" required />
+                                                    <a href="#" class="state-toggle link icon-only color-gray" @stateChange="${togglePasswordVisibility}">
+                                                        <i class="state-active icon material-icons tooltip-init" data-tooltip="Hide Password">visibility_off</i>
+                                                        <i class="state-inactive icon material-icons tooltip-init" data-tooltip="Show Password">visibility</i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">lock</i>
+                                                    </div>
+                                                    <input type="password" name="confirm_password" placeholder="Confirm Password" required />
+                                                    <a href="#" class="state-toggle link icon-only color-gray" @stateChange="${togglePasswordVisibility}">
+                                                        <i class="state-active icon material-icons tooltip-init" data-tooltip="Hide Password">visibility_off</i>
+                                                        <i class="state-inactive icon material-icons tooltip-init" data-tooltip="Show Password">visibility</i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="margin-vertical text-align-center">
+                                <button type="submit" class="button button-fill button-large">Sign Up</button>
+                                <div class="margin-top-half">By signing up, you agree to Nectar's <a href="/terms/" data-open-in="popup">Terms of Use</a>, <a href="/privacy-policy/" data-open-in="popup">Privacy Policy</a> and <a href="/cookie-policy/" data-open-in="popup">Cookie Policy</a>.</div>
+                            </div>
+
+                        </form>
+
+                        <div class="line-divider">
+                            <span class="font-size-12">OR</span>
+                        </div>
+
+                        <div class="margin-vertical">
+                            <div id="googleAccess1" class="margin">
+                            </div>
+
+                            ${$f7.config.navigation.authentication.required && $f7.config.navigation.authentication.guestAccess && $h`
+                            <a href="/home/" class="button button-large button-fill button-social color-green margin-top" data-reload-current="true">
+                                <i class="icon fa-solid fa-user"></i>
+                                <span>Continue as Guest</span>
+                            </a>
+                            `}
+                        </div>
+                        <div class="margin-top-auto text-align-center">
+                            <div>Already have an account? <a href="/login/">Log In</a></div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    @media (max-width: 567.98px) {
+        .page[data-name=signup] {
+            background-color: var(--f7-block-strong-bg-color);
+        }
+    }
+</style>
+
+<script>
+    /*function handleCredentialResponse(response){
+        console.log(response);
+        // Post JWT token to server-side
+      fetch("auth_init.php", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ request_type:'user_auth', credential: response.credential }),
+        })
+            .then(response => response.json())
+            .then(data => {
+                if(data.status == 1){
+                    let responsePayload = data.pdata;
+
+                    // Display the user account data
+                    let profileHTML = '<h3>Welcome '+responsePayload.given_name+'! <a href="javascript:void(0);" onclick="signOut('+responsePayload.sub+');">Sign out</a></h3>';
+                    profileHTML += '<img src="'+responsePayload.picture+'"/><p><b>Auth ID: </b>'+responsePayload.sub+'</p><p><b>Name: </b>'+responsePayload.name+'</p><p><b>Email: </b>'+responsePayload.email+'</p>';
+                    document.getElementsByClassName("pro-data")[0].innerHTML = profileHTML;
+
+                    document.querySelector("#btnWrap").classList.add("hidden");
+                    document.querySelector(".pro-data").classList.remove("hidden");
+                }
+            })
+            .catch(console.error);
+    }*/
+
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let countries = null;
+
+        let smartSelectCountry = null;
+        let formValidator = null;
+        let googleAccess = function(){
+            google.accounts.id.prompt()
+        }
+        let loadCountries = function() {
+            countries = null;
+            $update();
+            $f7.request({
+                url: $f7.config.restCountries.rootEndpoint + '/all',
+                method: 'GET',
+                data: {
+                    fields: 'name,cca2,idd'
+                },
+                dataType: 'json'
+            })
+            .then(function(response) {
+                countries = response.data;
+                fastSort.inPlaceSort(countries).by([
+                    {asc: c => c.name.common}
+                ]);
+                $update(function() {
+                    initializeSmartSelectCountry();
+                    smartSelectCountry.setValue('in');
+                    $el.value.find('#country-flag').attr('src', smartSelectCountry.selectEl.options[smartSelectCountry.selectEl.selectedIndex].dataset.optionImage);
+                    $el.value.find('#country-code').text(smartSelectCountry.selectEl.options[smartSelectCountry.selectEl.selectedIndex].dataset.code);
+                });
+            })
+            .catch(function(response) {
+                countries = [];
+                $update();
+            });
+        }
+
+        let initializeSmartSelectCountry = function() {
+            smartSelectCountry = $f7.smartSelect.create({
+                el: $el.value.find('#smart-select-country'),
+                openIn: 'popup',
+                valueEl: $el.value.find('#country-code'),
+                setValueText: false,
+                pageTitle: 'Select Country',
+                virtualList: true,
+                on: {
+                    close: function(smartSelect) {
+                        $el.value.find('#country-flag').attr('src', smartSelect.selectEl.options[smartSelect.selectEl.selectedIndex].dataset.optionImage);
+                        $el.value.find('#country-code').text(smartSelect.selectEl.options[smartSelect.selectEl.selectedIndex].dataset.code);
+                    }
+                }
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=signup]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    mobile: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    password: {
+                        required: true
+                    },
+                    confirm_password: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    mobile: {
+                        required: 'Please enter mobile number.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    password: {
+                        required: 'Please enter password.'
+                    },
+                    confirm_password: {
+                        required: 'Please re-enter password.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for signing up. Please log in to continue.',
+                        cssClass: 'color-green'
+                    });
+                    $f7router.navigate('/login/', {
+                        reloadCurrent: true
+                    });
+                }
+            });
+        }
+
+        let togglePasswordVisibility = function(event) {
+            let state = event.detail;
+            let inputEl = $(event.target).closest('.item-input-wrap').find('input');
+            if (state) {
+                inputEl.attr('type', 'text');
+            }
+            else {
+                inputEl.attr('type', 'password');
+            }
+        }
+
+        $on('pageBeforeIn', function() {
+            loadCountries();
+            initializeFormValidator();
+            if (!$f7.device.cordova) {
+                google.accounts.id.renderButton(
+                    document.getElementById("googleAccess1"),
+                    {'text': 'Registrate con google', theme: "filled_blue", size: "large", width: '300'}  // customization attributes
+
+                );
+            }
+          //  google.accounts.id.prompt(); // also display the One Tap dialog
+        });
+
+        return $render;
+    }
+</script>

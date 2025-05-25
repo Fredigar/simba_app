@@ -1,0 +1,156 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">App Badging API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>App Badging API allows installed web apps to set an application-wide badge on the app icon, shown in an operating-system-specific place such as homescreen, taskbar, or dock.</p>
+                        <p>Badging makes it easy to notify the user without any interruption, when there is a new activity that might require their attention, or to show the number of unread notifications.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" class="button button-fill" @click="${setAppBadge}">Set Badge</button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="button button-fade" @click="${clearAppBadge}">Clear Badge</button>
+                            </div>
+                        </div>
+                    </div>
+                    ${$f7.device.standalone ? $h`
+                    ${$f7.device.android ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">On Android, the App Badging API does not have any effect on the app icon. Instead, Android automatically shows a badge on the app icon when there is any unread notification.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">App Badging API works only when the app is installed and opened on homescreen.</div>
+                    </div>
+                    `}
+                    ` : $h`
+                    ${$f7.support.webApi.appBadging ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">App Badging API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">App Badging API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Badging_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let setAppBadge = function() {
+            if ($f7.device.standalone) {
+                let dialog = $f7.dialog.prompt(
+                    'Please enter any numeric value.',
+                    'Set App Badge',
+                    function(value) {
+                        navigator.setAppBadge(value)
+                            .then(function() {
+                                $f7.toast.show({
+                                    text: 'App badge has been set successfully. Please check the app icon on homescreen, taskbar, or dock.',
+                                    cssClass: 'color-green'
+                                });
+                            })
+                            .catch(function(error) {
+                                $f7.toast.show({
+                                    text: error,
+                                    cssClass: 'color-red'
+                                });
+                            });
+                    }
+                );
+                dialog.$el.find('input').attr('type', 'tel');
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please install and open the app on homescreen.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let clearAppBadge = function() {
+            if ($f7.device.standalone) {
+                navigator.clearAppBadge()
+                    .then(function() {
+                        $f7.toast.show({
+                            text: 'App badge has been cleared successfully. Please check the app icon on homescreen, taskbar, or dock.',
+                            cssClass: 'color-green'
+                        });
+                    })
+                    .catch(function(error) {
+                        $f7.toast.show({
+                            text: error,
+                            cssClass: 'color-red'
+                        });
+                    });
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please install and open the app on homescreen.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        return $render;
+    }
+</script>

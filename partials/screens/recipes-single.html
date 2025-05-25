@@ -1,0 +1,225 @@
+<template>
+    <div class="page" data-name="recipes-single">
+
+        <div class="navbar navbar-transparent color-theme-white dark">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Recipes - Single</div>
+                <div class="right">
+                    <a href="#" class="state-toggle link icon-only ripple-color-gray" @stateChange="${(event) => toggleFavorite(event.detail)}">
+                        <i class="state-inactive icon f7-icons">flame_fill</i>
+                        <i class="state-active icon f7-icons color-orange">flame_fill</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content" style="--f7-page-navbar-offset: 0;">
+
+            <div class="overlay-container">
+                <img src="https://source.unsplash.com/lEbNZsn0ujM" alt="" style="height: 384px;" />
+                <div class="overlay-content align-items-stretch justify-content-flex-end text-align-start" style="padding-left: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-left)); padding-right: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-right));">
+                    <div class="font-size-22 font-weight-bold margin-top-half multi-line-text lines-2">Peppermint Macarons</div>
+                    <div class="font-size-14">Have fun piping out the mezmerizing meringue cookies and filling them with a rich chocolate ganache.</div>
+                </div>
+            </div>
+
+            <div class="list no-hairlines no-hairlines-between no-margin-vertical">
+                <ul class="row padding-vertical-half">
+                    <li class="col-50 large-auto">
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-rounded-square size-40 bg-gradient-blue">
+                                    <i class="icon f7-icons color-white">clock</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    <div class="item-header single-line-text">Preparation Time</div>
+                                    <div class="font-weight-600">45 Minutes</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="col-50 large-auto">
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-rounded-square size-40 bg-gradient-deeppurple">
+                                    <i class="icon f7-icons color-white">rocket_fill</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    <div class="item-header single-line-text">Level</div>
+                                    <div class="font-weight-600">Beginner</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="col-50 large-auto">
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-rounded-square size-40 bg-gradient-green">
+                                    <i class="icon f7-icons color-white">person_2_fill</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    <div class="item-header single-line-text">Servings Per Recipe</div>
+                                    <div class="font-weight-600">10</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="col-50 large-auto">
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-rounded-square size-40 bg-gradient-orange">
+                                    <i class="icon f7-icons color-white">flame_fill</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    <div class="item-header single-line-text">Energy Per Serving</div>
+                                    <div class="font-weight-600">75 KCal</div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block block-strong no-margin-vertical sticky sticky-top" style="top: calc(var(--f7-navbar-height) + var(--f7-safe-area-top));">
+                <div class="segmented segmented-strong">
+                    <a href="#tab-ingredients" class="button font-size-12 tab-link tab-link-active">Ingredients</a>
+                    <a href="#tab-directions" class="button font-size-12 tab-link">Directions</a>
+                    <a href="#tab-nutrition" class="button font-size-12 tab-link">Nutrition</a>
+                    <span class="segmented-highlight"></span>
+                </div>
+            </div>
+
+            <div class="tabs-swipeable-wrap" data-auto-height="true">
+                <div class="tabs">
+
+                    <div id="tab-ingredients" class="tab tab-active">
+
+                        <div class="block block-strong inset margin-vertical">
+                            <h3>Macarons</h3>
+                            <ul>
+                                <li>1 ¾ cups powdered sugar (210g)</li>
+                                <li>1 cup almond flour (95g), finely ground</li>
+                                <li>1 teaspoon salt, divided</li>
+                                <li>3 egg whites, at room temperature</li>
+                                <li>¼ cup granulated sugar (50g)</li>
+                                <li>½ teaspoon vanilla extract</li>
+                                <li>2 drops pink gel food coloring</li>
+                            </ul>
+                            <h3>Vanilla Buttercream</h3>
+                            <ul>
+                                <li>1 cup unsalted butter (230g)</li>
+                                <li>2 sticks, at room temperature</li>
+                                <li>3 cups powdered sugar (360g)</li>
+                                <li>1 teaspoon vanilla extract</li>
+                                <li>3 tablespoons heavy cream</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <div id="tab-directions" class="tab">
+
+                        <div class="row justify-content-center no-gap padding-vertical-half">
+                            <div class="col-100 large-50">
+                                <div class="block margin-vertical-half">
+                                    <div class="responsive-container shape-rounded-square elevation-24">
+                                        <iframe class="responsive-content shape-rounded-square" src="https://youtube.com/embed/MjVgIXccYXA" frameborder="0"></iframe>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-100 large-50">
+                                <div class="list inset margin-vertical-half">
+                                    <ul>
+                                        ${Array(13).fill().map((item, index) => $h`
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media align-self-flex-start text-align-center">
+                                                    <span class="font-size-22 font-weight-bold" style="color: var(--color-gray-300); width: 36px;">${(index+1).toString().padStart(2, '0') + '.'}</span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">${faker.lorem.sentences(3)}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        `)}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="tab-nutrition" class="tab">
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th class="label-cell">Nutrient</th>
+                                        <th class="numeric-cell">Amount (Per Serving)</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td class="label-cell">Fat</td>
+                                        <td class="numeric-cell">4.9 g</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">Cholestrol</td>
+                                        <td class="numeric-cell">24.5 mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">Sodium</td>
+                                        <td class="numeric-cell">87.6 mg</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">Carbohydrate</td>
+                                        <td class="numeric-cell">23.8 g</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="label-cell">Protein</td>
+                                        <td class="numeric-cell">2.4 g</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let toggleFavorite = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Cookbook' : 'Removed from Cookbook',
+                icon: state ? '<i class="icon f7-icons color-orange">flame_fill</i>' : '<i class="icon f7-icons color-gray">flame_fill</i>',
+                position: 'center'
+            });
+        }
+
+        return $render;
+    }
+</script>

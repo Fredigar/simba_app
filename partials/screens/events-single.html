@@ -1,0 +1,367 @@
+<template>
+    <div class="page no-tabbar" data-name="events-single" style="--f7-toolbar-height: 80px;">
+
+        <div class="navbar navbar-transparent color-theme-white dark">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Events - Single</div>
+                <div class="right">
+                    <a href="#" class="state-toggle link icon-only ripple-color-white" @stateChange="${(event) => toggleFavorite(event.detail)}">
+                        <i class="state-inactive icon material-icons">favorite</i>
+                        <i class="state-active icon material-icons color-red">favorite</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar toolbar-bottom">
+            <div class="toolbar-inner">
+                <button type="button" class="state-toggle button button-fill button-large flex-shrink-0 margin-horizontal-half width-auto bg-color-chrome" @stateChange="${(event) => toggleReminder(event.detail)}">
+                    <i class="state-inactive icon material-icons color-mono">notifications_none</i>
+                    <i class="state-active icon material-icons color-primary">notifications</i>
+                </button>
+                <button type="submit" form="form-tickets" class="button button-fill button-large flex-grow-1 margin-horizontal-half">Buy Tickets</button>
+            </div>
+        </div>
+
+        <div class="page-content" style="--f7-page-navbar-offset: 0;">
+
+            <div class="overlay-container">
+                <img src="https://source.unsplash.com/VEE4nYoLbfI" alt="" style="height: 384px;" />
+                <div class="overlay-content align-items-stretch justify-content-flex-end text-align-start" style="padding-left: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-left)); padding-right: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-right));">
+                    <div class="shape-container shape-rounded-square size-64 bg-color-white">
+                        <div class="font-size-28 font-weight-bold line-height-1 text-color-black">31</div>
+                        <div class="font-size-12 font-weight-bold letter-spacing-1 text-color-red">DEC</div>
+                    </div>
+                    <div class="font-size-22 font-weight-bold margin-top-half multi-line-text lines-2">Tomorrowland Music Festival 2023</div>
+                    <div class="font-size-14 text-color-white">Boom, Belgium</div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 medium-60 large-65">
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content">
+                            <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                    <i class="icon material-icons color-white">celebration</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Event</div>
+                                                    <div class="font-weight-600">Tomorrowland Music Festival 2023</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                    <i class="icon material-icons color-white">foundation</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Organiser</div>
+                                                    <div class="font-weight-600">Eventbrite</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                    <i class="icon material-icons color-white">calendar_month</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Date</div>
+                                                    <div class="font-weight-600">${moment('2023-12-31T11:59:59').format('dddd, MMMM DD, YYYY')}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                    <i class="icon material-icons color-white">schedule</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Time</div>
+                                                    <div class="font-weight-600">${moment('2023-12-31T11:59:59').format('HH:MM A')}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                    <i class="icon material-icons color-white">place</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Location</div>
+                                                    <div class="font-weight-600">Boom, Belgium</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <a href="https://tomorrowland.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media align-self-flex-start">
+                                                    <span class="shape-container shape-rounded-square size-48 bg-color-primary">
+                                                        <i class="icon material-icons color-white">language</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">
+                                                        <div class="item-header">Website</div>
+                                                        <div class="font-weight-600">https://tomorrowland.com</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content card-content-padding">
+                            <p>Tomorrowland is the world's biggest dance music festival, bringing an A-list lineup of DJs from across the dance music spectrum to Boom in Belgium each summer. That means whether you're into EDM, house, techno, hardstyle, or all of the above, you'll be surrounded by only the best.</p>
+                            <video class="shape-rounded-square" controls playsinline preload="metadata">
+                                <source src="https://player.vimeo.com/external/521707474.hd.mp4?s=98c57d8ee2f46544e481fb54aa2b1ee767fbd97d&profile_id=174" type="video/mp4" />
+                            </video>
+                            <p>Throw in its incredible stage design, production and quirky surprises, and it's easy to see why Tomorrowland's tickets sell out in record time each year. Now regarded as a mecca for all dance music fans, immersing yourself into this mythological wonderland has to be high up on every music fan's bucket list.</p>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-header">Tickets</div>
+                        <div class="card-content card-content-padding">
+                            <form id="form-tickets" name="tickets" action="#" method="POST" enctype="multipart/form-data">
+                                <div class="list cards-list radio-list radio-fill inset no-hairlines no-hairlines-between no-margin">
+                                    <ul>
+                                        <li>
+                                            <label class="item-content item-radio color-blue">
+                                                <input type="radio" name="ticket" value="regular" disabled />
+                                                <div class="item-inner item-cell bg-color-chrome">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-22 font-weight-bold">Regular Pass</div>
+                                                            <div class="font-size-14">General access to Tomorrowland</div>
+                                                        </div>
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-22 font-weight-bold text-color-gray">SOLD OUT</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="item-content item-radio">
+                                                <input type="radio" name="ticket" value="pleasure" />
+                                                <div class="item-inner item-cell bg-color-chrome">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-22 font-weight-bold">Pleasure Pass</div>
+                                                            <div class="font-size-14">General access to Tomorrowland + access to 3 different comfort zones for 1 day. No access to the comfort zone at the Mainstage.</div>
+                                                        </div>
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-22 font-weight-bold">$200</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                        <li>
+                                            <label class="item-content item-radio">
+                                                <input type="radio" name="ticket" value="comfort" />
+                                                <div class="item-inner item-cell bg-color-chrome">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-22 font-weight-bold">Comfort Pass</div>
+                                                            <div class="font-size-14">General access to Tomorrowland + access to the comfort (VIP) zone at the Mainstage and 4 other stages for 1 day.</div>
+                                                        </div>
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-22 font-weight-bold">$300</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </label>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-header">FAQs</div>
+                        <div class="card-content">
+                            <div class="list no-safe-areas">
+                                <ul>
+                                    <li class="accordion-item custom-toggle-icon">
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">What is Lorem Ipsum?</div>
+                                                    <div class="item-after">
+                                                        <i class="icon f7-icons toggle-icon-open color-green">plus_circle_fill</i>
+                                                        <i class="icon f7-icons toggle-icon-close color-red">minus_circle_fill</i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="accordion-item-content">
+                                            <div class="block">
+                                                <p>Lorem Ipsum is simply a dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book.</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="accordion-item custom-toggle-icon">
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">Where does it come from?</div>
+                                                    <div class="item-after">
+                                                        <i class="icon f7-icons toggle-icon-open color-green">plus_circle_fill</i>
+                                                        <i class="icon f7-icons toggle-icon-close color-red">minus_circle_fill</i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="accordion-item-content">
+                                            <div class="block">
+                                                <p>Lorem Ipsum has roots in a piece of classical Latin literature from 45 BC, making it over 2000 years old. It comes from sections 1.10.32 and 1.10.33 of "de Finibus Bonorum et Malorum" (The Extremes of Good and Evil) by Cicero, written in 45 BC. This book is a treatise on the theory of ethics, very popular during the Renaissance.</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li class="accordion-item custom-toggle-icon">
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">Why do we use it?</div>
+                                                    <div class="item-after">
+                                                        <i class="icon f7-icons toggle-icon-open color-green">plus_circle_fill</i>
+                                                        <i class="icon f7-icons toggle-icon-close color-red">minus_circle_fill</i>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                        <div class="accordion-item-content">
+                                            <div class="block">
+                                                <p>It is a long established fact that a reader will be distracted by the readable content of a page when looking at its layout. The point of using Lorem Ipsum is that it has a more-or-less normal distribution of letters, as opposed to using 'Content here, content here', making it look like readable English.</p>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-100 medium-40 large-35 sticky sticky-top" style="top: var(--f7-navbar-height);">
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'} medium-margin-top no-margin-top">
+                        <div class="card-header">About Organiser</div>
+                        <div class="card-content card-content-padding">
+                            <img src="https://cdn.svgporn.com/logos/eventbrite-icon.svg" loading="lazy" height="40" alt="" />
+                            <div class="card-title margin-top-half">Eventbrite</div>
+                            <div class="card-text">Eventbrite brings people together through live experiences. Discover events that match your passions, or create your own with online ticketing tools.</div>
+                            <div class="row margin-top" style="--f7-grid-gap: 8px;">
+                                <a href="#" class="col-50 button button-fill button-round">All Events</a>
+                                <a href="#" class="col-50 button button-fill button-round color-mono text-color-mono-invert">Follow</a>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=tickets]')).validate({
+                rules: {
+                    ticket: {
+                        required: true
+                    }
+                },
+                messages: {
+                    ticket: {
+                        required: 'Please select a ticket.'
+                    }
+                },
+                invalidHandler: function(event, validator) {
+                    $f7.toast.show({
+                        text: 'Please select a ticket.',
+                        cssClass: 'color-red'
+                    });
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for your purchase. Your tickets will be sent to your registered email address.',
+                        cssClass: 'color-green'
+                    });
+                    form.reset();
+                }
+            });
+        }
+
+        let toggleFavorite = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Favorites' : 'Removed from Favorites',
+                icon: state ? '<i class="icon material-icons color-red">favorite</i>' : '<i class="icon material-icons color-gray">favorite</i>',
+                position: 'center'
+            });
+        }
+
+        let toggleReminder = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Reminders' : 'Removed from Reminders',
+                icon: state ? '<i class="icon material-icons color-primary">notifications</i>' : '<i class="icon material-icons color-gray">notifications</i>',
+                position: 'center'
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

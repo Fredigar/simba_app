@@ -1,0 +1,544 @@
+<template>
+    <div class="page">
+
+        <div class="navbar navbar-transparent bg-color-orange color-white">
+            <div class="navbar-bg bg-color-orange"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title text-color-white">Web APIs</div>
+                <div class="right">
+                    <a href="#" class="link icon-only" @click="${enableSearchbar}">
+                        <i class="icon material-icons">search</i>
+                    </a>
+                </div>
+                <form class="searchbar searchbar-expandable">
+                    <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search" />
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong elevation-12 flexbox-centered height-auto no-hairlines no-margin bg-color-orange color-orange text-color-white" style="min-height: 256px;">
+                <span class="shape-container shape-circle" style="background-color: var(--color-orange-700);">
+                    <i class="icon f7-icons font-size-40 color-white">chevron_left_slash_chevron_right</i>
+                </span>
+                <div class="font-size-24 font-weight-bold margin-top-half">Web APIs</div>
+                <div class="font-size-16 margin-top-half">Web APIs provide access to native device and platform functionalities to the web apps via JavaScript.</div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="searchbar-found">
+                        <div class="list inset margin-vertical no-chevron">
+                            <ul>
+                                <li>
+                                    <a href="/web-apis/app-badging/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">App Badging API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.appBadging ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/app-shortcuts/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">App Shortcuts API</div>
+                                                <div class="item-after">
+                                                    <a href="https://developer.mozilla.org/en-US/docs/Web/Manifest/shortcuts#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="external link icon-only">
+                                                        <i class="icon material-icons tooltip-init color-blue" data-tooltip="View Support">info</i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/battery-status/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Battery Status API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.batteryStatus ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/clipboard/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Clipboard API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.clipboard ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/contact-picker/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Contact Picker API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.contactPicker ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/device-memory/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Device Memory API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.deviceMemory ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/device-orientation/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Device Orientation API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.deviceOrientation ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/file/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">File API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.file ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/fullscreen/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Fullscreen API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.fullscreen ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/geolocation/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Geolocation API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.geolocation ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/get-installed-related-apps/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Get Installed Related Apps API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.getInstalledRelatedApps ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/html-media-capture/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">HTML Media Capture API</div>
+                                                <div class="item-after">
+                                                    <a href="https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes/capture#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="external link icon-only">
+                                                        <i class="icon material-icons tooltip-init color-blue" data-tooltip="View Support">info</i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/local-storage/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Local Storage API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.localStorage ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/network-information/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Network Information API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.networkInformation ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/notifications/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Notifications API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.notifications ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/online-offline-status/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Online & Offline Status API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.onlineOfflineStatus ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/page-visibility/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Page Visibility API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.pageVisibility ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/permissions/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Permissions API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.permissions ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/picture-in-picture/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Picture-In-Picture API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.pictureInPicture ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/quota-estimation/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Quota Estimation API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.quotaEstimation ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/screen-orientation/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Screen Orientation API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.screenOrientation ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/screen-wake-lock/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Screen Wake Lock API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.screenWakeLock ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/server-sent-events/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Server-Sent Events API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.serverSentEvents ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/session-storage/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Session Storage API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.sessionStorage ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/vibration/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Vibration API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.vibration ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/web-apis/web-share/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title">Web Share API</div>
+                                                <div class="item-after">
+                                                    ${$f7.support.webApi.webShare ? $h`
+                                                    <i class="icon material-icons tooltip-init color-green" data-tooltip="Supported">check_circle</i>
+                                                    ` : $h`
+                                                    <i class="icon material-icons tooltip-init color-red" data-tooltip="Unsupported">cancel</i>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="searchbar-not-found">
+                        <div class="empty-state empty-state-strong inset margin-vertical">
+                            <div class="empty-state-media">
+                                <span class="shape-container shape-auto bg-color-chrome">
+                                    <i class="icon material-icons font-size-32">search_off</i>
+                                </span>
+                            </div>
+                            <div class="empty-state-subtitle">No Search Results</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let searchbar = null;
+
+        let initializeSearchbar = function() {
+            let navbarEl = $f7.navbar.getElByPage($el.value);
+            searchbar = $f7.searchbar.create({
+                el: $(navbarEl).find('.searchbar'),
+                searchContainer: $el.value.find('.list'),
+                searchItem: 'li',
+                searchIn: 'a',
+                backdrop: false,
+                removeDiacritics: true,
+                on: {
+                    enable: function(searchbar) {
+                        searchbar.$el.find('input').focus();
+                    }
+                }
+            });
+            if ($f7route.query.search) {
+                searchSearchbar($f7route.query.search);
+            }
+        }
+
+        let enableSearchbar = function() {
+            if (searchbar) {
+                searchbar.enable();
+            }
+        }
+
+        let disableSearchbar = function() {
+            if (searchbar) {
+                searchbar.disable();
+            }
+        }
+
+        let searchSearchbar = function(query) {
+            if (searchbar) {
+                searchbar.search(query);
+            }
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeSearchbar();
+        });
+
+        $on('pageBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        $on('tabInit', function() {
+            initializeSearchbar();
+        });
+
+        $on('tabBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        return $render;
+    }
+</script>

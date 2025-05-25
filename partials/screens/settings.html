@@ -1,0 +1,360 @@
+<template>
+    <div class="page" data-name="settings">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Settings</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="list media-list inset chevron-center margin-vertical no-hairlines-between">
+                        <ul>
+                            <li>
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <img class="shape-auto elevation-12" src="https://source.unsplash.com/5vg_SarQimA/96x96" height="56" width="56" alt="" />
+                                        </div>
+                                        <div class="item-inner align-self-center">
+                                            <div class="item-title-row">
+                                                <div class="item-title">Richmond Spencer</div>
+                                            </div>
+                                            <div class="item-text">Croatia</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    ${$f7.config.theming.enabled && $h`
+                    <div class="block-title margin-vertical">Appearance</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li id="theme-color-selector">
+                                <a href="#" class="item-link" @click="${() => themeColorPicker.open()}">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="shape-container shape-circle size-40" style="background-color: ${$store.getters.themeColor.value};"></i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Theme Color</div>
+                                            <div class="item-after text-uppercase">${$store.getters.themeColor.value}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        ${$store.getters.themeMode.value == 'light' && $h`
+                                        <span class="shape-container shape-auto size-40 bg-color-amber">
+                                            <i class="icon material-icons color-white">light_mode</i>
+                                        </span>
+                                        `}
+                                        ${$store.getters.themeMode.value == 'dark' && $h`
+                                        <span class="shape-container shape-auto size-40 bg-color-mono">
+                                            <i class="icon material-icons color-mono-invert">dark_mode</i>
+                                        </span>
+                                        `}
+                                        ${$store.getters.themeMode.value == 'system' && $h`
+                                        <span class="shape-container shape-auto size-40 bg-color-bluegray">
+                                            <i class="icon material-icons color-white">brightness_4</i>
+                                        </span>
+                                        `}
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Mode</div>
+                                        <div class="item-after">
+                                            <div class="segmented segmented-strong color-gray">
+                                                <button class="button button-small color-amber ${$store.getters.themeMode.value == 'light' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('light')}">Light</button>
+                                                <button class="button button-small color-black ${$store.getters.themeMode.value == 'dark' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('dark')}">Dark</button>
+                                                <button class="button button-small color-bluegray ${$store.getters.themeMode.value == 'system' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('system')}">System</button>
+                                                <span class="segmented-highlight"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    `}
+
+                    ${$f7.i18n.config.enabled && $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="#" class="item-link smart-select smart-select-init" data-open-in="popover" data-close-on-select="true" data-searchbar="false">
+                                    <div class="item-content">
+                                        <select name="language" @change="${(event) => $f7.i18n.changeLanguage(event.target.value)}">
+                                            ${Object.keys($f7.i18n.config.languages).map((code) => $h`
+                                            <option value="${$f7.i18n.config.languages[code].code}" data-i18n="${$f7.i18n.config.languages[code].slug}" selected="${$f7.i18n.config.languages[code].code == $f7.i18n.currentLanguage().code}">${$f7.i18n.config.languages[code].name}</option>
+                                            `)}
+                                        </select>
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-blue">
+                                                <i class="icon material-icons color-white">language</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Language</div>
+                                            <div class="item-after" data-i18n="${$f7.i18n.currentLanguage().slug}"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    `}
+
+                    ${$f7.zooming.config.enabled && $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="#" class="item-link smart-select smart-select-init" data-open-in="popover" data-close-on-select="true" data-searchbar="false">
+                                    <div class="item-content">
+                                        <select name="zooming" @change="${(event) => $f7.zooming.changeLevel(event.target.value)}">
+                                            ${Object.keys($f7.zooming.config.levels).map((level) => $h`
+                                            <option value="${level}" data-i18n="${$f7.zooming.config.levels[level].slug}" selected="${$f7.zooming.config.levels[level].value == $f7.zooming.currentLevel().value}">${$f7.zooming.config.levels[level].name}</option>
+                                            `)}
+                                        </select>
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-pink">
+                                                <i class="icon material-icons color-white">format_size</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Text Size</div>
+                                            <div class="item-after" data-i18n="${$f7.zooming.currentLevel().slug}"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    `}
+
+                    <div class="block-title margin-vertical">Connected Accounts</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-40 bg-color-mono">
+                                            <i class="icon fa-brands fa-apple font-size-18 color-mono-invert"></i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Apple</div>
+                                        <div class="item-after">
+                                            <label class="toggle toggle-init">
+                                                <input type="checkbox" checked />
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-google));">
+                                            <i class="icon fa-brands fa-google font-size-18 color-white"></i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Google</div>
+                                        <div class="item-after">
+                                            <label class="toggle toggle-init">
+                                                <input type="checkbox" checked />
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-facebook));">
+                                            <i class="icon fa-brands fa-facebook-f font-size-18 color-white"></i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Facebook</div>
+                                        <div class="item-after">
+                                            <label class="toggle toggle-init">
+                                                <input type="checkbox" checked />
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">${$f7.config.app.title}</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-40 bg-color-blue">
+                                            <i class="icon material-icons color-white">info</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Version</div>
+                                        <div class="item-after">${$f7.getAppVersion()}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-amber">
+                                                <i class="icon material-icons color-white">star</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Rate App</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-green">
+                                                <i class="icon material-icons color-white">share</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Share App</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/feedback/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-pink">
+                                                <i class="icon material-icons color-white">message</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Leave Feedback</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Help</div>
+                    <div class="list links-list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="/about/">About</a>
+                            </li>
+                            <li>
+                                <a href="/faq/">FAQ</a>
+                            </li>
+                            <li>
+                                <a href="/careers/">Careers</a>
+                            </li>
+                            <li>
+                                <a href="/contact/">Contact</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Legal</div>
+                    <div class="list links-list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="/terms/">Terms</a>
+                            </li>
+                            <li>
+                                <a href="/privacy-policy/">Privacy Policy</a>
+                            </li>
+                            <li>
+                                <a href="/cookie-policy/">Cookie Policy</a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    ${$store.getters.isUserLoggedIn.value ? $h`
+                    <div class="list links-list inset no-chevron margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="#" class="list-button font-size-14 font-weight-600 letter-spacing-1 text-uppercase color-red text-color-red" @click="${() => $store.dispatch('logoutUser')}">Logout</a>
+                            </li>
+                        </ul>
+                    </div>
+                    ` : $h` `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let themeColorPicker = null;
+
+        let initializeThemeColorPicker = function() {
+            themeColorPicker = $f7.colorPicker.create({
+                targetEl: $el.value.find('#theme-color-selector'),
+                modules: ['rgb-sliders', 'hex', 'initial-current-colors'],
+                openIn: 'popover',
+                sliderLabel: true,
+                sliderValue: true,
+                sliderValueEditable: true,
+                hexValueEditable: true,
+                value: {
+                    hex: $f7.theming.currentColor()
+                },
+                on: {
+                    change: function(colorPicker, value) {
+                        $f7.theming.changeColor(value.hex);
+                    }
+                }
+            });
+        }
+
+        $on('languageChanged', function(language) {
+            $f7.i18n.localize();
+        });
+
+        $on('pageBeforeIn', function() {
+            initializeThemeColorPicker();
+        });
+
+        $on('tabInit', function() {
+            initializeThemeColorPicker();
+        });
+
+        return $render;
+    }
+</script>

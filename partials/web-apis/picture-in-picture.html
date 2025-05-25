@@ -1,0 +1,132 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Picture-In-Picture API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Picture-In-Picture API allows web apps to create a floating video window always on top of other windows so that users may continue consuming media while they interact with other content or apps on their device.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <video class="responsive-content shape-rounded-square" controls playsinline preload="metadata">
+                                <source src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4" type="video/mp4" />
+                            </video>
+                        </div>
+                        <div class="menu margin-top">
+                            <div class="menu-inner justify-content-center">
+                                <a href="#" class="menu-item" @click="${togglePictureInPicture}">
+                                    <div class="menu-item-content">Toggle Picture-In-Picture Mode</div>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.pictureInPicture ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Picture-In-Picture API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Picture-In-Picture API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Picture-in-Picture_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let video = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            video = $el.value.find('video')[0];
+            $update(function() {
+                addEventListeners();
+            });
+        }
+
+        let addEventListeners = function() {
+            video.addEventListener('enterpictureinpicture', onEnterPictureInPicture);
+            video.addEventListener('leavepictureinpicture', onLeavePictureInPicture);
+        }
+
+        let removeEventListeners = function() {
+            video.removeEventListener('enterpictureinpicture', onEnterPictureInPicture);
+            video.removeEventListener('leavepictureinpicture', onLeavePictureInPicture);
+        }
+
+        let togglePictureInPicture = function() {
+            if (document.pictureInPictureElement) {
+                document.exitPictureInPicture();
+            }
+            else {
+                if (document.pictureInPictureEnabled) {
+                    video.requestPictureInPicture();
+                }
+            }
+        }
+
+        let onEnterPictureInPicture = function(event) {
+            video.play();
+        }
+
+        let onLeavePictureInPicture = function(event) {
+            video.pause();
+        }
+
+        $on('pageBeforeRemove', function() {
+            if (video) {
+                removeEventListeners();
+            }
+        });
+
+        return $render;
+    }
+</script>

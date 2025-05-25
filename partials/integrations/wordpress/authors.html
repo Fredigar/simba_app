@@ -1,0 +1,550 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Authors</div>
+                ${data.entries && data.entries.length ? $h`
+                <div class="right">
+                    ${widgets.layoutSwitcher.enabled ? $h`
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-layout-switcher" data-tooltip="Layout">
+                        <i class="icon material-icons">
+                            ${data.layout == 'list' ? 'view_headline' : ''}
+                            ${data.layout == 'grid' ? 'apps' : ''}
+                        </i>
+                    </a>
+                    ` : $h` `}
+                    ${widgets.dataFilter.enabled ? $h`
+                    <a href="#" class="link icon-only popup-open tooltip-init" data-popup="#popup-data-filter" data-tooltip="Filters">
+                        <i class="icon material-icons">tune</i>
+                    </a>
+                    ` : $h` `}
+                </div>
+                ` : $h` `}
+            </div>
+        </div>
+
+        <div class="page-content infinite-scroll-content ptr-content">
+
+            <div class="ptr-preloader" key="ptr-preloader">
+                <div class="preloader"></div>
+                <div class="ptr-arrow"></div>
+            </div>
+
+            ${data.entries && data.entries.length ? $h`
+            ${data.layout == 'list' ? $h`
+            <div class="list inset margin-vertical no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${data.entries.map((item, index) => $h`
+                    <li class="col-100 small-50 xlarge-33">
+                        <a href="/integrations/wordpress/authors/${item.slug}/${item.id}/" class="item-link height-100">
+                            <div class="item-content">
+                                <div class="item-media">
+                                    ${item.avatar ? $h`
+                                    <img class="shape-auto" src="${item.avatar}" loading="lazy" height="40" width="40" alt="" />
+                                    ` : $h`
+                                    <span class="shape-container shape-auto size-40 bg-color-random text-color-white">
+                                        <span class="font-size-20 font-weight-600">${item.name.trim().charAt(0)}</span>
+                                    </span>
+                                    `}
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title font-weight-600" innerHTML="${item.name}"></div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+            ${data.layout == 'grid' ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${data.entries.map((item, index) => $h`
+                    <li class="col-50 small-33 xlarge-25">
+                        <a href="/integrations/wordpress/authors/${item.slug}/${item.id}/" class="item-link height-100">
+                            <div class="item-content">
+                                <div class="item-inner item-cell padding-vertical">
+                                    <div class="item-row">
+                                        <div class="item-cell text-align-center">
+                                            ${item.avatar ? $h`
+                                            <img class="shape-auto" src="${item.avatar}" loading="lazy" height="48" width="48" alt="" />
+                                            ` : $h`
+                                            <span class="shape-container shape-auto size-48 bg-color-random text-color-white">
+                                                <span class="font-size-24 font-weight-600">${item.name.trim().charAt(0)}</span>
+                                            </span>
+                                            `}
+                                            <div class="font-size-16 font-weight-600 margin-top-half" innerHTML="${item.name}"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+
+            ${!flags.allEntriesLoaded ? $h`
+            ${widgets.infiniteScroll.enabled ? $h`
+            <div id="infinite-scroll-handler" class="block margin-vertical text-align-center">
+                ${flags.loadMoreEntriesError ? $h`
+                <button type="button" class="button button-fill button-round margin-horizontal-auto color-mono text-color-mono-invert" style="width: 144px;" @click="${loadMoreEntries}">Load More</button>
+                ` : $h`
+                <span class="preloader" key="preloader-infinite-scroll"></span>
+                `}
+            </div>
+            ` : $h` `}
+            ${!widgets.infiniteScroll.enabled ? $h`
+            <div id="load-more-handler" class="block margin-vertical text-align-center">
+                ${flags.loadingMoreEntries ? $h`
+                <span class="preloader" key="preloader-load-more"></span>
+                ` : $h`
+                <button type="button" class="button button-fill button-round margin-horizontal-auto color-mono text-color-mono-invert" style="width: 144px;" @click="${loadMoreEntries}">Load More</button>
+                `}
+            </div>
+            ` : $h` `}
+            ` : $h` `}
+            ` : $h` `}
+
+            ${flags.loadingInitialEntries ? $h`
+            ${data.layout == 'list' ? $h`
+            <div class="list inset margin-vertical no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${Array(12).fill().map((item, index) => $h`
+                    <li class="col-100 small-50 xlarge-33">
+                        <div class="item-content skeleton-effect-fade">
+                            <div class="item-media">
+                                <span class="shape-container shape-auto size-40 skeleton-block"></span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title font-size-16 font-weight-600 skeleton-text">Author Name Here</div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+            ${data.layout == 'grid' ? $h`
+            <div class="list cards-list inset margin-vertical-half no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${Array(12).fill().map((item, index) => $h`
+                    <li class="col-50 small-33 xlarge-25">
+                        <div class="item-content skeleton-effect-fade">
+                            <div class="item-inner item-cell padding-vertical">
+                                <div class="item-row">
+                                    <div class="item-cell text-align-center">
+                                        <span class="shape-container shape-auto size-48 skeleton-block"></span>
+                                        <div class="font-size-16 font-weight-600 margin-top-half skeleton-text">Author Name Here</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h` `}
+            ` : $h` `}
+
+            ${flags.noEntriesFound ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Authors Found</div>
+                ${flags.filtersActive ? $h`
+                <div class="empty-state-text">We couldn't find anything matching your filter criteria.</div>
+                ` : $h`
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                `}
+                <div class="empty-state-actions">
+                    ${flags.filtersActive ? $h`
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert popup-open" data-popup="#popup-data-filter">Change Filters</button>
+                    ` : $h`
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadInitialEntries}">Retry</button>
+                    `}
+                </div>
+            </div>
+            ` : $h` `}
+
+            ${flags.apiErrorEntries ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                ${$f7.online ? $h`
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">${messages.apiError}</div>
+                ` : $h`
+                <div class="empty-state-title">No Internet Connection</div>
+                <div class="empty-state-text">Please make sure you are connected to the Internet.</div>
+                `}
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadInitialEntries}">Retry</button>
+                </div>
+            </div>
+            ` : $h` `}
+
+        </div>
+
+        ${widgets.layoutSwitcher.enabled ? $h`
+        <div id="popover-layout-switcher" class="popover" style="min-width: 192px;">
+            <div class="popover-inner">
+                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                    <ul>
+                        ${widgets.layoutSwitcher.layouts.map((item, index) => $h`
+                        <li>
+                            <a href="#" class="popover-close" @click="${() => switchLayout(item.slug)}">
+                                <span>${item.name}</span>
+                                ${item.slug == data.layout ? $h`
+                                <i class="icon f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                ` : $h` `}
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        ` : $h` `}
+
+        ${widgets.dataFilter.enabled ? $h`
+        <div id="popup-data-filter" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">Filters</div>
+                        <div class="right">
+                            <button type="button" class="button button-fade button-small popup-close" @click="${resetFilters}">Reset</button>
+                            <button type="submit" class="button button-fill button-small margin-horizontal-half popup-close" form="form-data-filter">Apply</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <form id="form-data-filter" @submit="${applyFilters}">
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul>
+                                <li class="item-divider">Search</li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner padding-vertical">
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="search-string" value="${filters.searchString}" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li class="item-divider">Sort By</li>
+                                <li>
+                                    <label class="item-content item-radio">
+                                        <input type="radio" name="sort-by" value="name" checked="${filters.sortBy == 'name'}" />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">Name</div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li class="item-divider">Sort Order</li>
+                                <li>
+                                    <label class="item-content item-radio">
+                                        <input type="radio" name="sort-order" value="asc" checked="${filters.sortOrder == 'asc'}" />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">Ascending</div>
+                                        </div>
+                                    </label>
+                                </li>
+                                <li>
+                                    <label class="item-content item-radio">
+                                        <input type="radio" name="sort-order" value="desc" checked="${filters.sortOrder == 'desc'}" />
+                                        <i class="icon icon-radio"></i>
+                                        <div class="item-inner">
+                                            <div class="item-title">Descending</div>
+                                        </div>
+                                    </label>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        ` : $h` `}
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let widgets = {
+            dataFilter: {
+                enabled: true,
+                defaultFilters: {
+                    sortBy: 'name',
+                    sortOrder: 'asc',
+                    searchString: null
+                }
+            },
+            layoutSwitcher: {
+                enabled: true,
+                layouts: [
+                    {
+                        name: 'List View',
+                        slug: 'list'
+                    },
+                    {
+                        name: 'Grid View',
+                        slug: 'grid'
+                    }
+                ],
+                defaultLayout: 'grid'
+            },
+            infiniteScroll: {
+                enabled: true
+            }
+        }
+
+        let data = {
+            layout: localStorage.getItem('Nectar_WordPress_Authors_Layout') || widgets.layoutSwitcher.defaultLayout,
+            entries: null
+        }
+
+        let messages = {
+            apiError: null
+        }
+
+        let flags = {
+            allowInfiniteScroll: false,
+            allEntriesLoaded: false,
+            apiErrorEntries: false,
+            initialEntriesLoaded: false,
+            loadingInitialEntries: false,
+            loadingMoreEntries: false,
+            loadMoreEntriesError: false,
+            noEntriesFound: false,
+            filtersActive: false
+        }
+
+        let pagination = {
+            entriesPerPage: 25,
+            currentPage: 1
+        }
+
+        let filters = $f7.utils.extend({}, widgets.dataFilter.defaultFilters);
+
+        let generateRequestParameters = function() {
+            let parameters = {};
+            parameters.per_page = pagination.entriesPerPage;
+            parameters.page = pagination.currentPage;
+            if (filters.sortBy != null) {
+                parameters.orderby = filters.sortBy;
+            }
+            if (filters.sortOrder != null) {
+                parameters.order = filters.sortOrder;
+            }
+            if (filters.searchString != null) {
+                parameters.search = filters.searchString;
+            }
+            parameters._embed = true;
+            return parameters;
+        }
+
+        let generateResponseData = function(response) {
+            let entries = [];
+            for (i=0; i<response.data.length; i++) {
+                let entry = {};
+                entry.id = response.data[i].id || null;
+                entry.name = response.data[i].name || null;
+                entry.slug = response.data[i].slug || null;
+                entry.description = response.data[i].description || null;
+                entry.avatar = response.data[i].avatar_urls ? (response.data[i].avatar_urls['96'] || response.data[i].avatar_urls['48'] || response.data[i].avatar_urls['24']) : null;
+                entries.push(entry);
+            }
+            return entries;
+        }
+
+        let loadInitialEntries = function() {
+            flags.allEntriesLoaded = false;
+            flags.apiErrorEntries = false;
+            flags.initialEntriesLoaded = false;
+            flags.loadingInitialEntries = true;
+            flags.loadingMoreEntries = false;
+            flags.loadMoreEntriesError = false;
+            flags.noEntriesFound = false;
+            pagination.currentPage = 1;
+            data.entries = null;
+            messages.apiError = null;
+            $update();
+            let requestParameters = generateRequestParameters();
+            $f7.request({
+                url: $f7.wordpress.generateEndpoint($f7.wordpress.type == 'org' ? '/wp/v2' : '', '/users'),
+                method: 'GET',
+                data: requestParameters,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                if (response.data.length) {
+                    flags.initialEntriesLoaded = true;
+                    flags.loadingInitialEntries = false;
+                    let entries = generateResponseData(response);
+                    data.entries = entries;
+                    $update(function() {
+                        $f7.randomColorClassGenerator.initialize($el.value);
+                        if (response.data.length < pagination.entriesPerPage) {
+                            flags.allEntriesLoaded = true;
+                            $update();
+                        }
+                        else {
+                            if (widgets.infiniteScroll.enabled) {
+                                flags.allowInfiniteScroll = true;
+                                $update(function() {
+                                    initializeInfiniteScroll();
+                                });
+                            }
+                        }
+                    });
+                }
+                else {
+                    flags.loadingInitialEntries = false;
+                    flags.noEntriesFound = true;
+                    $update();
+                }
+            })
+            .catch(function(response) {
+                flags.apiErrorEntries = true;
+                flags.loadingInitialEntries = false;
+                messages.apiError = $f7.wordpress.parseHttpError(response);
+                $update();
+            });
+        }
+
+        let loadMoreEntries = function() {
+            flags.loadingMoreEntries = true;
+            flags.loadMoreEntriesError = false;
+            pagination.currentPage = pagination.currentPage + 1;
+            $update();
+            let requestParameters = generateRequestParameters();
+            $f7.request({
+                url: $f7.wordpress.generateEndpoint($f7.wordpress.type == 'org' ? '/wp/v2' : '', '/users'),
+                method: 'GET',
+                data: requestParameters,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                if (response.data.length) {
+                    flags.loadingMoreEntries = false;
+                    entries = generateResponseData(response);
+                    data.entries = data.entries.concat(entries);
+                    $update(function() {
+                        $f7.randomColorClassGenerator.initialize($el.value);
+                        if (response.data.length < pagination.entriesPerPage) {
+                            if (widgets.infiniteScroll.enabled) {
+                                $f7.infiniteScroll.destroy($el.value.find('.infinite-scroll-content'));
+                            }
+                            flags.allEntriesLoaded = true;
+                            $update();
+                            return;
+                        }
+                        if (widgets.infiniteScroll.enabled) {
+                            if ($f7.elementInViewport($el.value.find('#infinite-scroll-handler')[0])) {
+                                loadMoreEntries();
+                            }
+                            else {
+                                flags.allowInfiniteScroll = true;
+                                $update();
+                            }
+                        }
+                    });
+                }
+            })
+            .catch(function(response) {
+                flags.loadingMoreEntries = false;
+                flags.loadMoreEntriesError = true;
+                pagination.currentPage = pagination.currentPage - 1;
+                $update();
+            });
+        }
+
+        let initializeInfiniteScroll = function() {
+            $f7.infiniteScroll.create($el.value.find('.infinite-scroll-content'));
+            $el.value.find('.infinite-scroll-content').on('infinite', function() {
+                if (!flags.allowInfiniteScroll) {
+                    return;
+                }
+                flags.allowInfiniteScroll = false;
+                $update(function() {
+                    loadMoreEntries();
+                });
+            });
+            if ($f7.elementInViewport($el.value.find('#infinite-scroll-handler')[0])) {
+                flags.allowInfiniteScroll = false;
+                $update(function() {
+                    loadMoreEntries();
+                });
+            }
+        }
+
+        let switchLayout = function(layout) {
+            localStorage.setItem('Nectar_WordPress_Authors_Layout', layout);
+            data.layout = layout;
+            $update(function() {
+                $f7.randomColorClassGenerator.initialize($el.value);
+            });
+        }
+
+        let applyFilters = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            filters.sortBy = form.elements.namedItem('sort-by').value;
+            filters.sortOrder = form.elements.namedItem('sort-order').value;
+            filters.searchString = form.elements.namedItem('search-string').value;
+            flags.filtersActive = true;
+            $update(function() {
+                loadInitialEntries();
+            });
+        }
+
+        let resetFilters = function() {
+            $f7.utils.extend(filters, widgets.dataFilter.defaultFilters);
+            $update(function() {
+                loadInitialEntries();
+            });
+        }
+
+        let initializePullToRefresh = function() {
+            let pullToRefresh = $f7.ptr.create($el.value.find('.ptr-content'));
+            pullToRefresh.on('refresh', function() {
+                setTimeout(function() {
+                    pullToRefresh.done();
+                    $f7router.refreshPage();
+                }, 1000);
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadInitialEntries();
+            initializePullToRefresh();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,276 @@
+<template>
+    <div class="page">
+
+        <div class="navbar navbar-transparent color-theme-white dark">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title" innerHTML="${data.entry ? data.entry.title : 'Page'}"></div>
+            </div>
+        </div>
+
+        <div class="page-content" style="--f7-page-navbar-offset: 0;">
+
+            ${data.entry ? $h`
+            <div class="overlay-container" style="height: 384px;">
+                ${data.entry.featuredMedia && data.entry.featuredMedia.original ? $h`
+                <img src="${data.entry.featuredMedia.original.source_url}" alt="" style="height: 384px;" />
+                ` : $h` `}
+                <div class="overlay-content align-items-stretch justify-content-flex-end text-align-start" style="padding-left: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-left)); padding-right: calc(var(--f7-block-padding-horizontal) + var(--f7-safe-area-right));">
+                    <div class="margin-top-auto padding-top">
+                        <div class="font-size-22 font-weight-bold multi-line-text lines-5" innerHTML="${data.entry.title}"></div>
+                        <div class="font-size-12 margin-top-half single-line-text">
+                            ${data.entry.author ? $h`
+                            <a href="/integrations/wordpress/authors/${data.entry.author.slug}/${data.entry.author.id}/pages/" class="text-color-white">
+                                ${data.entry.author.avatar ? $h`
+                                <img class="shape-circle vertical-align-middle" src="${data.entry.author.avatar}" height="28" width="28" alt="" />
+                                ` : $h`
+                                <span class="shape-container shape-circle bg-color-random text-color-white" style="height: 28px; width: 28px;">
+                                    <span class="font-size-14 font-weight-600">${data.entry.author.name.trim().charAt(0)}</span>
+                                </span>
+                                `}
+                                <span class="margin-horizontal-half">${data.entry.author.name}</span>
+                            </a>
+                            ${`\u2022`}
+                            ` : $h` `}
+                            <span class="margin-horizontal-half">${moment(data.entry.date_updated).format('MMMM DD, YYYY')}</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="row justify-content-center no-gap padding-horizontal-half">
+
+                <div class="col-100 medium-60 large-65">
+
+                    <div class="card margin-horizontal-half no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content card-content-padding">
+                            <div class="entry">
+                                ${data.entry.content ? $h`
+                                <div class="entry-content" innerHTML="${data.entry.content}"></div>
+                                ` : $h`
+                                <div class="empty-state">
+                                    <div class="empty-state-media">
+                                        <span class="shape-container shape-auto size-72 bg-color-chrome">
+                                            <i class="icon f7-icons font-size-40">doc_richtext</i>
+                                        </span>
+                                    </div>
+                                    <div class="empty-state-title">No Content Available</div>
+                                </div>
+                                `}
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-100 medium-40 large-35 sticky sticky-top" style="top: var(--f7-navbar-height);">
+
+                    ${data.entry.author ? $h`
+                    <div class="card margin-horizontal-half no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'} medium-margin-top no-margin-top">
+                        <div class="card-header">
+                            <span>Author</span>
+                            <a href="/integrations/wordpress/authors/${data.entry.author.slug}/${data.entry.author.id}/pages/" class="link link-button font-size-14 font-weight-600">All Pages</a>
+                        </div>
+                        <div class="card-content card-content-padding">
+                            ${data.entry.author.avatar ? $h`
+                            <img class="avatar shape-circle" src="${data.entry.author.avatar}" loading="lazy" height="64" width="64" alt="" />
+                            ` : $h`
+                            <span class="avatar shape-container shape-circle size-64 text-color-white">
+                                <span class="font-size-40 font-weight-900">${data.entry.author.name.trim().charAt(0)}</span>
+                            </span>
+                            `}
+                            <div class="card-title margin-top-half" innerHTML="${data.entry.author.name}"></div>
+                            <div class="card-text" innerHTML="${data.entry.author.description}"></div>
+                        </div>
+                    </div>
+                    ` : $h` `}
+
+                </div>
+
+            </div>
+            ` : $h` `}
+
+            ${flags.loadingEntry ? $h`
+            <div class="block margin-vertical text-align-center" style="top: var(--f7-navbar-height);">
+                <div class="preloader" key="preloader"></div>
+            </div>
+            ` : $h` `}
+
+            ${flags.noEntryFound ? $h`
+            <div class="empty-state">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Page Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadEntry}">Retry</button>
+                </div>
+            </div>
+            ` : $h` `}
+
+            ${flags.apiErrorEntry ? $h`
+            <div class="empty-state">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                ${$f7.online ? $h`
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">${messages.apiError}</div>
+                ` : $h`
+                <div class="empty-state-title">No Internet Connection</div>
+                <div class="empty-state-text">Please make sure you are connected to the Internet.</div>
+                `}
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadEntry}">Retry</button>
+                </div>
+            </div>
+            ` : $h` `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let data = {
+            entry: null
+        }
+
+        let messages = {
+            apiError: null
+        }
+
+        let flags = {
+            apiErrorEntry: false,
+            entryLoaded: false,
+            loadingEntry: false,
+            noEntryFound: false
+        }
+
+        let generateRequestParameters = function() {
+            let parameters = {};
+            parameters.slug = $f7route.params.page_slug;
+            parameters.include = $f7route.params.page_id;
+            parameters._embed = true;
+            return parameters;
+        }
+
+        let generateResponseData = function(response) {
+            let entry = {};
+            entry.id = response.data[0].id || null;
+            entry.title = response.data[0].title && response.data[0].title.rendered ? response.data[0].title.rendered : null;
+            entry.slug = response.data[0].slug || null;
+            entry.excerpt = response.data[0].excerpt && response.data[0].excerpt.rendered ? response.data[0].excerpt.rendered : null;
+            entry.content = response.data[0].content && response.data[0].content.rendered ? response.data[0].content.rendered : null;
+            if (response.data[0].featured_media && response.data[0]._embedded && response.data[0]._embedded['wp:featuredmedia'] && response.data[0]._embedded['wp:featuredmedia'].length && response.data[0]._embedded['wp:featuredmedia'][0].id) {
+                entry.featuredMedia = {};
+                if (response.data[0]._embedded['wp:featuredmedia'][0].media_details && response.data[0]._embedded['wp:featuredmedia'][0].media_details.sizes) {
+                    entry.featuredMedia = $f7.utils.extend(entry.featuredMedia, response.data[0]._embedded['wp:featuredmedia'][0].media_details.sizes);
+                }
+                entry.featuredMedia.original = {};
+                entry.featuredMedia.original.source_url = response.data[0]._embedded['wp:featuredmedia'][0].source_url;
+            }
+            else {
+                entry.featuredMedia = null;
+            }
+            if (response.data[0].author && response.data[0]._embedded && response.data[0]._embedded['author'] && response.data[0]._embedded['author'].length && response.data[0]._embedded['author'][0].id) {
+                entry.author = {};
+                entry.author.id = response.data[0]._embedded['author'][0].id;
+                entry.author.name = response.data[0]._embedded['author'][0].name;
+                entry.author.slug = response.data[0]._embedded['author'][0].slug;
+                entry.author.description = response.data[0]._embedded['author'][0].description;
+                entry.author.avatar = response.data[0]._embedded['author'][0].avatar_urls ? (response.data[0]._embedded['author'][0].avatar_urls['96'] || response.data[0]._embedded['author'][0].avatar_urls['48'] || response.data[0]._embedded['author'][0].avatar_urls['24']) : null;
+            }
+            else {
+                entry.author = null;
+            }
+            entry.date_published = response.data[0].date_gmt;
+            entry.date_updated = response.data[0].modified_gmt;
+            entry.protected = (response.data[0].excerpt && response.data[0].excerpt.protected || response.data[0].content && response.data[0].content.protected) ? true : false;
+            return entry;
+        }
+
+        let loadEntry = function() {
+            flags.apiErrorEntry = false;
+            flags.entryLoaded = false;
+            flags.loadingEntry = true;
+            flags.noEntryFound = false;
+            data.entry = null;
+            messages.apiError = null;
+            $update();
+            let requestParameters = generateRequestParameters();
+            $f7.request({
+                url: $f7.wordpress.generateEndpoint($f7.wordpress.type == 'org' ? '/wp/v2' : '', '/pages'),
+                method: 'GET',
+                data: requestParameters,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                if (response.data.length) {
+                    flags.entryLoaded = true;
+                    flags.loadingEntry = false;
+                    let entry = generateResponseData(response);
+                    data.entry = entry;
+                    $update(function() {
+                        formatExternalLinks();
+                        initializePhotoBrowser();
+                    });
+                }
+                else {
+                    flags.loadingEntry = false;
+                    flags.noEntryFound = true;
+                    $update();
+                }
+            })
+            .catch(function(response) {
+                flags.apiErrorEntry = true;
+                flags.loadingEntry = false;
+                messages.apiError = $f7.wordpress.parseHttpError(response);
+                $update();
+            });
+        }
+
+        let formatExternalLinks = function() {
+            $el.value.find('.entry-content a').each(function(linkEl, index) {
+                $(linkEl).attr('target', $f7.getExternalUrlTarget());
+                $(linkEl).addClass('external');
+            });
+        }
+
+        let initializePhotoBrowser = function() {
+            $el.value.find('.entry-content img').on('click', function() {
+                let currentSlide = jQuery($el.value.find('.entry-content img')).index(this);
+                let photos = [];
+                $el.value.find('.entry-content img').each(function(imgEl, index) {
+                    let photo = {};
+                    photo.url = $(imgEl).attr('src');
+                    photo.caption = $(imgEl).attr('alt');
+                    photos.push(photo);
+                });
+                let photoBrowser = $f7.photoBrowser.create({
+                    photos: photos,
+                    swiper: {
+                        initialSlide: currentSlide
+                    }
+                });
+                photoBrowser.open();
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadEntry();
+        });
+
+        return $render;
+    }
+</script>

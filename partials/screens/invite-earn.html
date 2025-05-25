@@ -1,0 +1,334 @@
+<template>
+    <div class="page" data-name="invite-earn">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Invite & Earn</div>
+                <div class="right">
+                    <a href="#" class="link icon-only tooltip-init" data-tooltip="Your Referral Rewards" @click="${() => popupReferralRewards.open()}">
+                        <i class="icon f7-icons">gift</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-75 large-60 xlarge-50 padding-vertical">
+
+                    <div class="block block-strong inset display-flex flex-direction-column align-items-center justify-content-flex-start height-100 no-margin-vertical text-align-center">
+
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'invite-earn.json'}" autoplay loop background="transparent" speed="1" style="height: 256px;"></lottie-player>
+
+                        <div class="margin-vertical">
+                            <div class="font-size-24 font-weight-bold">Invite Friends & Earn Rewards</div>
+                            <div class="font-size-16 margin-vertical-half text-color-gray">Invite your friends to Nectar and when they sign up you both earn 1000 reward points.</div>
+                            <a href="#" class="link link-button font-size-12" @click="${() => popupHowItWorks.open()}">HOW IT WORKS?</a>
+                        </div>
+
+                        <div style="margin-top: 32px;">
+                            <div class="font-size-10 font-weight-600 letter-spacing-1 margin-bottom-half text-color-gray">YOUR INVITE CODE</div>
+                            <div class="invite-code" @click="${copyInviteCode}">
+                                ${inviteCode ? $h`
+                                <span>${inviteCode}</span>
+                                ` : $h`
+                                <span key="preloader" class="preloader"></span>
+                                `}
+                            </div>
+                            <div class="font-size-10 font-weight-600 letter-spacing-1 margin-top-half text-color-gray">TAP TO COPY</div>
+                        </div>
+
+                        <div class="margin-top-auto padding-top">
+                            <button type="button" class="button button-fill button-round" style="width: 192px;" @click="${shareInviteCode}">Invite</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-how-it-works" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">How Invite & Earn Works?</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => popupHowItWorks.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="list media-list medium-inset medium-margin-vertical no-margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media align-self-center text-align-center">
+                                        <span class="font-size-24 font-weight-bold" style="color: var(--color-blue-200);">01</span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">Share Your Invite Code</div>
+                                        </div>
+                                        <div class="item-text">Share your invite code with your friends so they can sign up on Nectar.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media align-self-center text-align-center">
+                                        <span class="font-size-24 font-weight-bold" style="color: var(--color-amber-200);">02</span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">You Get Reward Points</div>
+                                        </div>
+                                        <div class="item-text">You get 1000 reward points as soon as your friend signs up.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media align-self-center text-align-center">
+                                        <span class="font-size-24 font-weight-bold" style="color: var(--color-pink-200);">03</span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">Your Friend Gets Reward Points</div>
+                                        </div>
+                                        <div class="item-text">Your friend gets 1000 reward points when they sign up and complete their profile.</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Terms & Conditions</div>
+                    <div class="list medium-inset medium-margin-vertical no-margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons font-size-12" style="color: var(--color-bluegray-100);">circle</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title font-size-14">The user you refer must sign up and complete their profile in order to receive reward points and for you to get reward points they must at least sign up using your invite code.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons font-size-12" style="color: var(--color-bluegray-100);">circle</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title font-size-14">Nectar reserves the right to modify/suspend/terminate the program with a prior notice.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons font-size-12" style="color: var(--color-bluegray-100);">circle</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title font-size-14">Anyone found guilty of misusing this program will be taken strict legal action upon.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons font-size-12" style="color: var(--color-bluegray-100);">circle</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title font-size-14">Self referral or any sort of circular referral would lead to your reward points being removed.</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+        <div id="popup-referral-rewards" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Your Referral Rewards</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => popupReferralRewards.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="list no-margin-vertical no-hairlines sticky sticky-top">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon f7-icons font-size-40 text-gradient-blue">gift</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title font-size-20 font-weight-bold">Total Earnings</div>
+                                        <div class="item-after">
+                                            <div class="badge badge-fade badge-outline badge-round no-margin color-blue">25000 Points</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="list media-list inset margin-vertical">
+                        <ul>
+                            ${Array(25).fill().map((item, index) => $h`
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img class="shape-auto" src="${faker.internet.avatar()}" loading="lazy" height="40" width="40" alt="" />
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${faker.name.firstName() + ' ' + faker.name.lastName()}</div>
+                                            <div class="item-after">
+                                                <span class="badge badge-fade badge-outline badge-round no-margin color-blue">1000 Points</span>
+                                            </div>
+                                        </div>
+                                        <div class="item-text font-size-12">${moment(faker.date.recent(7)).fromNow()}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .page[data-name=invite-earn] .invite-code {
+        border: 2px dashed var(--color-bluegray-900);
+        border-radius: 4px;
+        box-sizing: border-box;
+        color: var(--color-bluegray-900);
+        cursor: pointer;
+        display: inline-block;
+        font-size: 24px;
+        font-weight: bold;
+        letter-spacing: 2px;
+        padding: 8px 16px;
+        text-align: center;
+        width: 192px;
+    }
+
+    .dark .page[data-name=invite-earn] .invite-code {
+        border: 2px dashed var(--color-bluegray-100);
+        color: var(--color-bluegray-100);
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let inviteCode = null;
+        let popupHowItWorks = null;
+        let popupReferralRewards = null;
+
+        let loadInviteCode = function() {
+            setTimeout(function() {
+                inviteCode = faker.random.alphaNumeric(5).toUpperCase();
+                $update();
+            }, 2500);
+        }
+
+        let copyInviteCode = function() {
+            if ($f7.support.webApi.clipboard) {
+                navigator.clipboard.writeText(inviteCode)
+                    .then(function() {
+                        $f7.toast.show({
+                            text: 'Code Copied!'
+                        });
+                    })
+                    .catch(function() {
+                        $f7.toast.show({
+                            text: 'Error!',
+                            cssClass: 'color-red'
+                        });
+                    });
+            }
+        }
+
+        let shareInviteCode = function() {
+            if ($f7.support.webApi.webShare) {
+                navigator.share({
+                    title: 'Nectar',
+                    text: 'Hey there, use the invite code ' + inviteCode + ' when signing up on Nectar.',
+                    url: 'https://nectar.website'
+                })
+                .then(function() {
+                    if ($f7.device.os == 'ios') {
+                        window.location.reload(true);
+                    }
+                })
+                .catch(function() {
+                    if ($f7.device.os == 'ios') {
+                        window.location.reload(true);
+                    }
+                });
+            }
+            else {
+                copyInviteCode();
+            }
+        }
+
+        let initializePopupHowItWorks = function() {
+            popupHowItWorks = $f7.popup.create({
+                el: $el.value.find('#popup-how-it-works')
+            });
+        }
+
+        let initializePopupReferralRewards = function() {
+            popupReferralRewards = $f7.popup.create({
+                el: $el.value.find('#popup-referral-rewards')
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadInviteCode();
+            initializePopupHowItWorks();
+            initializePopupReferralRewards();
+        });
+
+        return $render;
+    }
+</script>

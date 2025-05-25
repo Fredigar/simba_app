@@ -1,0 +1,281 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Google Maps</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-green-50);">
+                            <img src="https://cdn.svgporn.com/logos/google-maps.svg" height="48" alt="" />
+                        </span>
+                        <p>Show any location or different routes on the map, or build address autocomplete feature using Google Maps.</p>
+                    </div>
+
+                    <div class="block-title margin-vertical">Places Autocomplete</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content item-input">
+                                    <div class="item-inner">
+                                        <div class="item-input-wrap">
+                                            <div class="item-media">
+                                                <div class="icon material-icons">place</div>
+                                            </div>
+                                            <input id="input-places-autocomplete" type="text" placeholder="Where are we going?" />
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Area Map</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <iframe class="responsive-content" src="https://www.google.com/maps/embed/v1/place?key=${$f7.config.googleMaps.apiKey}&q=48.8583736,2.2922926&language=${$f7.i18n.currentLanguage().code}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="block-title margin-vertical">Route Map</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <iframe class="responsive-content" src="https://www.google.com/maps/embed/v1/directions?key=${$f7.config.googleMaps.apiKey}&origin=place_id:ChIJOfBn8mFuQUYRmh4j019gkn4&destination=place_id:ChIJIz2AXDxTUkYRuGeU5t1-3QQ&language=${$f7.i18n.currentLanguage().code}" frameborder="0" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="block-title margin-vertical">Markers & Info Window</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <div id="map-markers-info-window" class="responsive-content"></div>
+                        </div>
+                        <p class="text-align-center text-color-gray">Tap on the map markers to open info window.</p>
+                    </div>
+
+                    <div class="block-title margin-vertical">Street View Panorama</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <div id="map-street-view-panorama" class="responsive-content"></div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let locations = [
+            {
+                name: 'Great Wall of China',
+                location: 'China',
+                year: '700 BC',
+                image: 'https://source.unsplash.com/0FMRVVrMCyc',
+                coordinates: {
+                    lat: 40.67666667,
+                    lng: 117.2316667
+                }
+            },
+            {
+                name: 'Petra',
+                location: 'Ma\'an, Jordan',
+                year: '312 BC',
+                image: 'https://source.unsplash.com/k8-5bWDAklo',
+                coordinates: {
+                    lat: 30.32861111,
+                    lng: 35.44194444
+                }
+            },
+            {
+                name: 'Colosseum',
+                location: 'Rome, Italy',
+                year: '80 AD',
+                image: 'https://source.unsplash.com/hi_52O-h5G8',
+                coordinates: {
+                    lat: 41.89,
+                    lng: 12.49222222
+                }
+            },
+            {
+                name: 'Chichen Itza',
+                location: 'Yucatan, Mexico',
+                year: '600 AD',
+                image: 'https://source.unsplash.com/huMh6cfhl_o',
+                coordinates: {
+                    lat: 20.68277778,
+                    lng: -88.56861111
+                }
+            },
+            {
+                name: 'Machu Picchu',
+                location: 'Cuzco Region, Peru',
+                year: '1450 AD',
+                image: 'https://source.unsplash.com/yam1KMv0SgQ',
+                coordinates: {
+                    lat: -12.83666667,
+                    lng: -72.54555556
+                }
+            },
+            {
+                name: 'Taj Mahal',
+                location: 'Agra, India',
+                year: '1643 AD',
+                image: 'https://source.unsplash.com/iWMfiInivp4',
+                coordinates: {
+                    lat: 27.175,
+                    lng: 78.04194444
+                }
+            },
+            {
+                name: 'Christ the Redeemer',
+                location: 'Rio de Janeiro, Brazil',
+                year: '1931 AD',
+                image: 'https://source.unsplash.com/vEQe_DuVmKk',
+                coordinates: {
+                    lat: -21.04805556,
+                    lng: -43.21055556
+                }
+            }
+        ]
+
+        let placesAutocomplete = null;
+        let mapMarkersInfoWindow = null;
+        let mapStreetViewPanorama = null;
+
+        let initializePlacesAutocomplete = function() {
+            placesAutocomplete = new google.maps.places.Autocomplete(
+                $el.value.find('#input-places-autocomplete')[0],
+                {
+                    types: ['geocode']
+                }
+            );
+        }
+
+        let initializeMapMarkersInfoWindow = function() {
+            mapMarkersInfoWindow = new google.maps.Map(
+                $el.value.find('#map-markers-info-window')[0],
+                {
+                    center: {
+                        lat: 0,
+                        lng: 0
+                    },
+                    zoom: 1
+                }
+            );
+            for (i=0; i<locations.length; i++) {
+                let marker = new google.maps.Marker({
+                    position: locations[i].coordinates,
+                    map: mapMarkersInfoWindow
+                });
+                attachMapMarkersInfoWindow(marker, locations[i]);
+            }
+        }
+
+        let attachMapMarkersInfoWindow = function(marker, info) {
+            marker.addListener('click', function() {
+                openMapMarkersInfoWindow(info);
+            });
+        }
+
+        let openMapMarkersInfoWindow = function(info) {
+            let popup = $f7.popup.create({
+                content: `
+                    <div class="popup">
+                        <div class="page">
+                            <div class="navbar">
+                                <div class="navbar-bg"></div>
+                                <div class="navbar-inner">
+                                    <div class="title">Google Maps</div>
+                                    <div class="right">
+                                        <a class="link icon-only popup-close">
+                                            <i class="icon material-icons">cancel</i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-content">
+                                <div class="responsive-container">
+                                    <img class="responsive-content" src="${info.image}" alt="" />
+                                </div>
+                                <div class="list inset margin-vertical">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">Name</div>
+                                                    <div class="item-after">${info.name}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">Location</div>
+                                                    <div class="item-after">${info.location}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">Year</div>
+                                                    <div class="item-after">${info.year}</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `
+            });
+            popup.open();
+        }
+
+        let initializeMapStreetViewPanorama = function() {
+            mapStreetViewPanorama = new google.maps.StreetViewPanorama(
+                $el.value.find('#map-street-view-panorama')[0],
+                {
+                    position: {
+                        lat: 46.7363,
+                        lng: 10.8487
+                    },
+                    pov: {
+                        heading: 180,
+                        pitch: 0
+                    },
+                    zoom: 1,
+                }
+            );
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePlacesAutocomplete();
+            initializeMapMarkersInfoWindow();
+            initializeMapStreetViewPanorama();
+        });
+
+        return $render;
+    }
+</script>

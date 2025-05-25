@@ -1,0 +1,92 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Vibration</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be uset to access the vibration mechanism of the device.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical padding-top-half">
+                        ${isVibrating ? $h`
+                        <button type="button" class="button button-fade margin-top-half" @click="${stopVibration}">Stop Vibration</button>
+                        ` : $h`
+                        <div class="row">
+                            <div class="col-100 small-50 margin-top-half">
+                                <button type="button" class="button button-fill" @click="${singleVibration}">Single Vibration</button>
+                            </div>
+                            <div class="col-100 small-50 margin-top-half">
+                                <button type="button" class="button button-fill" @click="${patternedVibration}">Patterned Vibration</button>
+                            </div>
+                        </div>
+                        `}
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isVibrating = false;
+
+        let singleVibration = function() {
+            navigator.vibrate(1000);
+            setVibrationStatus(true);
+            setTimeout(function() {
+                setVibrationStatus(false);
+            }, 1000);
+        }
+
+        let patternedVibration = function() {
+            navigator.vibrate([1000, 500, 1500, 1000, 2000]);
+            setVibrationStatus(true);
+            setTimeout(function() {
+                setVibrationStatus(false);
+            }, 6000);
+        }
+
+        let stopVibration = function() {
+            navigator.vibrate(0);
+            setVibrationStatus(false);
+        }
+
+        let setVibrationStatus = function(status) {
+            isVibrating = status;
+            $update();
+        }
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,2822 @@
+<template>
+
+    <div class="page no-tabbar" data-name="cart">
+        <!-- Navbar remains unchanged -->
+        <div id="conversation-navbar" class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${chat.title}</div>
+                <div class="right">
+                    <a href="#" data-tooltip="Reproducir conversación" class="link tooltip-init icon-only"><i
+                            class="icon material-icons">play</i></a>
+                    <a href="/components/timer" data-tooltip="New conversation"
+                       class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
+                    <a href="/screens/conversation-list/${assistant.guid}" data-tooltip="Histórico de conversaciones"
+                       class="tooltip-init link icon-only"><i class="icon material-icons">forum</i></a>
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-assistants" data-tooltip="Change Assistant">
+                    <img class="shape-circle" width="40"  src="${assistant.avatar}"/>
+
+                </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="undefined toolbar messagebar messagebar-chat">
+            <div id="page-toolbar" class="toolbar-inner" style="min-height: 70px;">
+
+            </div>
+        </div>
+        <!-- Page content with messages and messagebar inside -->
+        <div class="page-content" id="conversationPage">
+            <div class="row justify-content-center no-gap padding-horizontal-half"
+                 style="--f7-card-margin-horizontal: 8px;">
+                <div id="message-area" class="col-100 medium-65 large-70 xlarge-65">
+                    <div style="${!showBottomBar ? 'margin-top:200px' : ''}"
+                         class="messages-content justify-content-center padding-top row">
+                        <div class="col-50 large-60 medium-75 messages xlarge-70" id="messages-space">
+
+                        </div>
+                        <!-- Centered messagebar component (only show when no messages) -->
+
+                        <div id="prompt-area"
+                             class="centered-messagebar-container">
+                            ${!showBottomBar ? $h`
+                            <div class="display-flex justify-content-center width-100">
+                                <img src="${assistant.mainImage}" width="300" class=""/>
+                            </div>
+
+                            <div class="block-title-large margin text-align-center">${myDevice ? 'How can I help you?' :
+                                'Please select a device.'}
+                            </div>
+
+                            ` : ''}
+                            <!-- Remaining components unchanged -->
+
+                            <div id="messagebar-chat"
+                                 class="${isResponding ? 'disabled' : ''}  messagebar-chat centered-messagebar auto-height">
+                                <div id="voiceStatus" ${speechToText ?
+                                '' : 'style="display:none"'}
+                                class="${speechToText ? 'block' : ''} mic-mode text-align-center">${speechToText}
+                            </div>
+
+                            <div class="messagebar-inner">
+                                <div class="messagebar-area" style="overflow:visible; width: 100%;">
+          <textarea style="${myDevice ? '' : 'display:none'}" id="prompt"
+                    placeholder="${!myDevice ? 'Ask anything about one particular device (please select a device first)...' : `Ask anything about the ${myDevice}`}"
+                    @input="${handlePromptTextArea}"
+                    @keydown="${handleKeyDown}"
+                    class="input-with-value resizable keyboard-mode"></textarea>
+
+                                </div>
+                            </div>
+                            <div class="messagebar-buttons-bottom">
+
+
+                                <div class="row align-items-center">
+                                    <div class="col-90">
+                                        <div id="device-list"
+                                             class="block float-left margin-bottom-auto margin-horizontal-auto inset margin-vertical">
+                                            ${(myDevice) ? $h`
+                                            <div data-tooltip="Select other device"
+                                                 class="tooltip-init bg-color-blue chip cursor-pointer"
+                                                 @click="${handleOpenDeviceSelection}">
+                                                <div class="chip-label">${myDevice}</div>
+                                            </div>
+                                            <div data-tooltip="Open toolbox"
+                                                 class="tooltip-init bg-color-bluegray chip cursor-pointer"
+                                                 @click="${() => actionsCustomLayout.open()}">
+                                                <div class="chip-media">
+                                                    <i class="fa  fa-tools fa-icon"></i>
+                                                </div>
+                                                <div class="chip-label">${chat.noSelectionInstructions.length} tools
+                                                </div>
+                                            </div>
+
+                                            ` : $h`
+                                            `}
+                                            ${devices.map((device, index) => $h`
+
+                                            <label style="${myDevice ? 'display:none' : ''}" class="chip-selectable">
+                                                ${myDevice === device ? $h`
+                                                <input type="radio" @change="${handleDeviceSelection}"
+                                                       name="chip-selectable-device" checked="checked"
+                                                       value="${device}"/>
+                                                ` : $h`
+                                                <input type="radio" @change="${handleDeviceSelection}"
+                                                       name="chip-selectable-device" value="${device}"/>
+                                                `}
+                                                <div class="chip">
+                                                    <div class="chip-label">${device}</div>
+                                                </div>
+                                            </label>
+                                            `)}
+                                        </div>
+                                    </div>
+                                    <div class="col-10 display-flex justify-content-right align-items-center">
+                                        ${(!prompt || !myDevice) ? $h`
+
+                                        <a href="#" @click="${sendPrompt}" style=""
+                                           data-tooltip='Send message'
+                                           class="disabled link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                            <i class="fa fa-2x fa-arrow-circle-up fa-icon" style="color: #ffffff;"></i>
+                                        </a>
+                                        ` : $h`
+
+                                        <a href="#" @click="${sendPrompt}" style=""
+                                           data-tooltip='Send message'
+                                           class="link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                            <i class="fa fa-2x fa-arrow-circle-up fa-icon" style="color: #4CAF50;"></i>
+                                        </a>
+                                        `}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="margin-top-half margin-bottom-half text-align-center">SIMBA may make mistakes.
+                            Consider verifying
+                            important information.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="scrollToBottom" @click="${scrollToBottom}"
+             class="fab fab-center-bottom hidden color-gray opacity-75">
+            <a href="#">
+                <i class="fa fa-arrow-down"></i>
+            </a>
+        </div>
+        <div class="block-footer"></div>
+    </div>
+
+    <!-- Fixed bottom messagebar (only show when there are messages) -->
+    <!-- Fixed bottom messagebar (only show when there are messages) -->
+
+
+    ${isResponding ? $h`
+    <div class="fab fab-extended fab-center-bottom"><a href="#"><i class="icon material-icons">stop</i><span
+            class="fab-text">Stop</span></a></div>
+    `:$h``}
+    <div id="dialog-choice-chip" class="dialog">
+        <div class="dialog-inner">
+            <div class="dialog-title">Choose te reason for your feedback</div>
+            <form name="dialog-choice-chip" action="#" method="POST" enctype="multipart/form-data"
+                  @submit="${(event) => event.preventDefault()}">
+                <div class="block margin-top no-margin-bottom no-padding-horizontal">
+                    ${unlikeReasons.map((option, index) => $h`
+                    <label data-tooltip="${option.description}" class="tooltip-init chip-selectable">
+                        <input type="checkbox" name="interests" value="${option.value}"/>
+                        <div class="chip color-pink">
+                            <div class="chip-label">${option.reason}</div>
+                        </div>
+                    </label>
+                    `)}
+                    <textarea class="padding margin" style="width:90%;height:200px;background-color:#333333!important"
+                              placeholder="Please describe your feedback"></textarea>
+
+                </div>
+            </form>
+        </div>
+        <div class="dialog-buttons">
+            <span class="dialog-button color-gray" @click="${closeDialogChoiceChip}">Cancel</span>
+            <span class="dialog-button" @click="${submitFormDialogChoiceChip}">OK</span>
+        </div>
+    </div>
+
+    <div id="dialog-open-ticket" class="dialog">
+        <div class="dialog-inner">
+            <div class="dialog-title">Opening a support ticket</div>
+            <form name="dialog-choice-chip" action="#" method="POST" enctype="multipart/form-data"
+                  @submit="${(event) => event.preventDefault()}">
+                <div class="block margin-top no-margin-bottom no-padding-horizontal">
+                    ${unlikeReasons.map((option, index) => $h`
+                    <label data-tooltip="${option.description}" class="tooltip-init chip-selectable">
+                        <input type="checkbox" name="interests" value="${option.value}"/>
+                        <div class="chip color-pink">
+                            <div class="chip-label">${option.reason}</div>
+                        </div>
+                    </label>
+                    `)}
+                    <textarea class="padding margin" style="width:90%;height:200px;background-color:#333333!important"
+                              placeholder="Please describe your feedback"></textarea>
+
+                </div>
+            </form>
+        </div>
+        <div class="dialog-buttons">
+            <span class="dialog-button color-gray" @click="${closeDialogChoiceChip}">Cancel</span>
+            <span class="dialog-button" @click="${submitFormDialogChoiceChip}">OK</span>
+        </div>
+    </div>
+    <div id="popup-ticket" class="popup">
+        <div class="page">
+            <div class="navbar">
+                <div class="navbar-bg"></div>
+                <div class="navbar-inner">
+                    <div class="title">Confirm Support Ticket</div>
+                    <div class="right">
+                        <a class="link icon-only" @click="${closePopupTicket}">
+                            <i class="icon material-icons">cancel</i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="page-content">
+
+                <div class="block block-strong inset margin-vertical">
+                    <div class="margin-top text-align-center">
+                        <div class="font-size-24 font-weight-bold">Confirm Support Ticket</div>
+                        <div class="font-size-16 margin-top-half text-color-gray">Please confirm the details of your
+                            support request.
+                        </div>
+                    </div>
+                </div>
+                <form name="ticket" action="#" method="POST" enctype="multipart/form-data">
+                    <div class="list inset margin-vertical">
+                        <ul class="padding-vertical-half">
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-input-wrap">
+                                            <div class="item-media">
+                                                <i class="icon material-icons">devices</i>
+                                            </div>
+                                            <input type="text" value="${ticket.device}" name="device"
+                                                   placeholder="Device" required/>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-input-wrap">
+                                            <div class="item-media">
+                                                <i class="icon material-icons">title</i>
+                                            </div>
+                                            <input type="text" name="problem_title" value="${ticket.problem_title}"
+                                                   placeholder="Title" required/>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-input-wrap">
+                                            <div class="item-media align-self-flex-start">
+                                                <i class="icon material-icons">description</i>
+                                            </div>
+                                            <textarea name="problem_description" class="resizable"
+                                                      placeholder="Description" required style="min-height: 128px;">${ticket.problem_description}</textarea>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <button type="submit" class="button button-fill button-large">Confirm Ticket
+                                        </button>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+    <div id="actions-custom-layout" class="actions-modal">
+        <div class="actions-group text-align-center">
+            <a href="#" class="link shape-container shape-circle overflow-hidden ripple-color-gray"
+               style="background-color: var(--f7-list-bg-color);" @click="${() => actionsCustomLayout.close()}">
+                <i class="icon material-icons text-color-mono">close</i>
+            </a>
+        </div>
+        <div class="actions-group">
+            <div class="list media-list inset no-chevron no-hairlines-between no-margin">
+                <ul>
+
+                    ${chat.instructions.map((option, index) => option.isSelection === 0 ? $h`
+                    <li>
+                        <a href="#" class="item-link" @click="${() => setPrompt(option.prompt)}">
+                            <div class="item-content">
+                                <div class="item-media">
+            <span style="background-color:${option.color}"
+                  class="shape-container shape-auto size-40">
+                <i class="fa ${option.icon} font-size-20 color-white"></i>
+            </span>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">${option.promptName}</div>
+                                    </div>
+                                    <div class="item-text">${option.prompt}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    ` : '')}
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="popover-selection" class="popover">
+        <div class="popover-inner">
+            <div class="list no-chevron no-hairlines-between">
+                <ul>
+                    <li>
+                        <div class="item-content item-input item-input-outline item-input-with-info">
+                            <div class="item-inner no-padding-bottom">
+                                <div class="item-title item-floating-label">Ask to SIMBA</div>
+                                <div class="item-input-wrap no-border">
+                                    <input type="text" @input="${handlePromptTextArea}" id="ask-simba" class=""/>
+                                    <span class="input-clear-button"></span>
+                                    <a href="#" class="link popover-close"  @click="${() => setPrompt(prompt,1)}"><i class="icon f7-icons">arrow_up</i></a></div>
+                            </div>
+                        </div>
+                    </li>
+
+                    <li>
+                        <a href="#" class="item-link" @click="${highlightForReporting}">
+                            <div class="item-content" style="height:10px">
+                                <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-highlighter color-yellow"></i>
+            </span>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title">Highlight for reporting</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    ${chat.instructions.map((option, index) => option.isSelection === 1 ? $h`
+                    <li>
+                        <a href="#" class="item-link popover-close" @click="${() => setPrompt(option.prompt,1)}">
+                            <div class="item-content" style="height:10px">
+                                <div class="item-media">
+            <span style="background-color:${option.color}"
+                  class="shape-container shape-auto size-40">
+                <i class="fa ${option.icon} color-white"></i>
+            </span>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title-row">
+                                        <div class="item-title">${option.promptName}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    ` : '')}
+                    <li>
+                        <a href="#" class="item-link popover-close">
+                            <div class="item-content" style="height:10px">
+                                <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-copy color-white"></i>
+            </span>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title">Copy to clipboard</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </div>
+    <div id="popover-assistants" class="popover" style="min-width: 192px;">
+        <div class="popover-inner">
+            <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                <ul>
+
+                    ${assistants.map((item, index) => $h`
+                    <li>
+                        <a href="#" class="popover-close" @click="${() => switchAssistant(item.guid)}">
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <img class="shape-circle" width="40"  height="40" src="${item.avatar}"/>
+
+                                </div>
+                                <div data-tooltip="${item.name}" class="tooltip-init item-inner">
+                                    <div class="item-title">${item.name}</div>
+                                    ${item.guid == assistant.guid && $h`
+                                    <i class="icon margin-left f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                    `}
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+</template>
+
+<style>
+    /* Your existing styles */
+    @keyframes pulse-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes thinking-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.5);
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    /* New styles for the centered messagebar container */
+    .centered-messagebar-container {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: inline-grid;
+        justify-content: center;
+        align-items: center;
+        top: 0;
+        transition: all 0.3s ease; /* Añadir transición suave */
+        left: 0;
+        /*margin-top: 110px;*/
+    }
+
+    .device-desktop .dark *, .device-desktop.dark * {
+        scrollbar-color: var(--color-gray-800) #303030 !important;
+    }
+
+    .centered-messagebar-container.at-bottom {
+        align-items: flex-end;
+        padding-bottom: 15px;
+        position: fixed;
+        top: auto;
+        bottom: 0;
+        height: auto;
+        padding-bottom: 18px;
+        z-index: 9999;
+        background-color: rgb(33 33 33);
+    }
+
+    .centered-messagebar {
+        min-width: 32rem !important;
+        max-width: 100% !important;
+        min-height: 56px !important;
+        border-radius: 28px !important;
+        background-color: #303030;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+        display: flex !important;
+        flex-direction: column !important;
+        justify-content: space-between !important;
+        padding: 10px 0 0 0 !important;
+        transition: height 0.2s ease !important;
+    }
+
+    .centered-messagebar .messagebar-inner {
+        /* display: flex !important;*/
+        flex-direction: row !important;
+        align-items: center !important;
+        width: 96% !important;
+        flex: 1 !important;
+        padding: 0 15px !important;
+        /* background-color: inherit !important;*/
+        margin-left: 10px;
+    }
+
+    .centered-messagebar .messagebar-area {
+        flex: 1 !important;
+        margin: 0 !important;
+        background-color: inherit !important;
+    }
+
+    .centered-messagebar textarea {
+        background-color: inherit !important;
+        border: none !important;
+        min-height: 50px !important;
+        max-height: 120px !important;
+        padding: 15px 5px !important;
+        color: #ffffff !important;
+        font-size: 1.1rem !important;
+        resize: none !important;
+        width: 100% !important;
+    }
+
+    .chip-label {
+    / / font-size: 11 px !important;
+    }
+
+    .centered-messagebar .messagebar-buttons-bottom {
+        /*display: flex !important;*/
+        align-items: center !important;
+        justify-content: flex-end !important;
+        width: 96% !important;
+        padding: 5px 15px !important;
+        /* background-color: inherit !important;*/
+        margin-bottom: 14px;
+        margin-left: 3px;
+    }
+
+
+    /* Keep your existing styles */
+    #center-indicator {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 1px;
+        height: 1px;
+        pointer-events: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #camera-preview, #captured-image {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
+    }
+
+    pre {
+        background-color: #2b2b2b !important;
+        overflow: auto;
+    }
+
+    pre code {
+        width: 100% !important;
+        display: block;
+    }
+
+    code:not(pre code) {
+        background-color: darkgray;
+    }
+
+    .message {
+        max-width: 100% !important;
+        flex-direction: row !important;
+        align-self: normal !important;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        text-align: left !important;
+        padding-top: 0px !important;
+    }
+
+    .message-sent.message-tail .message-bubble:before {
+        border: none !important;
+    }
+
+    pre .hljs {
+        background-color: inherit !important;
+        color: #fff4f4 !important;
+    }
+
+    .message-received.message-tail .message-bubble:before {
+        border: none !important;
+    }
+
+    .message-text {
+        font-size: 1.1em !important;
+        line-height: 1.8;
+    }
+
+    .message-text-header {
+        float: right !important;
+        position: absolute;
+        width: 100%;
+        right: 0px;
+        top: -31px;
+        color: white;
+        text-align: right !important;
+    }
+
+    .message:not(.message-first) .message-name {
+        display: inherit !important;
+    }
+
+    .message-content {
+        align-items: normal !important;
+        width: 100% !important;
+    }
+
+    .messages-content {
+        background-color: inherit !important;
+    }
+
+    .messages {
+        background-color: inherit !important;
+    }
+
+    .message-bubble {
+        color: inherit !important;
+        background: inherit !important;
+        width: 100% !important;
+        padding-top: 0px !important;
+    }
+
+    .card-title {
+        font-size: 1.4em;
+    }
+
+    .message-name {
+        font-weight: 800;
+        font-size: 0.9em;
+        margin-top: 15px !important;
+        padding-left: 0px !important;
+        color: inherit !important;
+    }
+
+    .language-name {
+        margin-right: -15px;
+        margin-top: -15px;
+        font-size: 10px !important;
+    }
+
+    .chip-source {
+        width: 200px !important;
+    }
+
+    .listening-button {
+        animation: pulse-animation 2s infinite;
+    }
+
+    .card-header {
+        margin-top: 3px !important;
+    }
+
+    .thinking-icon {
+        bottom: 1px;
+        position: relative;
+        margin-left: 3px;
+        animation: thinking-animation 2s infinite;
+    }
+
+    .speech-icon {
+        float: right;
+        margin-left: 5px;
+    }
+
+    #voiceStatus {
+        font-size: 1.3em;
+        font-weight: 500;
+    }
+
+    .toolbar.messagebar {
+        background-color: inherit !important;
+        border: none !important;
+    }
+
+    .messagebar-area {
+        background-color: inherit !important;
+    }
+
+    .messagebar textarea {
+        background-color: inherit !important;
+        border-radius: 20px !important;
+        color: white !important;
+        border: none !important;
+        font-size: 1.1rem !important;
+        width: 96%;
+    }
+
+    .toolbar.messagebar .link i {
+        color: #ffffff !important;
+    }
+
+    .message-text {
+        font-size: 1.1rem !important;
+    }
+
+    :root {
+        --mensaje-altura: 800px; /* Valor predeterminado */
+    }
+
+    /*   .block-footer{
+         min-height: var(--message-height) !important;
+       }*/
+
+    .messages .message:last-child .message-text {
+        min-height: var(--message-height) !important;
+    }
+
+    .message-received {
+        background-color: inherit !important;
+        box-shadow: none !important;
+    }
+
+    .message-avatar {
+        top: 15px !important;
+        margin-left: -35px !important;
+        position: absolute !important;
+    }
+
+    .message-sent {
+        background-color: #303030;
+    }
+
+    .call-execution {
+        color: #575757 !important;
+    }
+
+    /* Auto height for textarea */
+    .auto-height textarea {
+        /*overflow: hidden !important;*/
+    }
+
+    /* Text shimmer animation effect - FASTER VERSION */
+    @keyframes shimmer {
+        0% {
+            background-position: -200% 0;
+        }
+        100% {
+            background-position: 200% 0;
+        }
+    }
+
+    code {
+        padding-left: 5px;
+        padding-right: 5px;
+        padding-top: 3px;
+        padding-bottom: 3px;
+        background-color: #424242 !important;
+    }
+
+    .page-content {
+        scrollbar-color: var(--color-gray-800) #212121 !important;
+    }
+
+    .shimmer-text-fast {
+        position: relative;
+        display: inline-block;
+        background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.8) 50%,
+                rgba(255, 255, 255, 0) 100%
+        );
+        background-size: 200% 100%;
+        background-repeat: no-repeat;
+        background-clip: text;
+        -webkit-background-clip: text;
+        color: transparent;
+        text-fill-color: transparent;
+        -webkit-text-fill-color: transparent;
+        background-color: #a7a9a7; /* Text color (shows through the transparent gradient) */
+        animation: shimmer 1.5s infinite linear; /* Very fast - 0.5s */
+        overflow: hidden;
+        font-size: 18px;
+    }
+
+    #scrollToBottom a {
+        width: 30px;
+        height: 30px;
+        /* border: solid, 1px, #fffefe; */
+        background-color: #212121 !important;
+    }
+
+    #scrollToBottom {
+
+        position: sticky;
+        bottom: -8px;
+    }
+
+    .cod-with-auto {
+        width: auto !important;
+        font-size: 16px !important;
+    }
+
+    .message-footer-content .actions {
+        display: none;
+        position: absolute;
+    }
+
+    .message-footer-content .actions {
+        display: none;
+        position: absolute;
+    }
+
+    .messages .message:last-child .actions {
+        display: block !important;
+    }
+
+    #dialog-choice-chip {
+        width: 500px !important;
+    }
+
+    .source-summary {
+        display: -webkit-box !important;
+        -webkit-line-clamp: 4 !important; /* Número de líneas a mostrar */
+        -webkit-box-orient: vertical !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+    }
+
+    .source-title {
+        white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
+        max-width: 300px !important; /* Ajusta según necesites */
+    }
+
+    .source-extra {
+        color: #b7b75d !important
+    }
+
+    #sources-panel {
+        z-index: 999999 !important;
+    }
+
+    #device-list {
+        min-width: 600px;
+        max-width: 600px;
+    }
+
+    /*  .message-footer{
+          margin-top:-30px!important;
+      }*/
+    /* Additional JavaScript to make textarea auto-adjust height */
+</style>
+<script>
+    function chunkIdPlugin(md) {
+        // Expresión regular para detectar [Chunk ID: XXX] "Texto"
+        const chunkRegex = /\[Chunk ID: ([^\]]+)\]\s*"([^"]*)"/g;
+
+        // Regla para procesar el texto
+        md.core.ruler.push('chunk_id_replace', function (state) {
+            let src = state.src;
+            state.src = src.replace(chunkRegex, (match, chunkId, text) => {
+                // Escapar comillas en el texto para evitar errores en data-tooltip
+                const escapedText = text.replace(/"/g, '&quot;');
+                return `<small class="chunk-id" data-tooltip="${escapedText}">[Chunk ID: ${chunkId}]</small>`;
+            });
+        });
+    }
+
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        let photo = null;
+        let photo_description = '';
+        let audio = null;
+        let mode = 'keyboard';
+        let response = '';
+        let recognition = null;
+        let lastRecognizedText = null;
+        let lastCancelStreaming = '';
+        let lastTextStreaming = '';
+        let isRecognizing = false;
+        let autoPlay = false;
+        let isPlaying = false;
+        let mute = true;
+        let audioQueue = [];
+        let historyAudio = [];
+        let currentMessageId = null;
+        let windowMediaAudio = null;
+        const playbackSpeeds = [1, 1.5, 2];
+        // Índice de la velocidad de reproducción actual
+        let currentSpeedIndex = 0;
+        let speechToText = null;
+        let recognitionMode = "html5"//'html5'//'system' | 'auto'
+        let popupCamera = null;
+        let faceMode = 'environment' //user
+        let videoStream = null;
+        let isTorchOn = false;
+        let isVibrating = false;
+        let isScrolling = false;
+        let isResponding = null;
+        let notFinishedMessage = '';
+        let track;
+        let multipleCamera = false;
+        let imageTaken = null;
+        let base64Image = null;
+        let prompt = null;
+        let messages = [];
+        let messagebar = null;
+        let videos = [];
+        let player = null;
+        let currentVideo = null;
+        let ctx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext)();
+        let analyser = ctx.createAnalyser();
+        let popoverLinks = null;
+        let conversationHistory = [];
+        let processingToolResponse = false;
+        let sources = [];
+
+        let dialogChoiceChip = null;
+        let actionsCustomLayout = null;
+
+        function referencePlugin(md) {
+            const refRE = /\[Reference:\s*([^\]]+)\]/;
+
+            md.inline.ruler.before('emphasis', 'custom_reference', function (state, silent) {
+                const pos = state.pos;
+                const match = refRE.exec(state.src.slice(pos));
+                if (!match) return false;
+
+                if (!silent) {
+                    const token = state.push('custom_reference', '', 0);
+                    token.content = match[1]; // lo que está entre los corchetes
+                }
+
+                state.pos += match[0].length;
+                return true;
+            });
+
+            md.renderer.rules.custom_reference = function (tokens, idx) {
+                const refs = tokens[idx].content.split(';').map(r => r.trim());
+                return `<span class="reference">[${refs.join('; ')}]</span>`;
+            };
+        }
+
+// Usar la función en lugar de la configuración anterior
+        let md = window.markdownit({
+            html: true,            // ¡Muy importante para seguridad!
+            linkify: true,         // Convierte URLs automáticamente en enlaces
+            typographer: true,     // Mejores sustituciones tipográficas
+            highlight: function (str, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return '<pre class="no-margin-top hljs" data-lang="' + lang + '"><code class="cod-with-auto">' +
+                            hljs.highlight(str.replace('<span class="thinking-icon">' + assistant.thinkIcon + '</span>',''), {language: lang, ignoreIllegals: true}).value +
+                            '</code></pre>';
+                    } catch (__) {
+                    }
+                }
+
+                // Si no hay lenguaje especificado o se produce un error:
+                return '<pre class="no-margin-top hljs"><code>' + md.utils.escapeHtml(str.replace('<span class="thinking-icon">' + assistant.thinkIcon + '</span>','')) + '</code></pre>';
+            }
+        }).use(window.texmath, {engine: window.katex, delimiters: 'brackets'});
+        let popupTicket = null;
+        let formTicketValidator = null;
+        let ticket = {
+            device: '',
+            problem_title: "",
+            problem_description: ""
+        };
+        let scrollToBottomBtn = null;
+        let pageContent = null;
+        let breakAutoScroll = false;
+        let user = {
+            guid: '05F1A0C-54F6-5A83-25E0-13EB149B237'
+        }
+        let assistant = {
+            name: 'Bot Assistant',
+            thinkIcon: "✈",
+            avatar: '',
+            mainImage: '',
+            description: ''
+        };
+        let assistants = [];
+        let chat = {
+            guid: $f7route.params.guid,
+            title: 'New chat',
+            instructions: [],
+            noSelectionInstructions: []
+        }
+        let mainSystemMessage = {
+            role: "system",
+            content: ""//Por favor responde a las preguntas del usuario de manera clara y concisa y para aquiellos casos en los que necesites mas informacion usa las herramientas."
+        }
+        let messagesHistory = [{
+            role: "system",
+            content: ""//Por favor responde a las preguntas del usuario de manera clara y concisa y para aquiellos casos en los que necesites mas informacion usa las herramientas."
+        },
+
+        ];
+        let showCenteredBar = messagesHistory.length === 1;
+        let showBottomBar = messagesHistory.length > 1;
+        let params = null;
+        let selectedText = "";
+        console.log(chat.guid);
+        let config = {
+            completionsApiUrl: localStorage.getItem('completionsApiUrl') || 'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/',
+            completionsApiKey: localStorage.getItem('completionsApiKey') || 'sk-865d562c8d55db276dbe14a954e6ae3e',
+            assistantApiUrl: localStorage.getItem('assistantApiUrl') || 'https://survey.simeng.es/api/v1/assistant/',
+            assistantAuthToken: localStorage.getItem('assistantAuthToken') || '2efdb52b15a176c51eeb1da445c180179c95317a',
+            // theme: localStorage.getItem('theme') || 'light'
+        };
+        const unlikeReasons = [
+            {
+                value: "no_solution",
+                reason: "Doesn’t solve the issue",
+                description: "I followed the steps but the problem persists."
+            },
+            {
+                value: "incorrect",
+                reason: "Contains errors",
+                description: "The information or steps are wrong."
+            },
+            {
+                value: "incomplete",
+                reason: "Missing information",
+                description: "Key steps or details are omitted."
+            },
+            {
+                value: "unclear",
+                reason: "Hard to understand",
+                description: "The instructions are confusing or too technical."
+            },
+            {
+                value: "not_applicable",
+                reason: "Not applicable to my setup",
+                description: "The steps don’t fit my hardware or configuration."
+            },
+            {
+                value: "other",
+                reason: "Other (please specify)",
+                description: "The issue doesn’t match any of the above."
+            }
+        ];
+        let popoverSelection = null;
+        let devices = [
+            // "ARMS",
+            "FFS CN235",
+            "FFS C295 TS03",
+            "FFS C295 EA03",
+            "FFS A400M",
+            "FTD A400M",
+            "CHT-E",
+            "CMOS A400M",
+            "FFS A330 MRTT",
+            "CPTT",
+            "DT-MRTT",
+            "FMS A400M",
+            "LMWS",
+            "MPRS",
+            "GENERAL",
+        ];
+        let myDevice = null;
+        let footerTemplate = '<div class="message-footer-content"><div class="sources margin-bottom float-left"></div><div class="actions margin-top-half width-100 text-align-right float-right"></div></div>'
+        $update();
+
+
+        function renderSourcesInPanel(sources) {
+            const container = document.getElementById('panel-sources-content');
+            if (!container) return;
+
+            container.innerHTML = `
+    <div class="no-shadow">
+       <div class="card-content">
+        <div class="list media-list margin-top-auto">
+          <ul>
+            ${sources.map((item) => `
+              <li>
+                <a href="#" onclick = "viewDocument('https://itc.simeng.es/${item.source}','${item.name}')" class="color-white link icon-only"
+                   class="item-link external link color-blue">
+                  <div class="item-content">
+                    <div class="item-media"><i class="${item.icon}"></i></div>
+                    <div class="item-inner">
+                      <div class="source-title item-title">${item.name}</div>
+                      <div class="source-summary item-text">${item.summary}</div>
+                      <div class="source-extra item-text">${item.site} - ${item.device} - ${item.id}</div>
+                    </div>
+                  </div>
+                </a>
+              </li>
+            `).join('')}
+          </ul>
+        </div>
+      </div>
+    </div>
+  `;
+        }
+
+        let createConversation = function (guid) {
+            $f7.request({
+                url: `${window.config.api_methods.create_chat}?assistant=`+guid,//9772C12-043D-B3C1-61CC-9B960EA59BC`,
+                method: 'GET',
+                headers: {
+                    'x-auth-token': window.config.token,
+                    'Content-Type': 'application/json'
+                },
+                dataType: 'json'
+            }).then((response) => {
+                // Procesar response.data aquí
+                chat = response.data.data;
+                chat.noSelectionInstructions = chat.instructions.filter(instruction => !instruction.isSelection);
+                mainSystemMessage.content = chat.mainAssistant.system;
+                assistant.name = chat.mainAssistant.name;
+                assistant.avatar = 'https://survey.simeng.es' + chat.mainAssistant._myMedias.avatars[0].realPath;
+                assistant.mainImage = 'https://survey.simeng.es' + chat.mainAssistant._myMedias.mainImage[0].realPath
+                $update();
+                console.log('Respuesta:', response.data);
+            }).catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+        let addActionsToMessage = function (object) {
+            function extractMessageTextWithoutFooter(messageId) {
+                // Get the target element by ID
+                var targetElement = document.getElementById(messageId);
+                if (!targetElement) {
+                    console.error("Element with ID " + messageId + " not found");
+                    return null;
+                }
+
+                // Find the message-text element
+                var messageTextElement = targetElement.querySelector(".message-text");
+                if (!messageTextElement) {
+                    console.error("Element with class 'message-text' not found");
+                    return null;
+                }
+
+                // Clone the message-text element to avoid modifying the original
+                var messageTextClone = messageTextElement.cloneNode(true);
+
+                // Find and remove all message-text-footer elements from the clone
+                var footers = messageTextClone.querySelectorAll(".message-text-footer");
+                footers.forEach(function (footer) {
+                    footer.parentNode.removeChild(footer);
+                });
+
+                // Get the HTML content without the footer
+                var cleanedHtml = messageTextClone.innerHTML;
+
+                return cleanedHtml;
+            }
+
+            // Verificar si ya existe un footer, si no, crearlo
+            let $footer = object.find('.message-text-footer');
+            $footer.appendTo(object.find('.message-text'));
+            if ($footer.length === 0) {
+                $footer = $('<div class="message-text-footer"></div>');
+                object.find('.message-text').append($footer);
+
+                // Crear la estructura del footer con las dos secciones
+                $footer.html(footerTemplate);
+            }
+            $footer.find('.message-footer-content').attr('data-message-id', object.attr('id'))
+            // Obtener referencia a la sección derecha
+            const $rightSection = $footer.find('.actions');
+
+            // Crear HTML para las acciones
+            const actionsHTML = `
+         <a class="link  action-button margin-left-half" data-action="edit" data-message-id="${object.attr('id')}">
+            <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="Edit content">edit</i>
+        </a>
+        <a class="link  action-button margin-left-half" data-action="copy" data-message-id="${object.attr('id')}">
+            <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="Copy message">content_copy</i>
+        </a>
+        <a class=" link action-button margin-left-half" data-action="like" data-message-id="${object.attr('id')}">
+            <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="This response is usefull">thumb_up</i>
+        </a>
+        <a class="link  action-button margin-left-half" data-action="dislike" data-message-id="${object.attr('id')}">
+            <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="This response is not usefull">thumb_down</i>
+        </a>
+    `;
+
+            // Añadir el HTML a la sección derecha
+            $rightSection.html(actionsHTML);
+
+
+            // Añadir event listeners para las acciones
+            $rightSection.find('.action-button').on('click', function () {
+                const action = $(this).data('action');
+                const messageId = $(this).data('message-id');
+
+                switch (action) {
+                    case 'edit':
+
+                        editContent(extractMessageTextWithoutFooter(messageId), "my_editor", $el);
+                        break;
+                    case 'copy':
+                        var targetElement = document.getElementById(messageId); // Selecciona el elemento por ese ID
+                        var text = $(targetElement).find(".message-text").text();
+
+                        copyDivToClipboardWithStructure(text, true);
+                        break;
+                    case 'like':
+                        likeMessage(messageId);
+                        break;
+                    case 'dislike':
+                        dialogChoiceChip.open();
+                        //    dislikeMessage(messageId);
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                }
+            });
+        };
+        let addSourcesToMessage = function (object) {
+            const messageSources = getSourcesByMessageId(object.attr('id'));
+
+            // Verificar si ya existe un footer, si no, crearlo
+            let $footer = object.find('.message-text-footer');
+
+            $footer.appendTo(object.find('.message-text'));
+            if ($footer.length === 0) {
+                $footer = $('<div class="message-text-footer"></div>');
+                object.find('.message-text').append($footer);
+
+                // Crear la estructura del footer con las dos secciones
+                $footer.html(footerTemplate);
+            }
+
+            // Obtener referencias a las secciones izquierda y derecha
+            const $leftSection = $footer.find('.sources');
+
+            // Añadir fuentes a la sección izquierda
+            if (messageSources && messageSources.length > 0) {
+                // Agrupar fuentes por icono
+                const groupedByIcon = {};
+
+                // Recorrer todas las fuentes para agruparlas
+                messageSources.forEach(source => {
+                    const iconClass = source.icon || 'fa-solid fa-question'; // Icono por defecto
+
+                    // Si el grupo de este icono no existe, crearlo
+                    if (!groupedByIcon[iconClass]) {
+                        groupedByIcon[iconClass] = {
+                            icon: iconClass,
+                            count: 0,
+                            names: []
+                        };
+                    }
+
+                    // Incrementar contador y añadir nombre a la lista
+                    groupedByIcon[iconClass].count++;
+                    groupedByIcon[iconClass].names.push(source.name);
+                });
+
+                // Convertir el objeto de grupos a un array
+                const uniqueIcons = Object.values(groupedByIcon);
+
+                // Mostrar máximo 5 iconos únicos
+                const visibleIcons = uniqueIcons.slice(0, 5);
+                const remainingIconTypes = uniqueIcons.length > 5 ? uniqueIcons.length - 5 : 0;
+
+                let sourcesHTML = '';
+                // Crear el grupo de avatares para las fuentes
+                sourcesHTML += ' <span id="source-' + object.attr('id') + '" class="link font-size-14 badge badge-round badge-outline">';
+
+                // Añadir cada tipo de icono único
+                visibleIcons.forEach(iconGroup => {
+                    // Crear tooltip con los nombres de las fuentes de este tipo
+                    const tooltipText = iconGroup.names.join(', ');
+
+                    // Si hay más de 1 fuente con este icono, mostrar contador
+                    let badge = '';
+                    if (iconGroup.count > 1) {
+                        // badge = `<span class="badge margin-left">${iconGroup.count}</span>`;
+                    }
+
+                    sourcesHTML += `<i data-tooltip="${tooltipText}" class="margin-half ${iconGroup.icon} fa-icon">${badge}</i>`;
+                });
+
+                // Mostrar "Sources" al final
+                sourcesHTML += '<span class="margin-left-half">Sources</span></span>';
+
+                // Añadir el HTML de las fuentes a la sección izquierda del footer
+                $leftSection.html(sourcesHTML);
+
+                // Agregar el evento click para mostrar el panel de fuentes
+                $("#source-" + object.attr('id')).on('click', function () {
+                    const messageId = object.attr('id');
+                    if (messageId) {
+                        const messageSources = getSourcesByMessageId(messageId);
+                        if (messageSources && messageSources.length > 0) {
+                            console.log('Sources para el mensaje:', messageSources);
+                            renderSourcesInPanel(messageSources);
+                            app.panel.open('right')
+                            // Aquí podrías abrir el panel de sources si existe
+                        }
+                    }
+                });
+            }
+        };
+        let switchAssistant = function(guid){
+            let foundAssistant = assistants.find(item => item.guid === guid);
+
+            if (foundAssistant) {
+                assistant = foundAssistant;
+                loadConversations(foundAssistant.guid)
+                $update();
+            } else {
+                console.error("No se encontró ningún asistente con el GUID especificado.");
+            }
+        }
+        let loadAssistants = function(){
+            $f7.request({
+                url: window.config.api_methods.load_assistants,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    assistants = data.data;
+                    if (assistants.length > 0) {
+                        // Busca un assistant con guid igual a $f7route.params.guid
+                   //  const foundAssistant = assistants.find(assistant => assistant.guid === $f7route.params.guid);
+
+                        // Asigna foundAssistant si existe, de lo contrario asigna el primer elemento del array
+                        assistant = foundAssistant || assistants[0];
+                       // loadConversations(curAssistant.guid);
+                    } else {
+                        console.error("El array 'assistants' está vacío.");
+                    }
+                    //el primer elemento será el asistente por defecto
+
+                    $update();
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let initializeDialogChoiceChip = function () {
+            dialogChoiceChip = $f7.dialog.create({
+                el: $el.value.find('#dialog-choice-chip'),
+                on: {
+                    close: function (dialog) {
+                        dialog.$el.find('form')[0].reset();
+                    }
+                }
+            });
+        }
+
+        let showDialogChoiceChip = function () {
+            dialogChoiceChip.open();
+        }
+
+        let closeDialogChoiceChip = function () {
+            dialogChoiceChip.close();
+        }
+
+        let submitFormDialogChoiceChip = function () {
+            let form = dialogChoiceChip.$el.find('form');
+            let formData = $f7.form.convertToData(form);
+            form[0].reset();
+            if (formData.interests.length) {
+                $f7.toast.show({
+                    text: 'Your feedback(s): ' + formData.interests.join(', ')
+                });
+            }
+            dialogChoiceChip.close();
+        }
+        let onMessageAdded = function (object) {
+            showCenteredBar = messagesHistory.length === 1;
+            showBottomBar = messagesHistory.length > 1;
+            $update();
+            if (showBottomBar) {
+                const pageToolbar = document.getElementById('page-toolbar');
+                const promptArea = document.getElementById('prompt-area');
+
+                // Verificar si pageToolbar existe en el DOM
+                if (pageToolbar) {
+                    console.log('Page toolbar encontrado');
+
+                    // Mover el elemento completo al toolbar
+                    pageToolbar.appendChild(promptArea);
+                }
+
+            }
+            object.find('.message-name').addClass('card-header').remove();
+            object.find('table').addClass('data-table')
+            object.find('pre').each(function () {
+
+                $(this).addClass('block block-strong inset margin-vertical')
+                var codeClass = $(this).find('code').attr('class');
+                if (typeof codeClass !== 'undefined' && codeClass != null) {
+                    var language = codeClass.match(/language-(\w+)/)[1];
+                    $(this).prepend('<div class="bg-color-black float-right padding-half small language-name">' + language + '</div>');
+                }
+            })
+            //    hljs.highlightAll()
+            object.on('mouseenter touchstart', function () { // Reemplaza '.object-selector' con tu selector real
+                $(this).find(".message-footer-content .actions").show()
+                if (!isScrolling) {
+                    //$(this).find('.message-text-footer').css('visibility', 'visible');
+                    //navigator.vibrate(200);
+                }
+            }).on('mouseleave touchend', function () {
+                $(this).find(".message-footer-content .actions").hide()
+                if (!isScrolling) {
+                    // navigator.vibrate(0);
+                    // $(this).find('.message-text-footer').css('visibility', 'hidden');
+                }
+            });
+
+
+            //   scrollToBottom();
+        }
+        let scrollToBottom = function () {
+            pageContent.scrollTo({
+                top: pageContent.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+        /**
+         * Función para llamar a una herramienta basada en el nombre y parámetros recibidos.
+         * Esta función se invoca después de recibir el JSON correspondiente a una herramienta.
+         *
+         * @param {string} name - Nombre de la herramienta a ejecutar
+         * @param {object} params - Parámetros para la herramienta
+         * @returns {Promise} - Promise que resuelve con el resultado de la herramienta
+         */
+// Modificación de la función callTool para manejar la respuesta y continuar la conversación
+            // Modificación de la función callTool para evitar bucles infinitos
+// Modified callTool function to add tool response as a user message
+// Modified function to use companion for elaborating empty results
+        let callTool = function (name, params) {
+
+                console.log(`Llamada a herramienta: ${name}`);
+                console.log('Parámetros:', params);
+                console.log(`Calling tool: ${name} with params:`, params);
+
+                params['device'] = myDevice;
+                // Display a readable message about the search
+                let searchText = params.text || "";
+                let queryType = params.query_type || "";
+                let toolSetup = chat.tools_setup[name];
+                console.log("Configuracion de herramienta: ", toolSetup);
+                let inProgressMessage = toolSetup['in_progress_message'] ?? 'Calling tool';
+                let askForExecution = toolSetup['ask_for_execution'] ?? false;
+                let toolIcon = toolSetup['icon'] ?? "fa-database";
+                let humanReadableMessage = `<p><div class="call-execution shimmer-text-fast"><i class="fa ${toolIcon} margin-right -half"></i>${inProgressMessage} <strong>${searchText}</strong> in all <strong>${queryType || "available sources"}</strong></div></p>`;
+
+                $el.value.find('.message:last-child .message-text').html(humanReadableMessage);
+                if (askForExecution && name == "action_open_support_ticket") {
+                    ticket = params;
+                    $update();
+                    openPopupTicket();
+                    return;
+                }
+
+                // Mark that we're processing a tool response
+                processingToolResponse = true;
+                window.tempSources = [];
+
+                console.log(params)
+                if (params["title"]) {
+                    chat.title = params["title"].charAt(0).toUpperCase() + params["title"].slice(1);
+                    $update();
+                }
+                const payload = {
+                    name: name,
+                    params: params,
+                    chat: chat.guid
+                };
+
+                return new Promise((resolve, reject) => {
+                    $f7.request({
+                        url: window.config.api_methods.call_tool,
+                        method: 'POST',
+                        data: payload,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        headers: {
+                            'x-auth-token': window.config.token
+                        },
+                        success: function (data, status, xhr) {
+                            console.log("Llamada a herramienta completada con éxito:", data);
+                            if (data && data.data && data.data["tool_domain"] == 'action') {
+
+                                console.log("Ticket creado", data);
+                                return
+                            }
+                            // Procesar la respuesta: extraer y concatenar los sources
+                            if (data && data.data && Array.isArray(data.data.sources)) {
+                                // Concatenar todos los sources en un solo texto
+                                let sourcesContent = "";
+                                sources = data.data.sources;
+                                renderSourcesInPanel(sources);
+                                window.tempSources = sources;
+                                console.log('Sources guardados temporalmente, se asociarán con el ID del mensaje cuando se cree');
+
+                                // Verificar si hay sources con texto
+                                let hasSourcesWithText = false;
+                                data.data.sources.forEach((source, index) => {
+                                    if (source.text) {
+                                        hasSourcesWithText = true;
+                                        if (index > 0) {
+                                            sourcesContent += "\n\n---\n\n"; // Separador entre fuentes
+                                        }
+                                        sourcesContent += source.text;
+                                    }
+                                });
+
+                                // Obtener la última pregunta del usuario de messagesHistory
+                                let lastUserQuestion = "";
+                                for (let i = messagesHistory.length - 1; i >= 0; i--) {
+                                    if (messagesHistory[i].role === 'user') {
+                                        lastUserQuestion = messagesHistory[i].content;
+                                        break;
+                                    }
+                                }
+
+                                // Si encontramos contenido de sources
+                                if (hasSourcesWithText) {
+                                    console.log("Añadiendo contenido de sources como mensaje del usuario");
+
+                                    // Añadir el contenido como un mensaje del usuario incluyendo la pregunta original
+                                    messagesHistory[0].content = messagesHistory[0].content + '\n\n\n\nPLEASE USE THIS RETRIEVED CONTEXT FOR ANSWERING:\n\n' + sourcesContent;
+                                    /* messagesHistory.push({
+                                         role: 'user',
+                                         content: 'Could you answer my last question?',
+                                     });*/
+
+                                    // Señalizar que se han añadido sources a la conversación
+                                    resolve({
+                                        status: 'success',
+                                        sourcesAdded: true,
+                                        message: 'Se han añadido sources como mensaje del usuario',
+                                        originalResponse: data
+                                    });
+                                    $(".shimmer-text-fast").removeClass("shimmer-text-fast")
+                                } else {
+                                    console.log("No se encontraron fuentes con información relevante");
+
+                                    // En lugar de un mensaje predefinido, dejemos que el companion elabore la respuesta
+
+                                    // Generate a new unique ID for the next response
+                                    const noInfoMsgId = "assistant-no-info-" + Date.now();
+
+                                    // Create a new message for processing
+                                    messages.addMessage({
+                                        attrs: {
+                                            "data-id": noInfoMsgId,
+                                            "id": noInfoMsgId
+                                        },
+                                        isTitle: false,
+                                        text: '<p>Lo siento no se ha encontrado registros. Formula tu pregunta de otra forma</p>',
+                                        name: assistant.name,
+                                        cssClass: 'card no-margin-top padding-half',
+                                        textFooter: footerTemplate,
+                                        avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                        type: 'received',
+                                    }, 'append', true);
+
+                                    onMessageAdded($('#' + noInfoMsgId));
+                                    if (window.tempSources && window.tempSources.length > 0) {
+                                        const sourceArray = {
+                                            "sources": window.tempSources,
+                                            "params": params
+                                        }
+                                        localStorage.setItem('sources_' + noInfoMsgId, JSON.stringify(sourceArray));
+                                        console.log('Sources guardados en localStorage con clave:', 'sources_' + noInfoMsgId);
+                                    }
+                                    //    scrollToBottom();
+                                    messagesHistory.push({
+                                        role: 'assistant',
+                                        content: "Lo siento no se ha encontrado registros. Formula tu pregunta de otra forma."
+                                    })
+                                    // Añadir un mensaje para que el modelo sepa que no se encontró información
+                                    messagesHistory.push({
+                                        role: 'user',
+                                        content: "Respecto a mi pregunta: \"" + lastUserQuestion + "\", he intentado buscar información adicional pero no he encontrado datos relevantes. Por favor, dile al usuario que no encuentras información o solicita la informacion necesaria para realizar una nueva busqueda."
+                                    });
+
+                                    // Llamar a callCompletion para que el modelo elabore la respuesta
+                                    callCompletion(false, noInfoMsgId)
+                                        .then(() => {
+                                            processingToolResponse = false;
+                                            // Resolver después de que se genere la respuesta
+                                            resolve({
+                                                status: 'success',
+                                                sourcesAdded: false,
+                                                message: 'Se ha generado una respuesta por el companion para el caso sin datos',
+                                                originalResponse: data
+                                            });
+                                        })
+                                        .catch(error => {
+                                            processingToolResponse = false;
+                                            console.error("Error en la generación de respuesta para el caso sin datos:", error);
+                                            // Aún resolver para no interrumpir el flujo
+                                            resolve({
+                                                status: 'success',
+                                                sourcesAdded: true,
+                                                message: 'Error en la generación de respuesta para el caso sin datos',
+                                                originalResponse: data,
+                                                error: error
+                                            });
+                                        });
+                                }
+
+                            } else {
+                                console.log("La respuesta no contiene la estructura de sources esperada");
+
+                                // Obtener la última pregunta del usuario
+                                let lastUserQuestion = "";
+                                for (let i = messagesHistory.length - 1; i >= 0; i--) {
+                                    if (messagesHistory[i].role === 'user') {
+                                        lastUserQuestion = messagesHistory[i].content;
+                                        break;
+                                    }
+                                }
+
+                                // Generate a new unique ID for the next response
+                                const structureErrorMsgId = "assistant-structure-error-" + Date.now();
+
+                                // Create a new message for processing
+                                messages.addMessage({
+                                    attrs: {
+                                        "data-id": structureErrorMsgId,
+                                        "id": structureErrorMsgId
+                                    },
+                                    isTitle: false,
+                                    text: '<p>Procesando tu consulta...</p>',
+                                    name: assistant.name,
+                                    cssClass: 'card no-margin-top padding-half',
+                                    textFooter: footerTemplate,
+                                    avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                    type: 'received',
+                                }, 'append', true);
+
+                                onMessageAdded($('#' + structureErrorMsgId));
+                                //    scrollToBottom();
+                                if (window.tempSources && window.tempSources.length > 0) {
+                                    localStorage.setItem('sources_' + structureErrorMsgId, JSON.stringify(window.tempSources));
+                                    console.log('Sources guardados en localStorage con clave:', 'sources_' + structureErrorMsgId);
+                                }
+                                // Añadir un mensaje para que el modelo sepa que hubo un problema con la estructura
+                                messagesHistory.push({
+                                    role: 'user',
+                                    content: "Respecto a mi pregunta: \"" + lastUserQuestion + "\", ha ocurrido un problema al intentar buscar información adicional. Por favor, responde basándote en tu conocimiento general y menciona cualquier limitación en tu respuesta."
+                                });
+
+                                // Llamar a callCompletion para que el modelo elabore la respuesta
+                                callCompletion(false, structureErrorMsgId)
+                                    .then(() => {
+                                        processingToolResponse = false;
+                                        // Resolver después de que se genere la respuesta
+                                        resolve({
+                                            status: 'success',
+                                            sourcesAdded: true,
+                                            message: 'Se ha generado una respuesta por el companion para el caso de error de estructura',
+                                            originalResponse: data
+                                        });
+                                    })
+                                    .catch(error => {
+                                        processingToolResponse = false;
+                                        console.error("Error en la generación de respuesta para el caso de error de estructura:", error);
+                                        // Aún resolver para no interrumpir el flujo
+                                        resolve({
+                                            status: 'success',
+                                            sourcesAdded: true,
+                                            message: 'Error en la generación de respuesta para el caso de error de estructura',
+                                            originalResponse: data,
+                                            error: error
+                                        });
+                                    });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            console.error("Error en la llamada a la herramienta:", status, error);
+
+                            // Obtener la última pregunta del usuario en caso de error
+                            let lastUserQuestion = "";
+                            for (let i = messagesHistory.length - 1; i >= 0; i--) {
+                                if (messagesHistory[i].role === 'user') {
+                                    lastUserQuestion = messagesHistory[i].content;
+                                    break;
+                                }
+                            }
+
+                            // Generate a new unique ID for the next response
+                            const apiErrorMsgId = "assistant-api-error-" + Date.now();
+
+                            // Create a new message for processing
+                            messages.addMessage({
+                                attrs: {
+                                    "data-id": apiErrorMsgId,
+                                    "id": apiErrorMsgId
+                                },
+                                isTitle: false,
+                                text: '<p>Procesando tu consulta...</p>',
+                                name: assistant.name,
+                                cssClass: 'card no-margin-top padding-half',
+                                textFooter: footerTemplate,
+                                avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                type: 'received',
+                            }, 'append', true);
+                            if (window.tempSources && window.tempSources.length > 0) {
+                                localStorage.setItem('sources_' + apiErrorMsgId, JSON.stringify(window.tempSources));
+                                console.log('Sources guardados en localStorage con clave:', 'sources_' + apiErrorMsgId);
+                            }
+                            onMessageAdded($('#' + apiErrorMsgId));
+                            // scrollToBottom();
+
+                            // Añadir un mensaje para que el modelo sepa que hubo un error en la API
+                            messagesHistory.push({
+                                role: 'user',
+                                content: "Respecto a mi pregunta: \"" + lastUserQuestion + "\", ha ocurrido un error al intentar conectar con la fuente de información. Por favor, responde basándote en tu conocimiento general y menciona cualquier limitación en tu respuesta."
+                            });
+
+                            // Llamar a callCompletion para que el modelo elabore la respuesta
+                            callCompletion(false, apiErrorMsgId)
+                                .then(() => {
+                                    processingToolResponse = false;
+                                    // Resolver después de que se genere la respuesta
+                                    resolve({
+                                        status: 'success',
+                                        sourcesAdded: true,
+                                        message: 'Se ha generado una respuesta por el companion para el caso de error de API',
+                                        originalError: error
+                                    });
+                                })
+                                .catch(compError => {
+                                    processingToolResponse = false;
+                                    console.error("Error en la generación de respuesta para el caso de error de API:", compError);
+                                    // Aún resolver para no interrumpir el flujo
+                                    resolve({
+                                        status: 'success',
+                                        sourcesAdded: true,
+                                        message: 'Error en la generación de respuesta para el caso de error de API',
+                                        originalError: error,
+                                        companionError: compError
+                                    });
+                                });
+                        }
+                    });
+                });
+            };
+        let checkScrollPosition = function () {
+            if ((pageContent.offsetHeight + pageContent.scrollTop) >= pageContent.scrollHeight - 50) {
+                // Ocultar el botón si estamos cerca del final
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                // Mostrar el botón en otro caso
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        }
+        let getSourcesByMessageId = function (messageId) {
+            const sourcesJson = localStorage.getItem('sources_' + messageId);
+            if (sourcesJson) {
+                return JSON.parse(sourcesJson).sources;
+            }
+            return null;
+        }
+// Modified callCompletion function to properly save tool calls in message history
+        // Dentro de la función callCompletion, reemplazar la parte que procesa los chunks con esta versión actualizada
+        let callCompletion = function (withTool, messageId, stream) {
+            withTool = withTool ?? true;
+            stream = stream ?? true;
+            // Default to "assistant-thinking" if no messageId is provided (for backward compatibility)
+            messageId = messageId || "assistant-thinking";
+
+            let payload = {
+                stream: stream,
+                model: "mistral-small-24B-instruct-2501",//"phi-4",//
+                messages: messagesHistory,
+                max_tokens:10000
+            }
+            if (stream) {
+                payload['stream_options'] = {'include_usage': true};
+            }
+            if (chat.tools && withTool) {
+                messagesHistory[0].content = mainSystemMessage.content;
+                payload['tool_choice'] = "auto";
+                payload['tools'] = chat.tools;
+                delete payload['tools']["icon"];
+                payload['temperature'] = 0.1
+            } else {
+                payload['temperature'] = 0
+            }
+
+            return new Promise((resolve, reject) => {
+                let responseData = [];
+                let acumulatedText = "";
+                let fullResponse = "";
+                let isNoTool = false;
+                let extractingContent = false;
+                let isFunctionCall = false;
+                let newMessageId = "";
+
+                // Variables para el nuevo formato de tool_calls
+                let isToolCallsFormat = false;
+                let accumulatedToolCalls = [];
+                let currentToolCall = null;
+
+                // Function to get the message element using the ID
+                const getMessageElement = function () {
+                    return $('#' + messageId);
+                }
+
+                // Función para procesar y acumular tool calls
+                const processToolCalls = function (delta) {
+                    if (delta.tool_calls && delta.tool_calls.length > 0) {
+                        isToolCallsFormat = true;
+
+                        // Procesar cada tool call en el delta
+                        delta.tool_calls.forEach(toolCallDelta => {
+                            const index = toolCallDelta.index;
+
+                            // Si no existe el tool call con este índice, crear uno nuevo
+                            if (!accumulatedToolCalls[index]) {
+                                accumulatedToolCalls[index] = {
+                                    index: index,
+                                    id: toolCallDelta.id || "",
+                                    type: toolCallDelta.type || "function",
+                                    function: {
+                                        name: "",
+                                        arguments: ""
+                                    }
+                                };
+                            }
+
+                            // Actualizar los campos con la nueva información
+                            if (toolCallDelta.id) {
+                                accumulatedToolCalls[index].id = toolCallDelta.id;
+                            }
+
+                            if (toolCallDelta.type) {
+                                accumulatedToolCalls[index].type = toolCallDelta.type;
+                            }
+
+                            if (toolCallDelta.function) {
+                                // Actualizar nombre si viene en el delta
+                                if (toolCallDelta.function.name !== null && toolCallDelta.function.name !== undefined) {
+                                    accumulatedToolCalls[index].function.name =
+                                        (accumulatedToolCalls[index].function.name || "") +
+                                        (toolCallDelta.function.name || "");
+                                }
+
+                                // Actualizar argumentos si vienen en el delta
+                                if (toolCallDelta.function.arguments !== null && toolCallDelta.function.arguments !== undefined) {
+                                    accumulatedToolCalls[index].function.arguments =
+                                        (accumulatedToolCalls[index].function.arguments || "") +
+                                        (toolCallDelta.function.arguments || "");
+                                }
+                            }
+
+                            // Actualizar currentToolCall para referencia rápida
+                            currentToolCall = accumulatedToolCalls[index];
+                            isFunctionCall = true;
+                        });
+
+                        // Actualizar UI para mostrar que se está procesando una llamada a función
+                        let currentToolCallInfo = "";
+                        try {
+                            // Intentar formatear los tool calls acumulados para mostrarlos
+                            currentToolCallInfo = JSON.stringify(accumulatedToolCalls, null, 2);
+                            //  getMessageElement().find('.message-text').html('<pre>' + currentToolCallInfo + '</pre>');
+
+                            // IMPORTANTE: Verificar si el tool call parece estar completo
+                            // Esto es para ejecutar el tool call sin esperar al finish_reason
+                            if (currentToolCall &&
+                                currentToolCall.function &&
+                                currentToolCall.function.name &&
+                                currentToolCall.function.arguments &&
+                                currentToolCall.function.arguments.includes('}')) {
+
+                                // Verificar si los argumentos terminan correctamente
+                                const args = currentToolCall.function.arguments;
+                                // Si los argumentos parecen estar completos (terminan con } y están balanceados)
+                                if (args.trim().endsWith('}') && !processingToolResponse) {
+                                    // Intentar parsear para ver si el JSON está completo
+                                    try {
+                                        JSON.parse(args);
+                                        console.log("Tool call parece estar completo, procesando:", currentToolCall);
+                                        processCompleteToolCall();
+                                    } catch (e) {
+                                        console.log("Los argumentos parecen estar completos pero el JSON no es válido aún:", e);
+                                    }
+                                }
+                            }
+                        } catch (e) {
+                            console.error("Error formatting tool calls for UI:", e);
+                        }
+
+                        return true;
+                    }
+                    return false;
+                };
+
+                // Función para procesar un tool call completo
+                const processCompleteToolCall = function () {
+                    if (!currentToolCall || !currentToolCall.function) {
+                        console.warn("Tool call incompleto o inválido:", currentToolCall);
+                        return false;
+                    }
+
+                    // Evitar procesar el mismo tool call varias veces
+                    if (processingToolResponse) {
+                        console.log("Ya se está procesando un tool call, ignorando duplicado");
+                        return false;
+                    }
+
+                    try {
+                        const toolName = currentToolCall.function.name || "";
+                        if (!toolName) {
+                            console.warn("Tool call sin nombre de función:", currentToolCall);
+                            return false;
+                        }
+
+                        let toolParams;
+
+                        try {
+                            // Intentar parsear los argumentos como JSON
+                            toolParams = JSON.parse(currentToolCall.function.arguments);
+                        } catch (e) {
+                            console.warn("Error al parsear argumentos de la función, intentando limpiar:", e);
+                            // Intentar limpiar y parsear nuevamente
+                            const cleanedArgs = currentToolCall.function.arguments.trim()
+                                .replace(/^['"]+|['"]+$/g, '') // Quitar comillas al inicio/final
+                                .replace(/\\"/g, '"'); // Reemplazar \" por "
+
+                            try {
+                                // Si es un string simple, tratarlo como tal
+                                if (cleanedArgs.startsWith('{')) {
+                                    toolParams = JSON.parse(cleanedArgs);
+                                } else {
+                                    toolParams = {text: cleanedArgs};
+                                }
+                            } catch (e2) {
+                                console.error("No se pudieron parsear los argumentos después de limpiarlos:", e2);
+                                toolParams = {text: currentToolCall.function.arguments};
+
+                                newMessageId = "assistant-thinking-" + Date.now();
+                                callCompletion(true, newMessageId, false)
+                                    .then(() => {
+                                        processingToolResponse = false;
+                                        addSourcesToMessage($('#' + newMessageId))
+                                        addActionsToMessage($('#' + newMessageId))
+                                    })
+                                    .catch(error => {
+                                        processingToolResponse = false;
+                                        console.error("Error en la continuación:", error);
+                                    });
+                                return;
+                                //AQUI llamar a completion
+                            }
+                        }
+
+
+                        // Guardar en el historial de mensajes
+                        /*  messagesHistory.push({
+                              role: 'assistant',
+                              content: null,
+                              tool_calls: accumulatedToolCalls
+                          });*/
+
+                        // Llamar a la herramienta
+                        callTool(toolName, toolParams)
+                            .then(toolResponse => {
+                                console.log("Respuesta de la herramienta procesada:", toolResponse);
+                                $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                                // Si se añadieron sources, llamar a callCompletion nuevamente
+                                if (toolResponse.sourcesAdded) {
+                                    console.log("Continuando la conversación con los sources añadidos");
+
+                                    // Generar un nuevo ID único para la siguiente respuesta
+                                    newMessageId = "assistant-thinking-" + Date.now();
+
+                                    // Crear un nuevo mensaje para la respuesta continuada
+                                    messages.addMessage({
+                                        attrs: {
+                                            "data-id": newMessageId,
+                                            "id": newMessageId
+                                        },
+                                        isTitle: false,
+                                        text: '<p>Processing retrieved information...</p>',
+                                        textFooter: footerTemplate,
+                                        name: assistant.name,
+                                        cssClass: 'card no-margin-top padding-half',
+                                        avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                        type: 'received',
+                                    }, 'append', true);
+
+                                    if (window.tempSources && window.tempSources.length > 0) {
+                                        const sourceArray = {
+                                            "sources": window.tempSources,
+                                            "params": toolParams
+                                        }
+                                        localStorage.setItem('sources_' + newMessageId, JSON.stringify(sourceArray));
+                                        console.log('Sources guardados en localStorage con clave:', 'sources_' + newMessageId);
+                                    }
+
+                                    onMessageAdded($('#' + newMessageId));
+                                    //  scrollToBottom();
+
+                                    // Llamar a callCompletion nuevamente pero con un nuevo mensaje
+                                    callCompletion(false, newMessageId)
+                                        .then(() => {
+                                            processingToolResponse = false;
+                                            addSourcesToMessage($('#' + newMessageId))
+                                            addActionsToMessage($('#' + newMessageId));
+                                        })
+                                        .catch(error => {
+                                            processingToolResponse = false;
+                                            console.error("Error en la continuación:", error);
+                                        });
+                                } else {
+                                    // Si no se añadieron sources, restablecer el flag
+                                    processingToolResponse = false;
+                                }
+                            })
+                            .catch(error => {
+                                processingToolResponse = false;
+                                console.error("Error al llamar a la herramienta:", error);
+                            });
+
+                        return true;
+                    } catch (error) {
+                        console.error("Error al procesar tool call completo:", error);
+                        processingToolResponse = false;
+                        return false;
+                    }
+                };
+
+                $f7.request({
+                    url: window.config.completion.url,
+                    method: 'POST',
+                    data: payload,
+                    contentType: 'application/json',
+                    dataType: 'text',
+                    headers: {
+                        'Authorization': `Bearer ${window.config.completion.apiKey}`,
+                        'Accept': 'text/event-stream'
+                    },
+                    xhrFields: {
+                        onprogress: function (e) {
+                            // Get new text since last update
+                            const newText = e.target.responseText.substring(acumulatedText.length);
+                            acumulatedText = e.target.responseText;
+
+                            // Process new lines
+                            const lines = newText.split('\n');
+                            let displayContent = '';
+                            for (const line of lines) {
+                                if (line.startsWith('data: ')) {
+                                    try {
+                                        // Extract JSON data
+                                        const jsonData = line.substring(6);
+                                        if (jsonData.trim() === '') continue;
+
+                                        // Parse JSON
+                                        const parsedData = JSON.parse(jsonData);
+                                        responseData.push(parsedData);
+
+                                        // Comprobar el nuevo formato de tool_calls si existe
+                                        if (parsedData.choices &&
+                                            parsedData.choices.length > 0 &&
+                                            parsedData.choices[0].delta) {
+
+                                            const delta = parsedData.choices[0].delta;
+
+                                            // Verificar si este delta contiene tool_calls
+                                            if (processToolCalls(delta)) {
+                                                // Ya se ha procesado el tool_call, continuar al siguiente chunk
+                                                continue;
+                                            }
+
+                                            // Procesar delta.content si existe (formato tradicional)
+                                            if (delta.content) {
+                                                const content = delta.content;
+                                                fullResponse += content;
+                                                getMessageElement().find('.message-text').html(md.render(fullResponse + '<span class="thinking-icon">' + assistant.thinkIcon + '</span>'));// + '<span class="thinking-icon">' + assistant.thinkIcon + '</span>');
+                                            }
+                                        }
+                                        checkScrollPosition();
+                                        // Check if this is the last chunk
+                                        if (parsedData.choices &&
+                                            parsedData.choices.length > 0 &&
+                                            parsedData.choices[0].finish_reason !== null) {
+
+                                            // Verificar si debemos procesar un tool call completo
+                                            if (isToolCallsFormat && currentToolCall) {
+                                                processCompleteToolCall();
+                                            }
+                                            // Si es contenido normal sin tool_calls
+                                            else if (!isToolCallsFormat && !withTool) {
+                                                messagesHistory.push({
+                                                    role: 'assistant',
+                                                    content: fullResponse,
+                                                });
+                                                console.log("añadiendo ASSISTANT con tool");
+                                            }
+
+                                            // Manejar el contenido según lo detectado
+                                            if (chat.tools && withTool && !isToolCallsFormat) {
+                                                if (!processingToolResponse && !isToolCallsFormat && (isFunctionCall || (!isNoTool && !extractingContent))) {
+                                                    // Para tool en formato antiguo, mantener el JSON completo
+                                                    console.log("Mostrando JSON de herramienta al finalizar");
+                                                    //  getMessageElement().find('.message-text').html('<pre>' + fullResponse + '</pre>');
+                                                    messagesHistory.push({
+                                                        role: 'assistant',
+                                                        content: fullResponse
+                                                    });
+                                                }
+                                            }
+
+                                            // Generate a unique completed ID
+                                            const completedId = "message-completed-" + Date.now();
+
+                                            // Use ID selector to get only the current message
+                                            if (isNoTool && !isToolCallsFormat) {
+                                                getMessageElement().attr("id", completedId).attr('data-id', completedId);
+                                            }
+                                            //     addSourcesToMessage($('#' + thinkingMsgId));
+                                                 addActionsToMessage($('#' + completedId))
+                                            console.log("Transmisión SSE completada");
+
+                                            //  scrollToBottom();
+                                        }
+
+                                    } catch (error) {
+                                        console.error("Error al procesar línea SSE:", error, line);
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    success: function (data) {
+                        console.log(data);
+                        console.log("Petición completada con éxito");
+                        $(".thinking-icon").remove();
+                        addCodeHeaders();
+                        addActionsToMessage(getMessageElement());
+                        // document.documentElement.style.setProperty('--message-height', `auto`);
+                        $("table").addClass("data-table");
+                        // Check if data is a string and try to parse it
+                        let parsedData;
+                        if (typeof data === 'string') {
+                            try {
+                                parsedData = JSON.parse(data);
+                            } catch (e) {
+                                console.log("Data is not JSON or is already parsed");
+                                parsedData = data;
+                            }
+                        } else {
+                            parsedData = data;
+                        }
+
+                        // Handle case where data comes in full completion format (not streaming)
+                        if (parsedData &&
+                            parsedData.choices &&
+                            parsedData.choices.length > 0 &&
+                            parsedData.choices[0].message &&
+                            parsedData.choices[0].message.tool_calls &&
+                            parsedData.choices[0].message.tool_calls.length > 0) {
+
+                            console.log("Detected full completion with tool_calls");
+
+                            // Extract tool call data
+                            const toolCall = parsedData.choices[0].message.tool_calls[0];
+                            const toolName = toolCall.function.name;
+                            let toolParams;
+
+                            try {
+                                toolParams = JSON.parse(toolCall.function.arguments);
+                            } catch (e) {
+                                console.warn("Error parsing tool arguments:", e);
+                                const cleanedArgs = toolCall.function.arguments.trim()
+                                    .replace(/^['"]+|['"]+$/g, '') // Remove quotes at beginning/end
+                                    .replace(/\\"/g, '"'); // Replace \" with "
+
+                                try {
+                                    toolParams = JSON.parse(cleanedArgs);
+                                } catch (e2) {
+                                    console.error("Could not parse arguments after cleaning:", e2);
+                                    toolParams = {text: toolCall.function.arguments};
+                                }
+                            }
+
+                            callTool(toolName, toolParams)
+                                .then(toolResponse => {
+                                    console.log("Tool response processed:", toolResponse);
+                                    $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                                    // If sources were added, call callCompletion again
+                                    if (toolResponse.sourcesAdded) {
+                                        console.log("Continuing conversation with added sources");
+
+                                        // Generate a new unique ID for the next response
+                                        newMessageId = "assistant-thinking-" + Date.now();
+
+                                        // Create a new message for the continued response
+                                        messages.addMessage({
+                                            attrs: {
+                                                "data-id": newMessageId,
+                                                "id": newMessageId
+                                            },
+                                            isTitle: false,
+                                            text: '<p>Processing retrieved information...</p>',
+                                            textFooter: footerTemplate,
+                                            name: assistant.name,
+                                            cssClass: 'card no-margin-top padding-half',
+                                            avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                            type: 'received',
+                                        }, 'append', true);
+
+                                        if (window.tempSources && window.tempSources.length > 0) {
+                                            const sourceArray = {
+                                                "sources": window.tempSources,
+                                                "params": toolParams
+                                            }
+                                            localStorage.setItem('sources_' + newMessageId, JSON.stringify(sourceArray));
+                                            console.log('Sources saved in localStorage with key:', 'sources_' + newMessageId);
+                                        }
+
+                                        onMessageAdded($('#' + newMessageId));
+                                        // scrollToBottom();
+
+                                        // Call callCompletion again but with a new message
+                                        callCompletion(false, newMessageId)
+                                            .then(() => {
+                                                processingToolResponse = false;
+                                                addSourcesToMessage($('#' + newMessageId))
+                                                addActionsToMessage($('#' + newMessageId));
+                                            })
+                                            .catch(error => {
+                                                processingToolResponse = false;
+                                                console.error("Error in continuation:", error);
+                                            });
+                                    } else {
+                                        // If no sources were added, reset the flag
+                                        processingToolResponse = false;
+                                    }
+                                })
+                                .catch(error => {
+                                    processingToolResponse = false;
+                                    console.error("Error calling tool:", error);
+                                });
+                        } else {
+                            // Original success handling for streaming responses
+                            // Determining what to return in the promise
+                            let responseContent;
+
+                            if (chat.tools) {
+                                if (isToolCallsFormat) {
+                                    // For tool_calls in new format
+                                    responseContent = JSON.stringify(accumulatedToolCalls, null, 2);
+                                } else {
+                                    // For other cases, return complete JSON
+                                    responseContent = fullResponse;
+                                }
+                            } else {
+                                // If no tools, return the complete response
+                                responseContent = fullResponse;
+                            }
+
+                            // Don't modify the system message
+                            messagesHistory[0].content = mainSystemMessage.content;
+
+                            resolve({
+                                chunks: responseData,
+                                fullResponse: fullResponse,
+                                content: responseContent,
+                                isNoTool: isNoTool,
+                                processingTool: processingToolResponse,
+                                toolCalls: isToolCallsFormat ? accumulatedToolCalls : null
+                            });
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        console.error("Error en la petición:", status, error);
+                        reject(error);
+                    }
+                });
+            });
+        }
+        let setPrompt = function (myPrompt, isSelection) {
+            isSelection = isSelection ?? 0;
+            $("#prompt").val(myPrompt);
+            prompt = myPrompt;
+            if (isSelection) {
+                prompt = prompt + ': ' + selectedText;
+            }
+            sendPrompt();
+        }
+        let sendPrompt = function () {
+            if (prompt && prompt.length && myDevice) {
+
+                if (notFinishedMessage == '') {
+                    response = '';
+                    $update();
+
+                    // User message with unique ID
+                    const userMsgId = "user-msg-" + Date.now();
+                    messages.addMessage({
+                            attrs: {
+                                "data-id": userMsgId,
+                                "id": userMsgId
+                            },
+                            isTitle: false,
+                            text: '<p>' + prompt + '</p>',
+                            textHeader: '',//<a href="#" id="more_options_prompt" class="link more-options icon-only color-gray"><i class="icon f7-icons font-size-12 text-color-gray">ellipsis_vertical</i></a>',
+                            name: 'Alfredo García',
+                            cssClass: 'sent card no-margin-top padding-half',
+                            type: 'received',
+                            avatar: 'https://ui-avatars.com/api/?name=Alfredo%20García',
+                            textFooter: footerTemplate
+
+                        }
+                        , 'append', true);
+
+                    messagesHistory.push({
+                        role: 'user',
+                        content: prompt,
+                    });
+
+                    onMessageAdded($('#' + userMsgId));
+                    scrollToBottom();
+
+                    if (navigator.onLine) {
+                        // Create assistant thinking message with unique ID
+                        const thinkingMsgId = "assistant-thinking-" + Date.now();
+                        messages.addMessage({
+                            attrs: {"data-id": thinkingMsgId, "id": thinkingMsgId},
+                            isTitle: false,
+                            text: '<p><span class="thinking-icon">' + assistant.thinkIcon + '</span></p>',
+                            name: assistant.name,
+                            cssClass: 'card no-margin-top padding-half',
+                            textFooter: footerTemplate,
+                            type: 'received',
+                            avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                        }, 'append', true);
+                        setDynamicHeight(messagesHistory);
+
+                        onMessageAdded($('#' + thinkingMsgId));
+                        //     addSourcesToMessage($('#' + thinkingMsgId));
+                            addActionsToMessage($('#' + thinkingMsgId))
+                        if (!window.config.completion.url || !window.config.completion.apiKey) {
+                            console.log('Configuración incompleta para API de completions.');
+                            return;
+                        }
+
+                        //   $('input[name="chip-selectable-device"][value="ARMS"]').prop('checked', true).trigger('change');
+                        const radioButtons = $el.value.find('input[name="chip-selectable-device"]');
+
+                        // Iterar sobre los elementos encontrados
+                        radioButtons.forEach(radio => {
+                            if (radio.value === myDevice) {
+                                radio.checked = true;
+
+                                // Disparar evento change
+                                const event = new Event('change');
+                                radio.dispatchEvent(event);
+                            }
+                        });
+                        $el.value.find('.messagebar-chat textarea')[0].value = '';
+
+                        $el.value.find('#prompt')[0].focus();
+                        scrollToBottom();
+
+                        // Pass the unique ID to callCompletion
+                        callCompletion(true, thinkingMsgId);
+                    }
+                    // console.log("seteando device"+$el.value.find('input[name="chip-selectable-device"]'))
+                    //     console.log($el.value.find('input[name="chip-selectable-device"]'))
+                }
+            } else {
+                $f7.toast.show({
+                    text: 'Please select a Training Device before submit a query.',
+                    //cssClass: 'color-orange',
+                    position: 'center',
+                    horizontalPosition: 'center'
+
+                });
+            }
+        }
+        let handleDeviceSelection = function (e) {
+            myDevice = e.target.value;
+            $update();
+            document.getElementById('prompt').focus();
+
+        }
+
+        let handleOpenDeviceSelection = function (e) {
+            myDevice = null;
+            prompt = null;
+            $update();
+        }
+        let handlePromptTextArea = function (e) {
+            var value = e.target.value;
+            // Cambios en el icono según el contenido de 'value'
+            if (value.length > 0) {
+                prompt = value;
+                // Cambia el icono a 'send'
+            } else {
+                prompt = null;
+                // Cambia el icono a 'mic'
+            }
+
+            // Verifica si la tecla presionada es Enter y no se presionó la tecla Shift
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Previene el comportamiento por defecto del Enter
+                sendPrompt(); // Llama a la función sendPrompt
+            }
+
+            $update();
+        }
+        let handleKeyDown = function (e) {
+            // Verifica si la tecla presionada es Enter
+            // Permite crear nueva línea con Shift+Enter
+            if (e.key === 'Enter' && e.shiftKey) {
+                // No hacer nada, permitir el comportamiento predeterminado
+                return;
+            }
+
+            // Si es solo Enter (sin Shift), enviar el mensaje
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Previene el comportamiento por defecto
+                sendPrompt(); // Llama a la función sendPrompt
+            }
+        }
+        let initializeMessagebar = function () {
+            messagebar = $f7.messagebar.create({
+                el: $el.value.find('.messagebar-chat'),
+                textareaEl: $el.value.find('.messagebar-chat textarea')
+            });
+        }
+
+        let initializeMessages = function () {
+            var self = this;
+            messages = $f7.messages.create({
+                el: $el.value.find('.messages'),
+                scrollMessages: true,
+                autoLayout: true,
+                scrollMessagesOnEdge: true,
+                firstMessageRule: function (message, previousMessage, nextMessage) {
+
+                    if (message != undefined) {
+
+                        if (message.isTitle) {
+                            return false;
+                        }
+
+                        if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name) {
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+                },
+
+                lastMessageRule: function (message, previousMessage, nextMessage) {
+                    //    console.log(message)
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+
+                tailMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+
+        }
+
+        let initializePopupTicket = function () {
+            popupTicket = $f7.popup.create({
+                el: $el.value.find('#popup-ticket')
+            });
+        }
+
+        let openPopupTicket = function () {
+            popupTicket.open();
+        }
+
+        let closePopupTicket = function () {
+            formTicketValidator.resetForm();
+            popupTicket.close();
+        }
+
+        let initializeFormValidator = function () {
+            formTicketValidator = jQuery($el.value.find('form[name=ticket]')).validate({
+                rules: {
+                    problem_title: {
+                        required: true
+                    },
+                    problem_description: {
+                        required: true,
+                    },
+                    device: {
+                        required: true
+                    }
+                },
+                messages: {
+                    title: {
+                        required: 'Please enter a quick description of the issue.'
+                    },
+                    description: {
+                        required: 'Please enter a full description and details of the issue.',
+                    },
+                    device: {
+                        required: 'Please enter the simulator/device.'
+                    }
+                },
+                submitHandler: function (form) {
+
+                    const payload = {
+                        name: 'action_open_support_ticket',
+                        params: $f7.form.convertToData(form),
+                        chat: chat.guid
+                    };
+
+                    function buildServiceRequestMessage(response) {
+                        // Extraer los datos relevantes del JSON de respuesta
+                        const {ticket_id, guid, url, created_at} = response;
+
+                        // Formatear la fecha de manera más legible
+                        const date = new Date(created_at);
+                        const formattedDate = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: 'long',
+                            day: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit'
+                        });
+
+                        // Construir el mensaje en formato Markdown
+                        const markdownMessage = `
+## Service Request Created Successfully
+
+Your service request has been submitted and assigned the following ID:
+
+**${ticket_id}**
+
+Created on: ${formattedDate}
+
+You can <a href="#" onclick="viewDocument('${url}','${ticket_id}')" class="link icon-only" target="_blank">click here to view details</a> or track the progress of your request.
+
+Thank you for your patience. Our support team will review your request shortly.
+`;
+
+                        return markdownMessage;
+                    }
+
+                    $f7.request({
+                        url: window.config.api_methods.call_tool,
+                        method: 'POST',
+                        data: payload,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        headers: {
+                            'x-auth-token': window.config.token
+                        },
+                        success: function (data, status, xhr) {
+                            console.log("Llamada a herramienta completada con éxito:", data);
+                            if (data && data.data && data.data["tool_domain"] == 'action') {
+
+                                $f7.toast.show({
+                                    text: 'Thank you for open a Service Request. We will get back to you soon.',
+                                    cssClass: 'color-green'
+                                });
+                                console.log("Ticket creado", data);
+
+                                let newMessageId = "assistant-thinking-" + Date.now();
+                                $
+                                // Crear un nuevo mensaje para la respuesta continuada
+
+                                $(".shimmer-text-fast").removeClass("shimmer-text-fast")
+                                message = md.render(buildServiceRequestMessage(data.data));
+                                messages.addMessage({
+                                    attrs: {
+                                        "data-id": newMessageId,
+                                        "id": newMessageId
+                                    },
+                                    isTitle: false,
+                                    text: message,
+                                    textFooter: footerTemplate,
+                                    cssClass: 'card no-margin-top padding-half',
+                                    avatar: assistant.avatar,//'https://ui-avatars.com/api/?background=FFF00&name=' + assistant.name.replace(" ", "%20"),
+                                    type: 'received',
+                                }, 'append', true);
+
+                                messagesHistory.push({
+                                    role: 'assistant',
+                                    content: message,
+                                })
+                                closePopupTicket();
+                                return
+                            }
+                        }
+                    });
+                }
+            });
+        }
+        let initPopoverSelection = function () {
+            popoverSelection = $f7.popover.create({
+                el: $el.value.find('#popover-selection')
+            });
+
+            document.addEventListener('mouseup', function (event) {
+                const selection = window.getSelection();
+
+                if (selection.toString().trim().length > 0) {
+                    selectedText = selection.toString().trim();
+                    let targetElement = event.target;
+                    let isMessageText = false;
+                    let isAlreadyHighlighted = false;
+
+                    // Comprobar si el elemento ya está resaltado
+                    if (targetElement.classList && (targetElement.classList.contains('highlighted-text') ||
+                        targetElement.classList.contains('reporting-highlight'))) {
+                        isAlreadyHighlighted = true;
+
+                        // Eliminar el resaltado existente
+                        const parent = targetElement.parentNode;
+                        parent.insertBefore(document.createTextNode(targetElement.textContent), targetElement);
+                        parent.removeChild(targetElement);
+
+                        // Limpiar la selección y terminar
+                        selection.removeAllRanges();
+                        return;
+                    }
+
+                    // Comprobar si el elemento o alguno de sus padres tiene la clase message-text
+                    while (targetElement && targetElement !== document.body) {
+                        if (targetElement.classList && targetElement.classList.contains('message-text')) {
+                            isMessageText = true;
+                            break;
+                        }
+                        if (targetElement.classList && targetElement.classList.contains('highlighted-text')) {
+                            isAlreadyHighlighted = true;
+                            break;
+                        }
+                        targetElement = targetElement.parentElement;
+                    }
+
+                    if (isMessageText && !isAlreadyHighlighted) {
+                        const range = selection.getRangeAt(0);
+
+                        // Marcar físicamente el texto seleccionado en azul (color original)
+                        const highlightSpan = document.createElement('span');
+                        highlightSpan.style.backgroundColor = '#415c8d';
+                        highlightSpan.style.color = 'black';
+                        highlightSpan.className = 'highlighted-text';
+                        myId = 'highlight_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+
+                        highlightSpan.id = myId;
+                        range.surroundContents(highlightSpan);
+
+                        // Limpia la selección visual (opcional)
+                        //selection.removeAllRanges();
+
+                        // Obtener posición del rectángulo del span recién creado
+                        const rect = highlightSpan.getBoundingClientRect();
+
+                        // Crear un elemento temporal para usar como target del popover
+                        const tempTarget = document.createElement('div');
+                        tempTarget.style.position = 'absolute';
+                        tempTarget.style.left = rect.left + 'px';
+                        tempTarget.style.top = rect.bottom + 'px';
+                        tempTarget.style.width = '1px';
+                        tempTarget.style.height = '1px';
+                        tempTarget.style.pointerEvents = 'none';
+                        tempTarget.id = 'temp-popover-target';
+                        document.body.appendChild(tempTarget);
+
+                        // Guardar el texto seleccionado como atributo en el popover
+                        const popoverEl = document.getElementById('popover-selection');
+                        popoverEl.setAttribute('data-selected-text', selectedText);
+                        popoverEl.setAttribute('data-selected-id', myId);
+
+                        // Mostrar el popover
+                        popoverEl.addEventListener('popover:close', () => {
+                            setTimeout(function(){
+                                app.$("#popover-selection").find('.input-clear-button').trigger("click")
+                            },1000);
+                            clearHighlights();
+                        });
+                        popoverSelection.open('#temp-popover-target');
+
+                        // Limpiar el elemento temporal
+                        setTimeout(() => {
+                            if (document.getElementById('temp-popover-target')) {
+                                document.body.removeChild(tempTarget);
+                            }
+                        }, 100);
+                    }
+                }
+            });
+        }
+
+// Función para el botón "Highlight for reporting"
+        function highlightForReporting() {
+            // Obtener el ID del texto seleccionado desde el atributo del popover
+            const popoverEl = document.getElementById('popover-selection');
+            const selectedId = popoverEl.getAttribute('data-selected-id');
+
+            // Encontrar el elemento destacado por ID
+            const highlightEl = document.getElementById(selectedId);
+
+            if (highlightEl) {
+                // Cambiar el color de fondo a amarillo
+                highlightEl.style.backgroundColor = 'yellow';
+                highlightEl.style.color = 'black'; // Asegurar que el texto sea legible sobre amarillo
+
+                // Añadir una clase para identificación más fácil
+                highlightEl.classList.add('reporting-highlight');
+
+                // Evitar que el highlight se limpie cuando se cierra el popover
+                highlightEl.setAttribute('data-persistent', 'true');
+            }
+        }
+
+
+
+
+
+        let initializeActionsCustomLayout = function () {
+            actionsCustomLayout = $f7.actions.create({
+                el: $el.value.find('#actions-custom-layout'),
+                closeByBackdropClick: false,
+                closeByOutsideClick: false,
+                closeOnEscape: false
+            });
+        }
+
+
+        if (chat.guid === undefined) {
+            createConversation(assistant.guid);
+        }
+        $on('pageBeforeIn', function () {
+
+            scrollToBottomBtn = document.getElementById('scrollToBottom');
+            pageContent = document.getElementById('conversationPage');
+
+            initializeDialogChoiceChip();
+
+            initializePopupTicket();
+
+            initializeActionsCustomLayout();
+            initializeFormValidator();
+            initPopoverSelection();
+        });
+        $on('pageAfterIn', function () {
+            initializeMessagebar();
+            initializeMessages();
+            loadAssistants();
+            scrollToBottomBtn = document.getElementById('scrollToBottom');
+// Evento para manejar el desplazamiento dentro de .page-content
+            pageContent.addEventListener('scroll', checkScrollPosition);
+
+            checkScrollPosition();
+
+        })
+        return $render;
+    }
+</script>
+

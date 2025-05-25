@@ -1,0 +1,162 @@
+[
+    {
+        "id": 1,
+        "title": "Banana Pancakes",
+        "image": "https://source.unsplash.com/TkzdkVn1AyA/568x420",
+        "category": "Breakfast",
+        "rating": 4.5,
+        "favorite": true
+    },
+    {
+        "id": 2,
+        "title": "Summer Vegetable Minestrone Soup",
+        "image": "https://source.unsplash.com/KGw62KtHzxA/568x420",
+        "category": "Lunch",
+        "rating": 4.7,
+        "favorite": false
+    },
+    {
+        "id": 3,
+        "title": "Asparagus Stuffed Chicken Breast",
+        "image": "https://source.unsplash.com/9lubH598KsY/568x420",
+        "category": "Dinner",
+        "rating": 4.2,
+        "favorite": false
+    },
+    {
+        "id": 4,
+        "title": "Hazelnut Brownies",
+        "image": "https://source.unsplash.com/dKT6Q7q2UKs/568x420",
+        "category": "Desserts",
+        "rating": 4.9,
+        "favorite": true
+    },
+    {
+        "id": 5,
+        "title": "Soft Pretzels",
+        "image": "https://source.unsplash.com/YzhFhV_hiAM/568x420",
+        "category": "Snacks",
+        "rating": 3.9,
+        "favorite": false
+    },
+    {
+        "id": 6,
+        "title": "Potato-Crusted Quiche",
+        "image": "https://source.unsplash.com/H-VwuGQS278/568x420",
+        "category": "Lunch",
+        "rating": 4,
+        "favorite": false
+    },
+    {
+        "id": 7,
+        "title": "Chicken Fajita Quesadilla",
+        "image": "https://source.unsplash.com/ZEdN4DT0cO4/568x420",
+        "category": "Dinner",
+        "rating": 3.7,
+        "favorite": false
+    },
+    {
+        "id": 8,
+        "title": "Chocolate Chip Cookies",
+        "image": "https://source.unsplash.com/YDvfndOs4IQ/568x420",
+        "category": "Desserts",
+        "rating": 4.8,
+        "favorite": true
+    },
+    {
+        "id": 9,
+        "title": "French Fries",
+        "image": "https://source.unsplash.com/vi0kZuoe0-8/568x420",
+        "category": "Snacks",
+        "rating": 4.3,
+        "favorite": false
+    },
+    {
+        "id": 10,
+        "title": "Bacon Spinach Omelette",
+        "image": "https://source.unsplash.com/6rtm6a_aVyE/568x420",
+        "category": "Breakfast",
+        "rating": 3.5,
+        "favorite": false
+    },
+    {
+        "id": 11,
+        "title": "Tomato & Anchovy Pasta",
+        "image": "https://source.unsplash.com/-O3wkh2jZyo/568x420",
+        "category": "Dinner",
+        "rating": 2.7,
+        "favorite": true
+    },
+    {
+        "id": 12,
+        "title": "Rainbow Crepe Cake",
+        "image": "https://source.unsplash.com/SjPJcoSndzg/568x420",
+        "category": "Desserts",
+        "rating": 5,
+        "favorite": false
+    },
+    {
+        "id": 13,
+        "title": "Honey Mustard Popcorn",
+        "image": "https://source.unsplash.com/DPv61r6uCg8/568x420",
+        "category": "Snacks",
+        "rating": 4.6,
+        "favorite": false
+    },
+    {
+        "id": 14,
+        "title": "Mixed Berries French Toast",
+        "image": "https://source.unsplash.com/MSxw2vpQzx4/568x420",
+        "category": "Breakfast",
+        "rating": 4.5,
+        "favorite": true
+    },
+    {
+        "id": 15,
+        "title": "Chili Beef Noodles",
+        "image": "https://source.unsplash.com/wEBg_pYtynw/568x420",
+        "category": "Lunch",
+        "rating": 3.7,
+        "favorite": false
+    },
+    {
+        "id": 16,
+        "title": "Peppermint Macarons",
+        "image": "https://source.unsplash.com/MGskjWZDdhg/568x420",
+        "category": "Desserts",
+        "rating": 4.9,
+        "favorite": false
+    },
+    {
+        "id": 17,
+        "title": "Sweet Potato Wedges",
+        "image": "https://source.unsplash.com/9DEggBoY8CY/568x420",
+        "category": "Snacks",
+        "rating": 3.2,
+        "favorite": true
+    },
+    {
+        "id": 18,
+        "title": "Chocolate Peanut Butter Cookie Smoothie",
+        "image": "https://source.unsplash.com/ocku3zjNM7k/568x420",
+        "category": "Breakfast",
+        "rating": 4.3,
+        "favorite": false
+    },
+    {
+        "id": 19,
+        "title": "Cauliflower Walnut Burritos",
+        "image": "https://source.unsplash.com/50KffXbjIOg/568x420",
+        "category": "Lunch",
+        "rating": 4.8,
+        "favorite": false
+    },
+    {
+        "id": 20,
+        "title": "Chicken Alfredo Lasagna",
+        "image": "https://source.unsplash.com/E_bGSbXb12I/568x420",
+        "category": "Dinner",
+        "rating": 1,
+        "favorite": false
+    }
+]

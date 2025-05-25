@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+
+<html lang="en" dir="ltr">
+
+<head>
+    <base href="/"/>
+
+    <meta charset="utf-8"/>
+
+    <meta http-equiv="Content-Security-Policy"
+          content="default-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: cdvfile: data: filesystem: file://* gap: gap://ready ws:; style-src * 'self' 'unsafe-inline'; script-src * 'self' 'unsafe-eval' 'unsafe-inline'; worker-src blob: 'self' https://cdn.jsdelivr.net;"/>  <meta name="viewport"
+          content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover"/>
+
+    <meta name="mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-capable" content="yes"/>
+    <meta name="apple-mobile-web-app-title" content="Calculadora"/>
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+
+    <meta name="color-scheme" content="light dark"/>
+    <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)"/>
+    <meta name="theme-color" content="#1C1C1C" media="(prefers-color-scheme: dark)"/>
+
+    <link rel="icon" type="image/svg+xml" sizes="any" href="assets/custom/favicon/favicon.svg"/>
+    <link rel="icon" type="image/png" sizes="any" href="assets/custom/favicon/favicon.png"/>
+    <link rel="icon" type="image/x-icon" sizes="any" href="favicon.ico"/>
+    <link rel="apple-touch-icon" href="assets/custom/favicon/apple-touch-icon.png"/>
+
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Pro_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_11__iPhone_XR_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/12.9__iPad_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/11__iPad_Pro__10.5__iPad_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/10.9__iPad_Air_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/10.5__iPad_Air_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/10.2__iPad_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/light/8.3__iPad_Mini_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Pro_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_11__iPhone_XR_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/12.9__iPad_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/11__iPad_Pro__10.5__iPad_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/10.9__iPad_Air_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/10.5__iPad_Air_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/10.2__iPad_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/light/8.3__iPad_Mini_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Pro_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_11_Pro_Max__iPhone_XS_Max_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_11__iPhone_XR_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/4__iPhone_SE__iPod_touch_5th_generation_and_later_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/12.9__iPad_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/11__iPad_Pro__10.5__iPad_Pro_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/10.9__iPad_Air_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/10.5__iPad_Air_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/10.2__iPad_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: landscape)"
+          href="assets/custom/apple-touch-startup-image/dark/8.3__iPad_Mini_landscape.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 430px) and (device-height: 932px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Pro_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 393px) and (device-height: 852px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 428px) and (device-height: 926px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14_Plus__iPhone_13_Pro_Max__iPhone_12_Pro_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 390px) and (device-height: 844px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_14__iPhone_13_Pro__iPhone_13__iPhone_12_Pro__iPhone_12_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 812px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_13_mini__iPhone_12_mini__iPhone_11_Pro__iPhone_XS__iPhone_X_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_11_Pro_Max__iPhone_XS_Max_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 896px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_11__iPhone_XR_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 414px) and (device-height: 736px) and (-webkit-device-pixel-ratio: 3) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_8_Plus__iPhone_7_Plus__iPhone_6s_Plus__iPhone_6_Plus_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 375px) and (device-height: 667px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/iPhone_8__iPhone_7__iPhone_6s__iPhone_6__4.7__iPhone_SE_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 320px) and (device-height: 568px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/4__iPhone_SE__iPod_touch_5th_generation_and_later_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 1024px) and (device-height: 1366px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/12.9__iPad_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 834px) and (device-height: 1194px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/11__iPad_Pro__10.5__iPad_Pro_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 820px) and (device-height: 1180px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/10.9__iPad_Air_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 834px) and (device-height: 1112px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/10.5__iPad_Air_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 810px) and (device-height: 1080px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/10.2__iPad_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 768px) and (device-height: 1024px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/9.7__iPad_Pro__7.9__iPad_mini__9.7__iPad_Air__9.7__iPad_portrait.png"/>
+    <link rel="apple-touch-startup-image"
+          media="(prefers-color-scheme: dark) and (device-width: 744px) and (device-height: 1133px) and (-webkit-device-pixel-ratio: 2) and (orientation: portrait)"
+          href="assets/custom/apple-touch-startup-image/dark/8.3__iPad_Mini_portrait.png"/>
+
+    <link rel="manifest" href="manifest.json"/>
+
+    <link class="f7" rel="stylesheet" href="assets/vendor/framework7/framework7-bundle.min.css"/>
+
+    <link rel="stylesheet" href="assets/vendor/material-icons/material-icons.css"/>
+    <link rel="stylesheet" href="assets/vendor/framework7-icons/css/framework7-icons.css"/>
+    <link rel="stylesheet" href="assets/vendor/font-awesome/css/all.min.css"/>
+
+    <link rel="stylesheet" href="assets/vendor/framework7-keypad/framework7-keypad.min.css"/>
+    <link rel="stylesheet" href="assets/vendor/rateyo/jquery.rateyo.min.css"/>
+
+    <link rel="stylesheet" href="assets/vendor/nectar/nectar.css"/>
+    <link rel="stylesheet" href="assets/vendor/nectar/colors.css"/>
+    <link rel="stylesheet" href="assets/vendor/nectar/wordpress.css"/>
+    <link rel="stylesheet" href="assets/vendor/katex/katex.min.css"/>
+    <link rel="stylesheet" href="assets/custom/css/custom.css"/>
+    <!-- CSS opcional para estilos extra de markdown-it-texmath -->
+    <link rel="stylesheet" href="assets/vendor/markdown-it-texmath/texmath.min.css">
+
+
+    <title>SIMBA - Simulators Based Assistant</title>
+
+</head>
+
+<body>
+
+<div id="app"></div>
+
+<script src="cordova.js"></script>
+<script src="assets/vendor/jquery/jquery-3-6.0.min.js"></script>
+
+
+<script defer src="assets/vendor/framework7/framework7-bundle.min.js"></script>
+<!--script defer src="assets/vendor/jquery/jquery.min.js"></script-->
+<script defer src="assets/vendor/lazyload/LazyLoad.min.js"></script>
+
+<script defer src="assets/vendor/i18next/i18next.min.js"></script>
+<script defer src="assets/vendor/i18next/i18nextXHRBackend.min.js"></script>
+<script defer src="assets/vendor/i18next/loc-i18next.min.js"></script>
+
+<script defer src="assets/vendor/moment/moment.min.js"></script>
+
+<script defer src="assets/vendor/jquery-validation/jquery.validate.min.js"></script>
+<script defer src="assets/vendor/jquery-validation/additional-methods.min.js"></script>
+<script defer src="assets/vendor/framework7-keypad/framework7-keypad.min.js"></script>
+<script defer src="assets/vendor/rateyo/jquery.rateyo.min.js"></script>
+<script defer src="assets/vendor/easytimer/easytimer.min.js"></script>
+
+<script defer src="assets/vendor/anime/anime.min.js"></script>
+<script defer src="assets/vendor/lottie-player/lottie-player.js"></script>
+<script defer src="assets/vendor/exif/exif.js"></script>
+<script defer src="assets/vendor/circleaudioplayer/circleaudioplayer.js"></script>
+<script defer src="assets/vendor/highlight/highlight.min.js"></script>
+<script defer src="assets/vendor/showdown/showdown.min.js"></script>
+<script defer src="assets/vendor/showdown/showdown-katex.js"></script>
+<script defer src=" assets/vendor/markdown-it/markdown-it.min.js"></script>
+<!-- KaTeX -->
+<script src="assets/vendor/katex/katex.min.js"></script>
+<!-- markdown-it-texmath -->
+<script src="assets/vendor/markdown-it-texmath/texmath.min.js"></script>
+<script defer src="assets/vendor/show-more/showMore.min.js"></script>
+<!--script defer type="module">
+    import {faker} from 'https://cdn.skypack.dev/@faker-js/faker@v7.6.0';
+
+    window.faker = faker;
+</script-->
+
+<script defer type="module">
+    import {sort, inPlaceSort} from '/assets/vendor/fast-sort/sort.es.js';
+
+    window.fastSort = {};
+    window.fastSort.sort = sort;
+    window.fastSort.inPlaceSort = inPlaceSort;
+</script>
+
+<script defer src="assets/custom/js/config.js"></script>
+<script defer src="assets/custom/js/routes.js?id=3"></script>
+<script defer src="assets/custom/js/store.js"></script>
+<script defer src="assets/custom/js/init.js"></script>
+<script defer src="assets/custom/js/app.js"></script>
+<script defer src="assets/custom/js/custom.js"></script>
+<script defer src="assets/custom/js/flowfollow.js"></script>
+<script defer src="assets/custom/js/sources-manager.js"></script>
+<script defer src="assets/custom/js/filedropezone.js"></script>
+<script defer src="assets/vendor/fix-numbering/fix-numbering.js"></script>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+<script src="assets/vendor/html-docx/html-docx.js"></script>
+<script src="assets/vendor/html-docx/FileSaver.js"></script>
+<!-- Para archivos DOCX -->
+<script src="assets/vendor/mammoth/mammoth.browser.min.js"></script>
+<!-- Para archivos Excel -->
+<script src="assets/vendor/xlsx/xlsx.full.min.js"></script>
+<script src="assets/vendor/pdf/pdf.min.js"></script>
+<script src="assets/vendor/tesseract/tesseract.min.js"></script>
+<script src="assets/vendor/ace/1_32_6/ace.min.js"></script>
+<!-- Modos de lenguaje solicitados y comunes -->
+<script src = "assets/vendor/ace/1_32_6/mode-javascript.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-html.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-css.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-python.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-php.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-json.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-sh.js"></script>
+<script src = "assets/vendor/ace/1_32_6/mode-markdown.js"></script>
+<script  type="module" src="assets/vendor/mistral-tokernizer/global-tokernizer.js"></script>
+<script defer src="assets/custom/js/conversation-optimizer.js"></script>
+<script defer src="assets/custom/js/simba.js"></script>
+
+<!-- Temas, incluyendo dark (twilight) -->
+<script src = "assets/vendor/ace/1_32_6/theme-monokai.js"></script>
+
+
+<script>     // Configurar el worker de PDF.js
+if (typeof pdfjsLib !== 'undefined') {
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '/assets/vendor/pdf/pdf.worker.min.js';
+}
+
+function handleCredentialResponse(response) {
+    console.log("Encoded JWT ID token: " + response.credential);
+
+    var formData = new FormData();
+    // Añade el token JWT al formData
+    formData.append('jwt', response.credential);
+
+    app.request({
+        url: window.config.api_methods.login + '?jwt=' + response.credential,
+        method: 'POST',
+        /* headers: {
+             'X-Auth-Token': window.config.token
+         }*/
+        data: formData,
+        processData: false, // Necesario para FormData
+        contentType: false, // Necesario para FormData
+        success: function (result) {
+            result = JSON.parse(result);
+            sessionStorage.setItem('isLogin', true);
+            sessionStorage.setItem('userinfo', JSON.stringify(result.data.userinfo));
+            window.config.token = result.data.userinfo.token;
+            app.views.main.router.navigate('/home/', {
+                reloadCurrent: true
+            });
+        },
+        error: function (xhr, status, error) {
+            $f7.toast.show({
+                text: 'An error occured: ' + error,
+                cssClass: 'color-red'
+            });
+        }
+    });
+}
+
+window.onload = function () {
+    if (!('cordova' in window)) {
+        google.accounts.id.initialize({
+            client_id: "672180587034-d0tnsbto359dtq16cbm5ia8ucmh3la4v.apps.googleusercontent.com",
+            callback: handleCredentialResponse
+        })
+    }
+}
+
+window.addEventListener('DOMContentLoaded', function () {
+    if ('cordova' in window && cordova.platformId == 'android') {
+        let ANDROID_WEBVIEW_MIN_VER = 71;
+        let GOOGLE_CHROME_MIN_VER = 71;
+
+        let handleWebViewError = function (webViewName, packageName) {
+            navigator.notification.alert(
+                'You\'re using an outdated version of ' + webViewName + '. Please update it from the Play Store and then open ' + BuildInfo.name + ' again.',
+                function () {
+                    navigator.app.exitApp();
+                    if (packageName) {
+                        window.plugins.webViewChecker.openGooglePlayPage(packageName);
+                    }
+                },
+                'Alert',
+                'OK'
+            );
+        }
+
+        document.addEventListener('deviceready', function () {
+            window.plugins.webViewChecker.isAndroidWebViewEnabled()
+                .then(function (isEnabled) {
+                    if (isEnabled) {
+                        window.plugins.webViewChecker.getAndroidWebViewPackageInfo()
+                            .then(function (packageInfo) {
+                                if (packageInfo.versionName.split('.')[0] < ANDROID_WEBVIEW_MIN_VER) {
+                                    try {
+                                        handleWebViewError('Android WebView', packageInfo.packageName);
+                                    } catch (error) {
+                                        handleWebViewError('Android WebView');
+                                    }
+                                } else {
+                                    app.init();
+                                }
+                            })
+                            .catch(function (error) {
+                                handleWebViewError('Android WebView');
+                            });
+                    } else {
+                        window.plugins.webViewChecker.getCurrentWebViewPackageInfo()
+                            .then(function (packageInfo) {
+                                if (packageInfo.versionName.split('.')[0] < GOOGLE_CHROME_MIN_VER) {
+                                    try {
+                                        handleWebViewError('Google Chrome', packageInfo.packageName);
+                                    } catch (error) {
+                                        handleWebViewError('Google Chrome');
+                                    }
+                                } else {
+                                    app.init();
+                                }
+                            })
+                            .catch(function (error) {
+                                handleWebViewError('Google Chrome');
+                            });
+                    }
+                })
+                .catch(function (error) {
+                    handleWebViewError('Android WebView');
+                });
+        });
+    } else {
+        app.init();
+    }
+});
+</script>
+
+</body>
+
+</html>

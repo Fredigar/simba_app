@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora iPhone</title>
+    <style>
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #000;
+            margin: 0;
+            font-family: Arial, sans-serif;
+            box-sizing: border-box;
+        }
+
+        .calculator {
+            background-color: #000;
+            width: 100%;
+            max-width: 300px;
+            max-height: 600px;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            box-sizing: border-box;
+            padding: 20px 0;
+            border-radius: 20px;
+        }
+
+        .history {
+            color: #a5a5a5;
+            font-size: 20px;
+            text-align: right;
+            padding: 0 20px;
+            min-height: 30px;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            margin-bottom: 10px;
+            display: block;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .display {
+            background-color: #000;
+            color: #fff;
+            font-size: 48px;
+            text-align: right;
+            padding: 0 20px 20px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            transition: font-size 0.3s ease;
+            flex-shrink: 0;
+        }
+
+        .icon-buttons {
+            display: flex;
+            justify-content: flex-end;
+            padding: 10px 10px 10px 0;
+            margin-bottom: 10px;
+            flex-shrink: 0;
+        }
+
+        /* Modificación de los botones de iconos para que no sean redondos */
+        .icon-btn {
+            background-color: transparent; /* Fondo transparente */
+            color: #777; /* Color gris para los iconos */
+            font-size: 20px; /* Tamaño ligeramente mayor para los iconos */
+            border: none;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            #margin-left: 10px;
+            transition: color 0.3s;
+        }
+
+        .icon-btn:active {
+            color: #aaa; /* Color más claro al presionar */
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            #padding: 0 10px 20px 10px;
+            flex-shrink: 0;
+        }
+
+        .btn {
+            background-color: #333;
+            color: #fff;
+            font-size: 24px;
+            border: none;
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin: 5px;
+        }
+
+        .btn.zero {
+            grid-column: span 2;
+            width: 140px;
+            border-radius: 50px;
+            justify-content: flex-start;
+            padding-left: 25px;
+        }
+
+        .btn.operator {
+            background-color: #ff9500;
+            color: #fff;
+            font-size:40px;
+        }
+
+        .btn.operator.active {
+            background-color: #a5a5a5;
+        }
+
+        .btn.gray {
+            background-color: #a5a5a5;
+            color: #000;
+        }
+
+        .btn.operator:active {
+            background-color: #ffad33;
+        }
+
+        .btn:active {
+            background-color: #555;
+        }
+
+        .btn.operator#equals {
+            background-color: #ff9500;
+            color: #fff;
+        }
+
+        .btn.operator#equals:active {
+            background-color: #ffad33;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <!-- Histórico de operaciones -->
+        <div class="history" id="history"></div>
+
+        <!-- Display principal -->
+        <div class="display" id="display">0</div>
+        
+        <!-- Botonera de iconos -->
+        <div class="icon-buttons">
+            <button class="icon-btn" id="backspace">&#9003;</button> <!-- Botón de retroceso -->
+            <button class="icon-btn">&#9881;</button>
+        </div>
+
+        <!-- Botonera principal -->
+        <div class="buttons">
+            <button class="btn gray" data-value="AC">AC</button>
+            <button class="btn gray" data-value="+/-">+/-</button>
+            <button class="btn gray" data-value="%">%</button>
+            <button class="btn operator" data-value="÷">&#x00F7;</button>
+            <button class="btn" data-value="7">7</button>
+            <button class="btn" data-value="8">8</button>
+            <button class="btn" data-value="9">9</button>
+            <button class="btn operator" data-value="*">x</button>
+            <button class="btn" data-value="4">4</button>
+            <button class="btn" data-value="5">5</button>
+            <button class="btn" data-value="6">6</button>
+            <button class="btn operator" data-value="-">-</button>
+            <button class="btn" data-value="1">1</button>
+            <button class="btn" data-value="2">2</button>
+            <button class="btn" data-value="3">3</button>
+            <button class="btn operator" data-value="+">+</button>
+            <button class="btn zero" data-value="0">0</button>
+            <button class="btn" data-value=".">.</button>
+            <button class="btn operator" data-value="=">=</button>
+        </div>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const display = document.getElementById('display');
+            const history = document.getElementById('history');
+            const buttons = document.querySelectorAll('.btn');
+            const backspaceButton = document.getElementById('backspace');
+
+            let currentInput = '';
+            let operator = null;
+            let previousInput = '';
+            let numberY = '';
+            let yIndex = 0;
+            let isShowingY = false;
+            let originalNumber = '';
+            let activeOperatorButton = null;
+            let lastOperation = '';
+
+            // Probemos con un historial vacío para verificar que se muestra
+            history.textContent = "";
+            setTimeout(() => {
+                history.textContent = "";
+            }, 2000);
+
+            // Añadir evento al botón de retroceso
+            backspaceButton.addEventListener('click', handleBackspace);
+
+            buttons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const value = button.getAttribute('data-value');
+
+                    if (value === 'AC') {
+                        // Reiniciar todo
+                        resetCalculator();
+                    } else if (value === '+/-') {
+                        // Cambiar el signo del número actual
+                        handleSignChange();
+                    } else if (value === '%') {
+                        // Calcular el porcentaje
+                        handlePercentage();
+                    } else if (value === '+') {
+                        // Calcular el número Y
+                        handlePlusOperator(button);
+                    } else if (value === '=') {
+                        // Realizar la operación
+                        handleEquals();
+                    } else if (['-', '*', '÷'].includes(value)) {
+                        handleOperatorClick(button, value);
+                    } else {
+                        // Manejar números y el punto decimal
+                        handleNumberInput(value);
+                    }
+                });
+            });
+
+            // Función para manejar el botón de retroceso
+            function handleBackspace() {
+                if (currentInput !== '') {
+                    // Eliminar el último carácter del input actual
+                    currentInput = currentInput.slice(0, -1);
+                    
+                    // Si quedó vacío, mostrar 0
+                    if (currentInput === '') {
+                        display.textContent = '0';
+                    } else {
+                        display.textContent = formatNumber(currentInput);
+                    }
+                    adjustFontSize();
+                } else if (operator !== null && previousInput !== '') {
+                    // Si estamos esperando el segundo operando, volver al primer operando
+                    currentInput = previousInput;
+                    previousInput = '';
+                    operator = null;
+                    resetActiveOperatorButton();
+                    display.textContent = formatNumber(currentInput);
+                    // Actualizar el historial para mostrar la operación cancelada
+                    history.textContent = '';
+                    adjustFontSize();
+                }
+            }
+
+            // Función para reiniciar la calculadora
+            function resetCalculator() {
+                currentInput = '';
+                previousInput = '';
+                operator = null;
+                numberY = '';
+                yIndex = 0;
+                isShowingY = false;
+                originalNumber = '';
+                lastOperation = '';
+                display.textContent = '0';
+                history.textContent = '';
+                adjustFontSize();
+                resetActiveOperatorButton();
+            }
+
+            // Función para cambiar el signo
+            function handleSignChange() {
+                if (currentInput !== '') {
+                    currentInput = (parseFloat(currentInput.replace(/\./g, '').replace(',', '.')) * -1).toString();
+                    display.textContent = formatNumber(currentInput);
+                    adjustFontSize();
+                }
+            }
+
+            // Función para calcular porcentaje
+            function handlePercentage() {
+                if (currentInput !== '') {
+                    currentInput = (parseFloat(currentInput.replace(/\./g, '').replace(',', '.')) / 100).toString();
+                    display.textContent = formatNumber(currentInput);
+                    adjustFontSize();
+                }
+            }
+
+            // Función para manejar el operador +
+            function handlePlusOperator(button) {
+                if (currentInput !== '') {
+                    // Actualizar historial
+                    history.textContent = `${formatNumber(currentInput)} +`;
+                    
+                    const dateNumber = getDateAsNumber();
+                    const difference = dateNumber - parseFloat(currentInput.replace(/\./g, '').replace(',', '.'));
+                    numberY = difference.toString();
+                    yIndex = 0;
+                    isShowingY = true;
+                    originalNumber = currentInput;
+                    currentInput = '';
+                    display.textContent = '0';
+                    adjustFontSize();
+                    setActiveOperatorButton(button);
+                }
+            }
+
+            // Función para manejar el signo =
+            function handleEquals() {
+                if (operator && previousInput !== '' && currentInput !== '') {
+                    const result = calculate(previousInput, currentInput, operator);
+                    lastOperation = `${formatNumber(previousInput)} ${operator} ${formatNumber(currentInput)} =`;
+                    history.textContent = lastOperation;
+                    currentInput = result.toString();
+                    display.textContent = formatNumber(currentInput);
+                    operator = null;
+                    previousInput = '';
+                    adjustFontSize();
+                    resetActiveOperatorButton();
+                } else if (isShowingY) {
+                    // Sumar el número original y el número Y
+                    const result = parseFloat(originalNumber.replace(/\./g, '').replace(',', '.')) + parseFloat(currentInput.replace(/\./g, '').replace(',', '.'));
+                    lastOperation = `${formatNumber(originalNumber)} + ${formatNumber(currentInput)} =`;
+                    history.textContent = lastOperation;
+                    display.textContent = formatNumber(result.toString());
+                    currentInput = result.toString();
+                    isShowingY = false;
+                    adjustFontSize();
+                }
+            }
+
+            // Función para manejar entrada de números
+            function handleNumberInput(value) {
+                if (isShowingY) {
+                    if (currentInput === '') {
+                        currentInput = '';
+                        display.textContent = '';
+                    }
+                    if (yIndex < numberY.length) {
+                        const nextDigit = numberY[yIndex];
+                        currentInput += nextDigit;
+                        display.textContent = formatNumber(currentInput);
+                        yIndex++;
+                        adjustFontSize();
+                    }
+                } else {
+                    if (value === '.' && currentInput.includes('.')) return;
+                    if (currentInput.length >= 18) return;
+                    
+                    // Si acabamos de completar una operación y empezamos a ingresar un nuevo número,
+                    // movemos el resultado anterior al historial
+                    if (lastOperation !== '' && operator === null && previousInput === '' && !isNaN(currentInput)) {
+                        if (value !== '.') {
+                            // Solo si es un nuevo número (no un punto decimal para el resultado actual)
+                            history.textContent = `Ans = ${formatNumber(currentInput)}`;
+                            currentInput = '';
+                        }
+                    }
+                    
+                    currentInput += value;
+                    display.textContent = formatNumber(currentInput);
+                    adjustFontSize();
+                }
+            }
+
+            // Función para manejar el clic en un operador
+            function handleOperatorClick(button, value) {
+                if (currentInput !== '') {
+                    if (previousInput !== '') {
+                        const result = calculate(previousInput, currentInput, operator);
+                        history.textContent = `${formatNumber(previousInput)} ${operator} ${formatNumber(currentInput)} =`;
+                        currentInput = result.toString();
+                        display.textContent = formatNumber(currentInput);
+                        previousInput = currentInput;
+                    } else {
+                        previousInput = currentInput;
+                    }
+                    
+                    // Actualizar historial con la operación en curso
+                    history.textContent = `${formatNumber(previousInput)} ${value}`;
+                    
+                    operator = value;
+                    currentInput = '';
+                    adjustFontSize();
+                    setActiveOperatorButton(button);
+                } else if (previousInput !== '') {
+                    // Cambiar el operador si ya teníamos uno seleccionado
+                    operator = value;
+                    history.textContent = `${formatNumber(previousInput)} ${value}`;
+                    setActiveOperatorButton(button);
+                }
+            }
+
+            // Función para resaltar el botón de operación activo
+            function setActiveOperatorButton(button) {
+                if (activeOperatorButton) {
+                    activeOperatorButton.classList.remove('active');
+                }
+                activeOperatorButton = button;
+                activeOperatorButton.classList.add('active');
+            }
+
+            // Función para reiniciar el botón de operación activo
+            function resetActiveOperatorButton() {
+                if (activeOperatorButton) {
+                    activeOperatorButton.classList.remove('active');
+                    activeOperatorButton = null;
+                }
+            }
+
+            // Función para realizar cálculos
+            function calculate(a, b, op) {
+                const num1 = parseFloat(a.replace(/\./g, '').replace(',', '.'));
+                const num2 = parseFloat(b.replace(/\./g, '').replace(',', '.'));
+                let result;
+                switch (op) {
+                    case '+':
+                        result = num1 + num2;
+                        break;
+                    case '-':
+                        result = num1 - num2;
+                        break;
+                    case '*':
+                        result = num1 * num2;
+                        break;
+                    case '÷':
+                        result = num1 / num2;
+                        break;
+                    default:
+                        result = num2;
+                }
+                
+                // Redondear para evitar problemas de precisión con números flotantes
+                return parseFloat(result.toFixed(10)).toString();
+            }
+
+            // Función para obtener la fecha actual como número (ddmmaahhii)
+            function getDateAsNumber() {
+                const now = new Date();
+                const day = String(now.getDate()).padStart(2, '0');
+                const month = String(now.getMonth() + 1).replace(/^0+/, '');
+                const year = String(now.getFullYear()).slice(-2);
+                let hours = now.getHours() % 12 || 12;
+                hours = String(hours).replace(/^0+/, '');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const dateString = `${day}${month}${year}${hours}${minutes}`;
+                return parseFloat(dateString);
+            }
+
+            // Función para formatear números con separadores de miles (puntos) y decimales (comas)
+            function formatNumber(number) {
+                if (number === '') return '0';
+                let [integerPart, decimalPart] = number.split('.');
+                integerPart = integerPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+                return decimalPart ? `${integerPart},${decimalPart}` : integerPart;
+            }
+
+            // Función para ajustar el tamaño de la fuente según el contenido
+            function adjustFontSize() {
+                const contentLength = display.textContent.length;
+                if (contentLength > 15) {
+                    display.style.fontSize = '24px';
+                } else if (contentLength > 10) {
+                    display.style.fontSize = '36px';
+                } else {
+                    display.style.fontSize = '48px';
+                }
+            }
+        });
+    </script>
+</body>
+</html>

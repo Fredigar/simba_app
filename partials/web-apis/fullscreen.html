@@ -1,0 +1,186 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Fullscreen API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Fullscreen API allows web apps to present themselves or any of their elements in fullscreen mode, without the browser UI elements visible.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${() => toggleFullscreen(document.documentElement)}">Toggle Fullscreen</button>
+                    </div>
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <div class="responsive-container">
+                            <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/random/1920x1080?object" alt="" @click="${(event) => toggleFullscreen(event.target)}" />
+                        </div>
+                        <div class="margin-top-half text-color-gray">Tap on the image to view it in fullscreen mode.</div>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.fullscreen ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Fullscreen API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Fullscreen API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Fullscreen_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let vendorPrefix = {
+            fullscreen: null,
+            requestFullscreen: null,
+            exitFullscreen: null,
+            fullscreenElement: null,
+            fullscreenEnabled: null,
+            fullscreenChange: null,
+            fullscreenError: null
+        }
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            getvendorPrefix();
+        }
+
+        let getvendorPrefix = function() {
+            if ('requestFullscreen' in document.documentElement) {
+                vendorPrefix.fullscreen = 'fullscreen';
+                vendorPrefix.requestFullscreen = 'requestFullscreen';
+                vendorPrefix.exitFullscreen = 'exitFullscreen';
+                vendorPrefix.fullscreenElement = 'fullscreenElement';
+                vendorPrefix.fullscreenEnabled = 'fullscreenEnabled';
+                vendorPrefix.fullscreenChange = 'fullscreenchange';
+                vendorPrefix.fullscreenError = 'fullscreenerror';
+            }
+            else if ('webkitRequestFullscreen' in document.documentElement) {
+                vendorPrefix.fullscreen = 'webkitFullscreen';
+                vendorPrefix.requestFullscreen = 'webkitRequestFullscreen';
+                vendorPrefix.exitFullscreen = 'webkitExitFullscreen';
+                vendorPrefix.fullscreenElement = 'webkitFullscreenElement';
+                vendorPrefix.fullscreenEnabled = 'webkitFullscreenEnabled';
+                vendorPrefix.fullscreenChange = 'webkitfullscreenchange';
+                vendorPrefix.fullscreenError = 'webkitfullscreenerror';
+            }
+            else if ('mozRequestFullScreen' in document.documentElement) {
+                vendorPrefix.fullscreen = 'mozFullScreen';
+                vendorPrefix.requestFullscreen = 'mozRequestFullScreen';
+                vendorPrefix.exitFullscreen = 'mozCancelFullScreen';
+                vendorPrefix.fullscreenElement = 'mozFullScreenElement';
+                vendorPrefix.fullscreenEnabled = 'mozFullScreenEnabled';
+                vendorPrefix.fullscreenChange = 'mozfullscreenchange';
+                vendorPrefix.fullscreenError = 'mozfullscreenerror';
+            }
+            else if ('msRequestFullscreen' in document.documentElement) {
+                vendorPrefix.fullscreen = 'msFullscreen';
+                vendorPrefix.requestFullscreen = 'msRequestFullscreen';
+                vendorPrefix.exitFullscreen = 'msExitFullscreen';
+                vendorPrefix.fullscreenElement = 'msFullscreenElement';
+                vendorPrefix.fullscreenEnabled = 'msFullscreenEnabled';
+                vendorPrefix.fullscreenChange = 'msfullscreenchange';
+                vendorPrefix.fullscreenError = 'msfullscreenerror';
+            }
+            $update(function() {
+                addEventListeners();
+            });
+        }
+
+        let addEventListeners = function() {
+            document.addEventListener(vendorPrefix.fullscreenChange, onFullscreenChange);
+            document.addEventListener(vendorPrefix.fullscreenError, onFullscreenError);
+        }
+
+        let removeEventListeners = function() {
+            document.removeEventListener(vendorPrefix.fullscreenChange, onFullscreenChange);
+            document.removeEventListener(vendorPrefix.fullscreenError, onFullscreenError);
+        }
+
+        let toggleFullscreen = function(element) {
+            if (document[vendorPrefix.fullscreenElement]) {
+                document[vendorPrefix.exitFullscreen]();
+            }
+            else {
+                if (document[vendorPrefix.fullscreenEnabled]) {
+                    element[vendorPrefix.requestFullscreen]();
+                }
+            }
+        }
+
+        let onFullscreenChange = function(event) {
+            if (document[vendorPrefix.fullscreenElement]) {
+                $f7.toast.show({
+                    text: 'Entered Fullscreen Mode!',
+                    cssClass: 'color-green'
+                });
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Exited Fullscreen Mode!',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let onFullscreenError = function(event) {
+            $f7.toast.show({
+                text: 'An error occured while toggling fullscreen mode.',
+                cssClass: 'color-red'
+            });
+        }
+
+        $on('pageBeforeRemove', function() {
+            removeEventListeners();
+        });
+
+        return $render;
+    }
+</script>

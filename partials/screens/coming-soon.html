@@ -1,0 +1,838 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="404" style="background-color: var(--f7-block-strong-bg-color);">
+
+        <div class="page-content">
+            <div class=""><img style="width:100px;position:fixed;left:13px;top:11px" src="assets/custom/img/airbus_white.png"/></div>
+                <div class="" id="clock" style="
+    position: fixed;
+    right: 20px;
+    z-index: 999;
+    top: 5px;
+    font-size: x-large;
+">00:00</div>
+            <div class="row margin-top">
+                <div style="margin-top:10px!important" class="col-50">
+
+                    <div class="card margin-vertical no-shadow">
+                        <div class="card-header">
+                            <span id="agenda-title" class="font-size-24" contenteditable="true">Agenda</span>
+                            <a href="#" class="link icon-only" @click="${toggleSortableDefault}">
+                                <i class="icon material-icons">sort</i>
+                            </a>
+                        </div>
+                        <div class="card-content">
+                            <div id="sortable-list-default" class="list sortable no-safe-areas">
+                                <ul>
+                                    ${presenters.map((item, index) => $h`
+                                    <li id="${item.guid}">
+                                        <div class="item-content" class="${item.currentPresenter ? $h`bg-color-gray` : $h``}">
+                                            <div class="item-inner">
+                                            <div class="item-media no-padding">
+                                                <span class="shape-container shape-auto size-40">
+                                                    <i class="fa ${item.icon}"></i>
+                                                </span>
+                                            </div>
+                                                <div class="item-title">${item.name}</div>
+                                                <div class="item-after"> ${item.initTime} - ${item.endTime} (${item.formattedTimeNoSecs})</div>
+                                            </div>
+                                        </div>
+                                        <div class="sortable-handler"></div>
+                                    </li>
+                                    `)}
+                                </ul>
+                            </div>
+                            <div style="display:none" class="block text-align-center">
+
+                            <div id="description" class="text-align-left font-size-28 ">
+
+                            </div>
+                            <img style="width:250px" src="assets/custom/img/qr-code.png"/>
+                                <div style="position:fixed!important;bottom:33px" class="text-align-right">Next: <span id="next">...</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-50">
+
+            <div class="empty-state empty-state-strong inset">
+                <div class="empty-state-title font-size-48" id="currentPresenter">---</div>
+                <div class="empty-state-media">
+                  <div id="countdownTimer" class="timerActive font-size-72">00:00:00</div>
+                    <div class="font-size-72 timerInactive" id="accumulatedTime">00:00:00</div>
+                    <div class="font-size-72 timerInactive" id="extraTime">00:00:00</div>
+                </div>
+                <div class="empty-state-actions">
+                    <div class="row">
+                        <div class="col margin-top">
+                            <button type="button" id="playButton" class="button button-round button-icon button-large">
+                                <i class="fa fa-power-off"></i>
+                            </button>
+                            <!--a href="#" id="playButton" class="empty-state-action button button-fill  button-round color-mono text-color-mono-invert" style="min-width: 256px;">Init</a-->
+                        </div>
+                        <div class="col margin-top">
+
+                            <button type="button" id="pauseButton" class="button button-round button-icon button-large">
+                                <i id="pauseButtonIcon" class="fa fa-play"></i>
+                            </button>
+                            <!--a  href="#" id="pauseButton" class="empty-state-action button button-outline button-round color-mono"  style="min-width: 256px;">Pause</a-->
+                        </div>
+                        <div class="col margin-top">
+                            <button type="button" id="nextButton" class="button button-round button-icon button-large">
+                                <i class="fa fa-forward-step"></i>
+                            </button>
+
+                            <!--a href="#" id="nextButton" class="empty-state-action button  button-outline button-round color-mono"  style="min-width: 256px;">Next</a-->
+                        </div>
+
+                        <div class="col margin-top">
+                            <button type="button" id="deleteButton" @click="${deleteSession}" class="button button-round button-icon button-large">
+                                <i class="fa fa-trash"></i>
+                            </button>
+
+                            <!--a href="#" id="nextButton" class="empty-state-action button  button-outline button-round color-mono"  style="min-width: 256px;">Next</a-->
+                        </div>
+                    </div>
+                </div>
+            </div>
+            </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+<style>
+    @keyframes pulse-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+    .pulse{
+        animation: pulse-animation 2s;
+    }
+    #countdownTimer{
+        font-size:128px!important;
+    }
+    #accumulatedTime{
+        font-size:128px!important;
+
+    }
+    #extraTime{
+        font-size:128px!important;
+    }
+    .accumulatedTimerPositive{
+        color:green!important;
+    }
+    .timerActive{
+        color:white;
+    }
+    .timerInactive{
+        color:lightslategrey;
+    }
+    .presenterActive{
+        background-color:#607d8b;
+    }
+    .extraTimerActive{
+        color:red!important;
+    }
+</style>
+<script>
+
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        let agenda = [];
+        let presenters = [];
+
+        let sounds= [];
+        let currentPresenterIndex =0;
+        let timer;
+        let currentPresenterElementId = 'currentPresenter';
+        let toggleSortableDefault = function() {
+            $f7.sortable.toggle($el.value.find('#sortable-list-default'));
+        }
+
+        let minutesLeftEventsFired = {};
+        let deleteSession = function(){
+            $f7.dialog.confirm(
+                'Are you sure you want to remove session storage?',
+                'Confirm',
+                function() {
+
+                    sessionStorage.removeItem('timer');
+                    location.reload();
+                    $f7.toast.show({
+                        text: 'Yaay!',
+                        cssClass: 'color-green'
+                    });
+                },
+                function() {
+
+                }
+            );
+
+        }
+        function subtractHours(initTime, endTime) {
+            // Separate hours and minutes
+            var [initHours, initMinutes] = initTime.split(":");
+            var [endHours, endMinutes] = endTime.split(":");
+
+            // Convert to minutes
+            var totalMinutesInit = parseInt(initHours) * 60 + parseInt(initMinutes);
+            var totalMinutesEnd = parseInt(endHours) * 60 + parseInt(endMinutes);
+
+            // Subtract the minutes
+            var differenceMinutes = totalMinutesEnd - totalMinutesInit;
+
+            // Calculate resulting hours and minutes
+            var hoursResult = Math.floor(differenceMinutes / 60);
+            var minutesResult = differenceMinutes % 60;
+
+            // Format the result
+            var result = hoursResult.toString().padStart(2, "0") + ":" + minutesResult.toString().padStart(2, "0");
+
+            return result;
+        }
+        let audioManager = {
+
+            // Cargar un sonido
+            loadSound: function (name, path) {
+                sounds[name] = new Audio(path);
+            },
+
+            playSound: function (name, loop = false) {
+                if (sounds[name]) {
+                    sounds[name].loop = loop;
+                    sounds[name].play();
+                }
+            },
+
+            // Detener un sonido
+            stopSound: function (name) {
+                if (sounds[name]) {
+                   sounds[name].pause();
+                    sounds[name].currentTime = 0;
+                }
+            }
+        };
+        class CountdownTimer {
+            constructor(displayElementId, accumulatedElementId,presenters) {
+                this.hours = 0;
+                this.minutes = 0;
+                this.seconds = 0;
+                this.intervalId = null;
+                this.displayElement = document.getElementById(displayElementId);
+                this.accumulatedElement = document.getElementById(accumulatedElementId);
+                this.extraTimeElement = document.getElementById('extraTime');
+                this.accumulatedSeconds = 0;
+                this.isCountingDown = true;
+                this.isPaused = true;
+                this.remainingPresenterIndex = 0; // Índice del próximo ponente
+                this.extraTimeLimit = 10;
+                this.extraTime = 0;
+            }
+            convertSeconds(numsec) {
+                // Calcula las horas
+                this.hours = Math.floor(numsec / 3600);
+
+                // Calcula los minutos restantes
+                var remainingSeconds = numsec % 3600;
+                this.minutes = Math.floor(remainingSeconds / 60);
+
+                // Calcula los segundos restantes
+                this.seconds = remainingSeconds % 60;
+            }
+
+            emitPauseEvent() {
+                document.dispatchEvent(new Event('countdownTimerPaused'));
+            }
+
+            emitResumeEvent() {
+                document.dispatchEvent(new Event('countdownTimerResumed'));
+            }
+            start() {
+                document.getElementById('playButton').style.display="none"
+                this.isPaused = false;
+                this.intervalId = setInterval(() => {
+                    if (this.isCountingDown) {
+                        this.updateTime();
+                        if (this.hours === 0 && this.minutes === 0 && this.seconds === 0) {
+                            if (this.accumulatedSeconds == 0){
+                                this.updateExtraTime()
+                            }else{
+                                this.convertSeconds(this.accumulatedSeconds);
+                                this.accumulatedSeconds = 0;
+                                this.updateAccumulatedDisplay();
+                                //this.isCountingDown = false
+                                //this.isAccumulatedCountingDown = true
+                            }
+                            //this.isCountingDown = false;
+                           // this.isAccumulatedCountingDown = true; // Cambiamos a activar contador acumulado
+                        }
+                    } else if (this.isAccumulatedCountingDown) { // Agregamos esta condición para el contador acumulado
+                        this.updateAccumulatedTime();
+                    }
+                    this.render();
+                }, 1000);
+            }
+
+            pause() {
+                clearInterval(this.intervalId);
+                this.isPaused = true;
+                this.saveSession();
+                this.emitPauseEvent()
+
+                document.getElementById('description').parentNode.style.display = 'none';
+                document.getElementById('sortable-list-default').style.display='block';
+            }
+
+            resume() {
+                this.start();
+                this.isPaused = false;
+                if (presenters[currentPresenterIndex].content) {
+                    document.getElementById('description').innerHTML = presenters[currentPresenterIndex].content;
+                    document.getElementById('next').innerHTML = presenters[ (currentPresenterIndex + 1) % presenters.length].name;
+                    document.getElementById('description').parentNode.style.display = 'block';
+                    document.getElementById('sortable-list-default').style.display = 'none';
+                }
+                this.emitResumeEvent()
+
+            }
+
+            stop() {
+                clearInterval(this.intervalId);
+            }
+
+            saveSession() {
+                var myTimer = {
+                    timer: this,
+                    presenters:presenters,
+                    currentPresenterIndex: currentPresenterIndex
+                };
+
+
+                sessionStorage.setItem('timer',JSON.stringify(myTimer));
+            }
+            updateTime() {
+                this.saveSession();
+                if (this.seconds === 0) {
+                    if (this.minutes === 0) {
+                        if (this.hours === 0) {
+                            //this.updateExtraTime();
+                            console.log(this.extraTime);
+                            return;
+                        }
+                        this.hours--;
+                        this.minutes = 59;
+                        this.seconds = 59;
+                    } else {
+                        this.minutes--;
+                        this.seconds = 59;
+                    }
+                } else {
+                    this.seconds--;
+                }
+                const minutesLeftEvents = [10, 5, 1,0]; // Lista de minutos restantes para lanzar el evento
+                // Verificar si quedan ciertos minutos y los segundos son 0, y emitir el evento correspondiente
+                if (minutesLeftEvents.includes(this.minutes) && this.seconds === 0) {
+                    document.dispatchEvent(new CustomEvent('countdownMinutesLeft', { detail: this.minutes }));
+                    minutesLeftEventsFired[this.minutes] = true; // Marcar el evento como emitido
+                }
+            }
+
+
+            updateExtraTime() {
+                if (this.accumulatedSeconds === 0) {
+                    this.extraTime++;
+                    this.updateExtraTimeDisplay();
+                } else {
+                    return
+                }
+            }
+
+            updateAccumulatedTime() {
+                console.log(this.accumulatedSeconds);
+                if (this.accumulatedSeconds === 0) {
+                    this.updateExtraTime();
+                    //this.stop();
+                    return;
+                }
+                this.accumulatedSeconds--;
+                this.updateAccumulatedDisplay();
+                if (this.accumulatedSeconds >= this.extraTimeLimit) {
+                   // this.redistributeExtraTime();
+                }
+            }
+            updateExtraTimeDisplay() {
+                const accumulatedHours = Math.floor(this.extraTime / 3600);
+                const remainingSeconds = this.extraTime % 3600;
+                const accumulatedMinutes = Math.floor(remainingSeconds / 60);
+                const accumulatedSeconds = remainingSeconds % 60;
+                const formattedAccumulatedHours = accumulatedHours < 10 ? `0${accumulatedHours}` : accumulatedHours;
+                const formattedAccumulatedMinutes = accumulatedMinutes < 10 ? `0${accumulatedMinutes}` : accumulatedMinutes;
+                const formattedAccumulatedSeconds = accumulatedSeconds < 10 ? `0${accumulatedSeconds}` : accumulatedSeconds;
+                const formattedAccumulatedTime = `${formattedAccumulatedHours}:${formattedAccumulatedMinutes}:${formattedAccumulatedSeconds}`;
+                this.extraTimeElement.textContent = `${formattedAccumulatedTime}`;
+                if (this.extraTime>0) {
+                    this.extraTimeElement.classList.add('extraTimerActive');
+                } else {
+                    this.extraTimeElement.classList.remove('extraTimerActive');
+                }
+              /*  if (this.isAccumulatedCountingDown) {
+                    this.displayElement.classList.remove('timerInactive');
+                    this.accumulatedElement.classList.remove('timerInactive');
+                    this.accumulatedElement.classList.add('timerActive');
+                } else {
+                    this.accumulatedElement.classList.remove('timerActive');
+                    this.accumulatedElement.classList.add('timerInactive');
+                }*/
+            }
+            updateAccumulatedDisplay() {
+                const accumulatedHours = Math.floor(this.accumulatedSeconds / 3600);
+                const remainingSeconds = this.accumulatedSeconds % 3600;
+                const accumulatedMinutes = Math.floor(remainingSeconds / 60);
+                const accumulatedSeconds = remainingSeconds % 60;
+                const formattedAccumulatedHours = accumulatedHours < 10 ? `0${accumulatedHours}` : accumulatedHours;
+                const formattedAccumulatedMinutes = accumulatedMinutes < 10 ? `0${accumulatedMinutes}` : accumulatedMinutes;
+                const formattedAccumulatedSeconds = accumulatedSeconds < 10 ? `0${accumulatedSeconds}` : accumulatedSeconds;
+                const formattedAccumulatedTime = `${formattedAccumulatedHours}:${formattedAccumulatedMinutes}:${formattedAccumulatedSeconds}`;
+                this.accumulatedElement.textContent = `${formattedAccumulatedTime}`;
+                if (this.isAccumulatedCountingDown) {
+                    this.displayElement.classList.remove('timerInactive');
+                    this.accumulatedElement.classList.remove('timerInactive');
+                    this.accumulatedElement.classList.add('timerActive');
+                } else {
+                    this.accumulatedElement.classList.remove('timerActive');
+                    this.accumulatedElement.classList.add('timerInactive');
+                }
+                if (this.accumulatedSeconds>0){
+                    this.accumulatedElement.classList.add('accumulatedTimerPositive');
+                } else {
+                    this.accumulatedElement.classList.remove('accumulatedTimerPositive');
+                }
+            }
+
+            render() {
+                const formattedHours = this.hours < 10 ? `0${this.hours}` : this.hours;
+                const formattedMinutes = this.minutes < 10 ? `0${this.minutes}` : this.minutes;
+                const formattedSeconds = this.seconds < 10 ? `0${this.seconds}` : this.seconds;
+                const formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+                this.displayElement.textContent = this.isCountingDown ? formattedTime : `${formattedTime}`;
+                if (!this.isCountingDown) {
+                    this.displayElement.classList.remove('timerActive');
+                    this.displayElement.classList.add('timerInactive');
+                } else {
+                    this.displayElement.classList.remove('timerInactive');
+                    this.accumulatedElement.classList.remove('timerActive');
+                    this.accumulatedElement.classList.add('timerInactive');
+                    this.displayElement.classList.add('timerActive');
+                }
+            }
+
+            setTimer(hours, minutes, seconds) {
+                this.hours = hours;
+                this.minutes = minutes;
+                this.seconds = seconds;
+            }
+
+            restartAndSave() {
+                if (this.isCountingDown) {
+                    const totalSeconds = (this.hours * 3600) + (this.minutes * 60) + this.seconds;
+                    this.accumulatedSeconds += totalSeconds;
+                    this.updateAccumulatedDisplay();
+                }
+                this.isCountingDown = true;
+                this.render();
+            }
+
+            formatTime(obj,nosecs){
+                const formattedHours = obj.hours < 10 ? `0${obj.hours}` : obj.hours;
+                const formattedMinutes = obj.minutes < 10 ? `0${obj.minutes}` : obj.minutes;
+                const formattedSeconds = obj.seconds < 10 ? `0${obj.seconds}` : obj.seconds;
+                if (nosecs) {
+                    var formattedTime = `${formattedHours}:${formattedMinutes}`;
+                } else {
+                    var formattedTime = `${formattedHours}:${formattedMinutes}:${formattedSeconds}`;
+                }
+                return formattedTime;
+            }
+
+
+
+        }
+
+        let loadAgenda = function () {
+            var currentDate = new Date().toISOString().slice(0,10);
+            currentDate = '2024-05-16'
+            $f7.request({
+                url: window.config.api_urlbase + 'myeyes/get?entity=wsAgenda&extraQuery='+btoa("date(t.date)='"+currentDate+"'")+'&orderType=ASC&orderBy='+btoa('t.initTime'),
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    agenda = data.data.data;
+                    $update();
+                    initialize()
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+
+        }
+        let updatePresenterInfo = function(myIndex) {
+
+            myIndex = myIndex ?? currentPresenterIndex;
+            currentPresenterIndex = myIndex;
+            const currentPresenterElement = document.getElementById(currentPresenterElementId);
+            currentPresenterElement.textContent = `${presenters[myIndex].name}`;
+
+        }
+        let move = function (sourceIndex, destinationIndex) {
+            // Verificar si los índices son válidos
+            if (sourceIndex < 0 || sourceIndex >= presenters.length || destinationIndex < 0 || destinationIndex >= presenters.length) {
+                console.log("Índices inválidos");
+                return;
+            }
+
+            // Extraer el elemento a mover y eliminarlo del array
+            const elementToMove = presenters.splice(sourceIndex, 1)[0];
+
+            // Insertar el elemento en la nueva posición
+            presenters.splice(destinationIndex, 0, elementToMove);
+
+            // Recalcular initTime y endTime
+            let currentTime = "08:00"; // Hora inicial
+            for (let i = 0; i < presenters.length; i++) {
+                const presenter = presenters[i];
+                presenter.initTime = currentTime;
+                // Calcular endTime sumando la duración del elemento a la hora de inicio
+                const [hours, minutes] = currentTime.split(":").map(Number);
+                const [elementHours, elementMinutes] = presenter.formattedTimeNoSecs.split(":").map(Number);
+                const totalMinutes = hours * 60 + minutes + elementHours * 60 + elementMinutes; // Sumar duración del elemento
+                const endTimeHours = Math.floor(totalMinutes / 60);
+                const endTimeMinutes = Math.floor(totalMinutes % 60);
+                presenter.endTime = ("0" + endTimeHours).slice(-2) + ":" + ("0" + endTimeMinutes).slice(-2); // Formato HH:MM
+                // Actualizar el tiempo actual para el próximo elemento
+                currentTime = presenter.endTime;
+            }
+            console.log(presenters)
+            $update()
+        }
+        let updateClock = function() {
+            var now = new Date();
+            var hours = now.getHours();
+            var minutes = now.getMinutes();
+            var ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // La hora 0 debería ser 12 en formato de 12 horas
+            hours = hours < 10 ? '0' + hours : hours;
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            var timeString = hours + ':' + minutes + ' ' + ampm;
+            document.getElementById('clock').textContent = timeString;
+        }
+        let initialize = function() {
+            const timerElementId = 'countdownTimer';
+            const accumulatedTimeElementId = 'accumulatedTime';
+            const accumulatedAccumulatedTimeElementId = 'countdownAccumulatedTimer';
+            setInterval(updateClock, 1000);
+            presenters = agenda.map(item => {
+                document.getElementById('agenda-title').textContent = "9th Simulator Maintenance Workshop ("+item.date.split(' ')[0]+")"
+                item.time = item.time+':00';
+                item.time = subtractHours(item.initTime,item.endTime);
+                var originalTime = item.time+':00'
+                const [hours, minutes, seconds] = originalTime.split(':').map(Number);
+                return {
+                    name: item.presenter,
+                    guid:item.guid,
+                    hours,
+                    minutes,
+                    seconds,
+                    content: item.content,
+                    timeconsumed:0,
+                    formattedTimeNoSecs:item.time,
+                    formattedTime:item.time+':00',
+                    currentPresenter:false,
+                    initTime:item.initTime,
+                    endTime:item.endTime,
+                    icon:item.icon
+                };
+            });
+            console.log(presenters)
+            if (sessionStorage.key('timer')) {
+                const timerData = JSON.parse(sessionStorage.getItem('timer'))['timer'];
+                timer = new CountdownTimer(timerElementId, accumulatedTimeElementId);
+                timer.seconds = timerData.seconds;
+                timer.minutes = timerData.minutes;
+                timer.hours = timerData.hours;
+                timer.extraTime = timerData.extraTime;
+                timer.accumulatedSeconds = timerData.accumulatedSeconds;
+                console.log(timer);
+                timer.render();
+                timer.updateAccumulatedDisplay();
+                timer.updateExtraTimeDisplay();
+                currentPresenterIndex = JSON.parse(sessionStorage.getItem('timer'))['currentPresenterIndex'];
+                presenters = JSON.parse(sessionStorage.getItem('timer'))['presenters']
+                updatePresenterInfo();
+
+            } else {
+                timer = new CountdownTimer(timerElementId, accumulatedTimeElementId);
+                console.log(timer)
+            }
+
+            $update();
+           /* const presenters = [
+                { name: 'Ponente 1', hours: 0, minutes: 0, seconds: 20 },
+                { name: 'Ponente 2', hours: 0, minutes: 0, seconds: 30 },
+                { name: 'Ponente 3', hours: 0, minutes: 0, seconds: 20 }
+            ];*/
+
+
+
+
+
+            function resetTimer() {
+                const presenter = presenters[currentPresenterIndex];
+                timer.setTimer(presenter.hours, presenter.minutes, presenter.seconds);
+
+                timer.render();
+            }
+            function redistributeTimes() {
+                // Calcular el tiempo extra total
+                const totalExtraTime = timer.extraTime;
+
+                // Calcular cuántos presentadores quedan después del actual
+                const remainingPresenters = presenters.length - currentPresenterIndex - 1;
+
+                // Si no hay presentadores restantes, no se necesita redistribuir el tiempo extra
+                if (remainingPresenters === 0) return;
+
+                // Calcular cuánto tiempo extra debe recibir cada presentador restante
+                const extraTimePerPresenter = Math.floor(totalExtraTime / remainingPresenters);
+                console.log(extraTimePerPresenter);
+                // Aumentar el tiempo extra de cada presentador restante y actualizar los campos
+                for (let i = 0; i < presenters.length; i++) {
+                    presenters[i].currentPresenter = currentPresenterIndex == i;
+                }
+                for (let i = currentPresenterIndex; i < presenters.length; i++) {
+                 //   presenters[i].extraTime += extraTimePerPresenter;
+                    // Actualizar los campos hours, minutes y seconds del presentador con el tiempo extra redistribuido
+                    const totalSeconds = presenters[i].hours * 3600 + presenters[i].minutes * 60 + presenters[i].seconds - extraTimePerPresenter;
+                    presenters[i].hours = Math.floor(totalSeconds / 3600);
+                    const remainingSeconds = totalSeconds % 3600;
+                    presenters[i].minutes = Math.floor(remainingSeconds / 60);
+                    presenters[i].seconds = remainingSeconds % 60;
+                    presenters[i].formattedTime = timer.formatTime(presenters[i],false)
+                    presenters[i].formattedTimeNoSecs = timer.formatTime(presenters[i],true)
+                    presenters[i].currentPresenter = currentPresenterIndex == i;
+                }
+                console.log(presenters);
+                $update()
+                // Actualizar la visualización del tiempo extra para reflejar los cambios
+                timer.extraTime = 0;
+                timer.updateExtraTimeDisplay();
+            }
+
+            const nextButton = document.getElementById('nextButton');
+            nextButton.addEventListener('click', () => {
+                timer.restartAndSave();
+                currentPresenterIndex = (currentPresenterIndex + 1) % presenters.length;
+
+                redistributeTimes();
+                updatePresenterInfo();
+                resetTimer();
+                timer.pause();
+            });
+
+            let pauseButton = document.getElementById('pauseButton');
+            const playButton = document.getElementById('playButton');
+            let pauseButtonIcon = document.getElementById('pauseButtonIcon');
+            playButton.addEventListener('click', () => {
+                presenters[currentPresenterIndex].currentPresenter =true;
+                updatePresenterInfo();
+                resetTimer();
+                timer.start();
+
+                pauseButtonIcon.classList.add('fa-pause');
+                pauseButtonIcon.classList.remove('fa-play');
+                $update();
+            });
+            pauseButton.addEventListener('click', () => {
+                if (!timer.isPaused) {
+                    timer.pause();
+                } else {
+                    timer.resume();
+                }
+            });
+
+            // Escucha de eventos para el contador general
+            timer.onGeneralCounterSeconds = [0];
+
+            document.addEventListener('countdownTimerPaused', () => {
+                pauseButtonIcon.classList.remove('fa-pause');
+                pauseButtonIcon.classList.add('fa-play');
+            });
+
+            document.addEventListener('countdownTimerResumed', () => {
+                pauseButtonIcon.classList.remove('fa-play');
+                pauseButtonIcon.classList.add('fa-pause');
+            });
+
+            document.addEventListener('onGeneralCounterEvent', () => {
+                if (!timer.isCountingDown) {
+                    timer.isCountingDown = true;
+                    timer.isAccumulatedCountingDown = true;
+                }
+            });
+            // Agregar event listener para el evento de rueda del ratón
+            var generalTimer = timer;
+            const extraTime = document.getElementById('extraTime')
+            extraTime.addEventListener('wheel', function(event) {
+                // Detener el contador extraTime
+                timer.pause();
+
+                // Determinar la dirección del scroll
+                const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
+
+                // Actualizar los segundos, minutos y horas del contador extraTime según la dirección del scroll
+                if (scrollDirection === 'down') {
+                    // Disminuir segundos
+                    timer.extraTime--;
+                   if (timer.extraTime < 0) {
+                        timer.extraTime = 0;
+                       /*  Disminuir minutos cuando los segundos del extraTime llegan a 0
+                        timer.minutes--;
+                        if (timer.minutes < 0) {
+                            timer.minutes = 59;
+                            // Disminuir horas cuando los minutos del extraTime llegan a 0
+                            timer.hours--;
+                            if (timer.hours < 0) {
+                                timer.hours = 23; // Reiniciar las horas a 23 cuando llegan a 0
+                            }
+                        }*/
+                    }
+                } else {
+                    // Aumentar segundos
+                    timer.extraTime++;
+                   /* if (timer.extraTime > 59) {
+                        timer.extraTime = 0;
+                        // Aumentar minutos cuando los segundos del extraTime llegan a 59
+                        timer.minutes++;
+                        if (timer.minutes > 59) {
+                            timer.minutes = 0;
+                            // Aumentar horas cuando los minutos del extraTime llegan a 59
+                            timer.hours++;
+                            if (timer.hours > 23) {
+                                timer.hours = 0; // Reiniciar las horas a 0 cuando llegan a 23
+                            }
+                        }
+                    }*/
+                }
+                timer.updateExtraTimeDisplay()
+            })
+            const generalTimerElement = document.getElementById('countdownTimer');
+
+            generalTimerElement.addEventListener('wheel', function(event) {
+                // Detener el contador general
+                generalTimer.pause();
+
+                // Determinar la dirección del scroll
+                const scrollDirection = event.deltaY > 0 ? 'down' : 'up';
+
+                // Actualizar los segundos, minutos y horas del contador general según la dirección del scroll
+                if (scrollDirection === 'down') {
+                    // Disminuir segundos
+                    generalTimer.seconds=     generalTimer.seconds-10;
+                    if (generalTimer.seconds < 0) {
+                        generalTimer.seconds = 59;
+                        // Disminuir minutos cuando los segundos llegan a 0
+                        generalTimer.minutes--;
+                        if (generalTimer.minutes < 0) {
+                            generalTimer.minutes = 59;
+                            // Disminuir horas cuando los minutos llegan a 0
+                            generalTimer.hours--;
+                            if (generalTimer.hours < 0) {
+                                generalTimer.hours = 23; // Reiniciar las horas a 23 cuando llegan a 0
+                            }
+                        }
+                    }
+                } else {
+                    // Aumentar segundos
+                    generalTimer.seconds=     generalTimer.seconds+10;
+                    if (generalTimer.seconds > 59) {
+                        generalTimer.seconds = 0;
+                        // Aumentar minutos cuando los segundos llegan a 59
+                        generalTimer.minutes++;
+                        if (generalTimer.minutes > 59) {
+                            generalTimer.minutes = 0;
+                            // Aumentar horas cuando los minutos llegan a 59
+                            generalTimer.hours++;
+                            if (generalTimer.hours > 23) {
+                                generalTimer.hours = 0; // Reiniciar las horas a 0 cuando llegan a 23
+                            }
+                        }
+                    }
+                }
+                generalTimer.render()
+            })
+            // Escucha de eventos para el contador acumulado
+            timer.onAccumulatedCounterSeconds = [0];
+            document.addEventListener('onAccumulatedCounterEvent', () => {
+                if (!timer.isCountingDown) {
+                    timer.isCountingDown = true;
+                    timer.isAccumulatedCountingDown = true;
+                }
+            });
+            audioManager.loadSound('10_minutes', 'assets/custom/audio/10_minutes.mp3');
+            audioManager.loadSound('5_minutes', 'assets/custom/audio/5_minutes.mp3');
+            audioManager.loadSound('1_minutes', 'assets/custom/audio/1_minutes.mp3');
+            audioManager.loadSound('0_minutes', 'assets/custom/audio/timeexceded.mp3');
+            audioManager.loadSound('notification', 'assets/custom/audio/notification.mp3');
+            document.addEventListener('countdownMinutesLeft', function(event) {
+                const minutesLeft = event.detail;
+                var countdownTimer = document.getElementById('countdownTimer');
+                countdownTimer.classList.add('pulse');
+                audioManager.playSound('notification', false);
+                // Después de un segundo, reproducir el sonido de notificación
+                setTimeout(function() {
+                    audioManager.playSound(`${minutesLeft}_minutes`, false);
+                }, 1000);
+
+                console.log(`Quedan ${minutesLeft} minutos para que finalice el contador.`);
+                // Aquí puedes agregar cualquier acción que desees realizar cuando queden ciertos minutos
+                // Por ejemplo, mostrar una alerta o realizar una acción en la interfaz de usuario.
+            });
+        }
+        $on('pageBeforeIn', function() {
+            loadAgenda()
+            document.addEventListener('sortable:sort', function (event) {
+                // Código que se ejecuta cuando se reorganiza un elemento en la lista
+                console.log(event)
+                console.log(event.detail.from)
+                move(event.detail.from,event.detail.to)
+                console.log('Elemento reorganizado');
+            });
+
+        });
+        return $render;
+    }
+</script>

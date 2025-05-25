@@ -1,0 +1,197 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">YouTube</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-red-50);">
+                            <img src="https://cdn.svgporn.com/logos/youtube-icon.svg" width="48" alt="" />
+                        </span>
+                        <p>Embed YouTube videos using iFrame element or YouTube iFrame Player API and control it programatically.</p>
+                    </div>
+
+                    <div class="block-title margin-vertical">iFrame Embed</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <iframe class="responsive-content shape-rounded-square" src="https://youtube.com/embed/YE7VzlLtp-4" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        </div>
+                    </div>
+
+                    <div class="block-title margin-vertical">iFrame Player API</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Using the iFrame Player API, you can queue videos for playback; play, pause, or stop those videos; adjust the player volume; or retrieve information about the video being played.</p>
+                    </div>
+
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">YouTube iFrame Player API does not work in Cordova iOS. It works perfectly in Cordova Android.</div>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="responsive-container">
+                            <div id="youtube-player" class="responsive-content shape-rounded-square"></div>
+                        </div>
+                    </div>
+
+                    <div class="list media-list inset margin-vertical">
+                        <ul>
+                            ${videos.map((item, index) => $h`
+                            <li class="${currentVideo && currentVideo.index == index ? 'bg-color-chrome' : ''}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img class="shape-rounded-square" src="https://img.youtube.com/vi/${item.id}/0.jpg" width="72" height="48" alt="" />
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${item.title}</div>
+                                            ${currentVideo && $h`
+                                            <div class="item-after">
+                                                ${currentVideo.index == index ? $h`
+                                                ${currentVideo.state == 3 ? $h`
+                                                <span class="preloader color-primary size-24"></span>
+                                                ` : $h`
+                                                ${currentVideo.state == 1 ? $h`
+                                                <a href="#" class="link" @click="${pauseVideo}">
+                                                    <i class="icon material-icons">pause_circle</i>
+                                                </a>
+                                                ${`\u00A0`}
+                                                <a href="#" class="link" @click="${stopVideo}">
+                                                    <i class="icon material-icons">stop_circle</i>
+                                                </a>
+                                                ` : $h`
+                                                <a href="#" class="link" @click="${resumeVideo}">
+                                                    <i class="icon material-icons">play_circle</i>
+                                                </a>
+                                                `}
+                                                `}
+                                                ` : $h`
+                                                <a href="#" class="link" @click="${() => playVideo(index)}">
+                                                    <i class="icon material-icons">play_circle</i>
+                                                </a>
+                                                `}
+                                            </div>
+                                            `}
+                                        </div>
+                                        <div class="item-text">${item.author}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let videos = [
+            {
+                id: '_cMxraX_5RE',
+                title: 'Sprite Fright',
+                author: 'Blender Studio'
+            },
+            {
+                id: 'PVGeM40dABA',
+                title: 'Coffee Run',
+                author: 'Blender Studio'
+            },
+            {
+                id: 'WhWc3b3KhnY',
+                title: 'Spring',
+                author: 'Blender Studio'
+            },
+            {
+                id: 'apiu3pTIwuY',
+                title: 'The Daily Dweebs',
+                author: 'Blender Studio'
+            },
+            {
+                id: 'mN0zPOpADL4',
+                title: 'Agent 327: Operation Barbershop',
+                author: 'Blender Studio'
+            }
+        ]
+
+        let player = null;
+        let currentVideo = null;
+
+        let initializePlayer = function() {
+            YT.ready(function() {
+                player = new YT.Player($el.value.find('#youtube-player')[0], {
+                    playerVars: {
+                        autoplay: 0,
+                        controls: 1,
+                        playsinline: 1,
+                        origin: location.origin
+                    },
+                    events: {
+                        onReady: onPlayerReady,
+                        onStateChange: onPlayerStateChange
+                    }
+                });
+            });
+        }
+
+        let onPlayerReady = function(event) {
+            event.target.loadPlaylist({
+                playlist: videos.map((item, index) => item.id),
+                index: 2
+            });
+        }
+
+        let onPlayerStateChange = function(event) {
+            currentVideo = {
+                index: event.target.getPlaylistIndex(),
+                state: event.target.getPlayerState()
+            }
+            $update();
+        }
+
+        let playVideo = function(index) {
+            player.playVideoAt(index);
+        }
+
+        let pauseVideo = function() {
+            player.pauseVideo();
+        }
+
+        let resumeVideo = function() {
+            player.playVideo();
+        }
+
+        let stopVideo = function() {
+            player.stopVideo();
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePlayer();
+        });
+
+        return $render;
+    }
+</script>

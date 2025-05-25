@@ -1,0 +1,686 @@
+<template>
+    <div id="app">
+
+        <!-- If Sidebar Is Enabled For Single View Or Tab View Layout -->
+        ${$f7.config.layout[$f7.config.layout.default].sidebar.enabled && $h`
+        <div id="sidebar" class="panel panel-cover panel-left">
+            <div id="view-sidebar" class="view"></div>
+        </div>
+        `}
+
+        <!-- Panel de sources existente (sin cambios) -->
+        <div class="panel panel-right panel-cover" id="sources-panel">
+            <div class="view">
+                <div class="page">
+                    <div class="navbar">
+                        <div id="sources-title" class="navbar-inner">
+                            <div class="title">Sources</div>
+                            <div class="right">
+                                <a href="#" id="close-sources" class="link icon-only close-panel">
+                                    <i class="icon f7-icons">xmark</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <div id="panel-sources-content">
+                            <!-- Aquí se inyectará el contenido dinámico -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div id="viewer-popup" class="popup popup-tablet-fullscreen">
+            <div class="navbar bg-color-black">
+                <div class="navbar-inner">
+                    <div class="left">
+                        <a href="#" id="close-viewer" class="link icon-only ">
+                            <span class="fa fa-arrow-left"></span>
+                        </a>
+                    </div>
+                    <div class="title"></div>
+                    <div class="right">
+                        <a href="#" target="_blank" id="btn-document-maximize"
+                           data-tooltip="Open externally" class=" link tooltip-init icon-only">
+                            <span class="fa fa-window-maximize"></span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="page-content bg-color-black no-padding">
+                <div style="height:94vh">
+                    <iframe id="document-viewer" style="border:none;width:100%;height:98vh"></iframe>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contenedor principal con soporte para vista dividida y splitter -->
+        <div id="main-container" class="split-view-container">
+            <!-- If Single View Layout Is Set As Default -->
+            ${$f7.config.layout.default == 'singleView' && $h`
+            <div id="view-main" class="view view-main safe-areas split-view-main"></div>
+
+            <!-- Splitter para arrastrar y redimensionar -->
+            <div id="splitter" class="splitter"></div>
+
+            <!-- Vista secundaria (inicialmente oculta) -->
+            <div id="view-secondary" class="view safe-areas split-view-secondary" style="display: none;">
+                <div class="page">
+                    <div class="secundary-navbar navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar">
+                        <div id="secundary-title" style="background-color:#1c1c1c" class="navbar-inner">
+                            <div class="left">
+                                <a href="#" id="close-secundary" class="link icon-only close-panel">
+                                    <i class="icon f7-icons">xmark</i>
+                                </a>
+                            </div>
+                            <div class="title" contenteditable="plaintext-only">Editor</div>
+
+                            <div class="right">
+
+                                <a href="#" id="print-btn" class="link icon-only">
+                                    <i class="icon f7-icons">printer</i>
+                                </a>
+                                <a href="#" id="save-secundary" class="link icon-only close-split-view">
+                                    <i class="icon f7-icons">floppy_disk</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                    <div class="page-content">
+                    </div>
+                </div>
+            </div>
+            `}
+
+            <!-- If Tab View Layout Is Set As Default -->
+            ${$f7.config.layout.default == 'tabView' && $h`
+            <div class="views tabs safe-areas split-views-wrapper">
+                <div id="tabbar" class="toolbar toolbar-bottom tabbar tabbar-labels color-theme-mono">
+                    <div class="toolbar-inner">
+                        <a href="#view-main" class="tab-link tab-link-active">
+                            <span class="icons">
+                                <i class="icon f7-icons">house</i>
+                                <i class="icon icon-active f7-icons">house_fill</i>
+                            </span>
+                            <span class="tabbar-label" data-i18n="home">Home</span>
+                        </a>
+                        <a href="#view-components" class="tab-link">
+                            <span class="icons">
+                                <i class="icon f7-icons">square_grid_2x2</i>
+                                <i class="icon icon-active f7-icons">square_grid_2x2_fill</i>
+                            </span>
+                            <span class="tabbar-label" data-i18n="components">Components</span>
+                        </a>
+                        <a href="#view-screens" class="tab-link">
+                            <span class="icons">
+                                <i class="icon f7-icons">layers_alt</i>
+                                <i class="icon icon-active f7-icons">layers_alt_fill</i>
+                            </span>
+                            <span class="tabbar-label" data-i18n="screens">Screens</span>
+                        </a>
+                        <a href="#view-integrations" class="tab-link">
+                            <span class="icons">
+                                <i class="icon f7-icons">flame</i>
+                                <i class="icon icon-active f7-icons">flame_fill</i>
+                            </span>
+                            <span class="tabbar-label" data-i18n="integrations">Integrations</span>
+                        </a>
+                        <a href="#view-more" class="tab-link">
+                            <span class="icons">
+                                <i class="icon f7-icons">circle_grid_3x3</i>
+                                <i class="icon icon-active f7-icons">circle_grid_3x3_fill</i>
+                            </span>
+                            <span class="tabbar-label" data-i18n="more">More</span>
+                        </a>
+                    </div>
+                </div>
+                <div class="split-view-container">
+                    <div class="split-views-tabs">
+                        <div id="view-main" class="view view-main tab tab-active split-view-main"></div>
+                        <div id="view-components" class="view view-components tab split-view-main"></div>
+                        <div id="view-screens" class="view view-screens tab split-view-main"></div>
+                        <div id="view-integrations" class="view view-integrations tab split-view-main"></div>
+                        <div id="view-more" class="view view-more tab split-view-main"></div>
+                    </div>
+
+                    <!-- Splitter para arrastrar y redimensionar -->
+                    <div id="splitter" class="splitter"></div>
+
+                    <!-- Vista secundaria (inicialmente oculta) -->
+                    <div id="view-secondary" class="view safe-areas split-view-secondary" style="display: none;">
+                        <div class="page">
+                            <div class="secundary-navbar navbar">
+                            <div class="navbar-bg"></div>
+                            <div class="navbar">
+                                <div id="secundary-title" style="background-color:#1c1c1c" class="navbar-inner">
+                                    <div class="left">
+                                        <a href="#" id="close-secundary" class="link icon-only close-panel">
+                                            <i class="icon f7-icons">xmark</i>
+                                        </a>
+                                    </div>
+                                    <div class="title" contenteditable="plaintext-only">Editor</div>
+                                    <div class="right">
+                                        <a href="#" id="print-btn" class="link icon-only">
+                                            <i class="icon f7-icons">printer</i>
+                                        </a>
+                                        <a href="#" id="save-secundary" class="link icon-only close-split-view">
+                                            <i class="icon f7-icons">floppy_disk</i>
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+                            <div class="page-content">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            `}
+        </div>
+    </div>
+</template>
+
+<script>
+    export default function (props, {
+        $,
+        $el,
+        $f7,
+        $f7ready,
+        $f7route,
+        $f7router,
+        $h,
+        $on,
+        $onMounted,
+        $store,
+        $theme,
+        $update
+    }) {
+
+        let splitterActive = false;
+        let startX = 0;
+        let startMainWidth = 0;
+        let startSecondaryWidth = 0;
+        let minWidth = 250; // Ancho mínimo para cada panel
+        let requestAnimationFrameId = null;
+        let lastX = 0;
+        let pendingResize = false;
+
+        /* Configurar el evento de arrastre del splitter */
+        let setupSplitter = function () {
+            const splitter = $('#splitter');
+            const mainContainer = $('#main-container');
+
+            // Crear un elemento overlay para capturar eventos de movimiento
+            const overlay = $('<div id="splitter-overlay"></div>').appendTo('body');
+
+            function resizePanels(currentX) {
+                if (!splitterActive) return;
+
+                const deltaX = currentX - startX;
+                const containerWidth = mainContainer.width();
+
+                // Calcular nuevos anchos basados en el movimiento
+                let newMainWidth = startMainWidth + deltaX;
+                let newSecondaryWidth = startSecondaryWidth - deltaX;
+
+                // Asegurar anchos mínimos
+                if (newMainWidth < minWidth) {
+                    newMainWidth = minWidth;
+                    newSecondaryWidth = containerWidth - minWidth;
+                }
+
+                if (newSecondaryWidth < minWidth) {
+                    newSecondaryWidth = minWidth;
+                    newMainWidth = containerWidth - minWidth;
+                }
+
+                // Calcular porcentajes
+                const mainPercent = (newMainWidth / containerWidth) * 100;
+                const secondaryPercent = (newSecondaryWidth / containerWidth) * 100;
+
+                // Aplicar los nuevos anchos mediante transformación directa
+                $('.split-view-main').css('width', mainPercent + '%');
+                $('#view-secondary').css('width', secondaryPercent + '%');
+            }
+
+            // Función para usar con requestAnimationFrame
+            function animateResize() {
+                if (pendingResize) {
+                    resizePanels(lastX);
+                    pendingResize = false;
+                }
+
+                if (splitterActive) {
+                    requestAnimationFrameId = requestAnimationFrame(animateResize);
+                }
+            }
+
+            // Evento de inicio de arrastre
+            splitter.on('mousedown touchstart', function (e) {
+                e.preventDefault(); // Prevenir cualquier comportamiento por defecto
+
+                if (e.type === 'touchstart') {
+                    startX = e.touches[0].clientX;
+                } else {
+                    startX = e.clientX;
+                }
+
+                splitterActive = true;
+
+                // Desactivar transiciones durante el arrastre
+                $('.split-view-main, #view-secondary').css('transition', 'none');
+
+                const viewMain = $('.split-view-main');
+                const viewSecondary = $('#view-secondary');
+
+                startMainWidth = viewMain.width();
+                startSecondaryWidth = viewSecondary.width();
+
+                // Mostrar overlay para capturar eventos
+                overlay.addClass('active');
+
+                // Añadir clase visual durante el arrastre
+                splitter.addClass('splitter-active');
+
+                // Cambiar el cursor de todo el documento
+                $('body').css('cursor', 'col-resize');
+
+                // Iniciar la animación con requestAnimationFrame
+                requestAnimationFrameId = requestAnimationFrame(animateResize);
+
+                // Deshabilitar la selección de texto en todo el documento
+                $('body').addClass('no-select');
+            });
+
+            // Evento de movimiento durante el arrastre (delegado al overlay)
+            overlay.on('mousemove touchmove', function (e) {
+                if (!splitterActive) return;
+
+                e.preventDefault(); // Prevenir selección de texto
+
+                if (e.type === 'touchmove') {
+                    lastX = e.touches[0].clientX;
+                } else {
+                    lastX = e.clientX;
+                }
+
+                pendingResize = true;
+                setDynamicHeight();
+            });
+
+            // Evento de fin de arrastre (delegado a document para capturar incluso fuera del overlay)
+            $(document).on('mouseup touchend', function (e) {
+                if (!splitterActive) return;
+
+                splitterActive = false;
+
+                // Cancelar la animación
+                if (requestAnimationFrameId) {
+                    cancelAnimationFrame(requestAnimationFrameId);
+                    requestAnimationFrameId = null;
+                }
+
+                // Restaurar transiciones
+                $('.split-view-main, #view-secondary').css('transition', '');
+
+                // Ocultar overlay
+                overlay.removeClass('active');
+
+                // Quitar clase visual
+                splitter.removeClass('splitter-active');
+
+                // Restaurar cursor
+                $('body').css('cursor', '');
+
+                // Habilitar la selección de texto
+                $('body').removeClass('no-select');
+                setDynamicHeight();
+            });
+        };
+
+        /* If Single View Layout Is Set As Default */
+        let initializeViews = function () {
+            if ($f7.config.layout.default == 'singleView') {
+                $f7.views.create($el.value.find('#view-main'), {
+                    name: 'main',
+                    main: true,
+                    url: '/',
+                    initRouterOnTabShow: true,
+                    browserHistory: true,//$f7.device.cordova ? false : true,
+                    browserHistoryRoot: $('base').attr('href').slice(0, -1),
+                    browserHistorySeparator: '#!',
+                    browserHistoryTabs: 'push',
+                    preloadPreviousPage: false,
+                    auroraSwipeBack: false,
+                    iosSwipeBack: false,
+                    mdSwipeBack: false,
+                    animate: !$f7.device.ios
+                });
+
+                // Inicializar la vista secundaria
+                $f7.views.create($el.value.find('#view-secondary'), {
+                    name: 'secondary',
+                    url: '/secondary/',
+                    initRouterOnTabShow: true,
+                    preloadPreviousPage: false,
+                    auroraSwipeBack: false,
+                    iosSwipeBack: false,
+                    mdSwipeBack: false,
+                    animate: !$f7.device.ios
+                });
+            }
+
+            /* If Tab View Layout Is Set As Default */
+            if ($f7.config.layout.default == 'tabView') {
+                $f7.views.create($el.value.find('#view-main'), {
+                    name: 'main',
+                    main: true,
+                    url: '/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+                $f7.views.create($el.value.find('#view-components'), {
+                    name: 'components',
+                    main: false,
+                    url: '/components/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+                $f7.views.create($el.value.find('#view-screens'), {
+                    name: 'screens',
+                    main: false,
+                    url: '/screens/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+                $f7.views.create($el.value.find('#view-integrations'), {
+                    name: 'integrations',
+                    main: false,
+                    url: '/integrations/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+                $f7.views.create($el.value.find('#view-more'), {
+                    name: 'more',
+                    main: false,
+                    url: '/settings/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+
+                // Inicializar la vista secundaria
+                $f7.views.create($el.value.find('#view-secondary'), {
+                    name: 'secondary',
+                    url: '/secondary/',
+                    initRouterOnTabShow: true,
+                    auroraSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    iosSwipeBack: !$f7.device.desktop && $f7.device.ios,
+                    mdSwipeBack: !$f7.device.desktop && $f7.device.ios
+                });
+            }
+
+            /* If Sidebar Is Enabled For Single View Or Tab View Layout */
+            if ($f7.config.layout[$f7.config.layout.default].sidebar.enabled) {
+                $f7.views.create($el.value.find('#view-sidebar'), {
+                    name: 'sidebar',
+                    main: false,
+                    url: '/sidebar/'
+                });
+                $f7.panel.create({
+                    el: $el.value.find('#sidebar'),
+                    swipe: true,
+                    swipeActiveArea: 64,
+                    visibleBreakpoint: 1024,
+                    collapsedBreakpoint: 768
+                });
+            }
+
+            // Inicializar el splitter
+            setupSplitter();
+
+            // Crear método global para controlar la vista dividida
+            $f7.splitView = {
+                toggle: function () {
+                    const viewMain = $('.split-view-main');
+                    const viewSecondary = $('#view-secondary');
+                    const splitter = $('#splitter');
+
+                    if (viewSecondary.css('display') === 'none') {
+                        // Mostrar vista dividida
+                        viewMain.addClass('with-transition').css('width', '50%');
+                        viewSecondary.addClass('with-transition').css({
+                            'display': 'block',
+                            'width': '50%'
+                        });
+                        splitter.css('display', 'block');
+                    } else {
+                        // Ocultar vista dividida
+                        viewMain.addClass('with-transition').css('width', '100%');
+                        viewSecondary.addClass('with-transition').css({
+                            'width': '0%',
+                            'display': 'none'
+                        });
+                        splitter.css('display', 'none');
+
+                        // Quitar la clase de transición después de completar la animación
+                        setTimeout(function () {
+                            viewMain.removeClass('with-transition');
+                            viewSecondary.removeClass('with-transition');
+                        }, 300);
+                    }
+                },
+
+                open: function (content, options = {}) {
+                    const viewSecondary = $('#view-secondary');
+                    const viewMain = $('.split-view-main');
+                    const splitter = $('#splitter');
+                    const secondaryView = $f7.views.get('#view-secondary');
+
+                    // Configurar opciones por defecto
+                    const defaultOptions = {
+                        isHtml: false,
+                        pushState: false,
+                        pageTitle: 'Secondary View'
+                    };
+
+                    options = Object.assign({}, defaultOptions, options);
+
+                    // Si es una URL, navegar a ella
+                    if (!options.isHtml && typeof content === 'string') {
+                        secondaryView.router.navigate(content, {
+                            pushState: options.pushState
+                        });
+                    }
+                    // Si es HTML, cargarlo directamente
+                    else if (options.isHtml && content) {
+                        // Si ya tenemos un div con el contenedor en la vista secundaria, lo usamos
+                        let mainPage = viewSecondary.find('.page-current .page-content');
+
+                        // Si no hay página en la vista secundaria, creamos una
+                        if (mainPage.length === 0) {
+                            const newPage = `
+                                <div class="page">
+                                    <div class="navbar">
+                                        <div class="navbar-inner">
+                                            <div class="title">${options.pageTitle}</div>
+                                            <div class="right">
+                                                <a href="#" class="link icon-only close-split-view">
+                                                    <i class="icon f7-icons">xmark</i>
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="page-content"></div>
+                                </div>
+                            `;
+
+                            secondaryView.router.clearPreviousPages();
+                            secondaryView.router.clearPreviousHistory();
+                            secondaryView.el.innerHTML = newPage;
+
+                            // Reintentar obtener el contenedor después de crear la página
+                            mainPage = viewSecondary.find('.page-content');
+
+                            // Añadir evento para cerrar
+                            viewSecondary.find('.close-split-view').on('click', function () {
+                                $f7.splitView.close();
+                            });
+                        }
+
+                        // Ahora contenedor existe, asignar el HTML
+                        if (mainPage.length > 0) {
+                            mainPage.html(content);
+                        }
+                    }
+                    viewSecondary.find('.title').text(options.pageTitle)
+                    // Si la vista secundaria ya está visible, solo cambiar el contenido
+                    if (viewSecondary.css('display') !== 'none') {
+                        return;
+                    }
+
+                    // Mostrar vista dividida
+                    viewMain.addClass('with-transition').css('width', '50%');
+                    viewSecondary.addClass('with-transition').css({
+                        'display': 'block',
+                        'width': '50%'
+                    });
+                    splitter.css('display', 'block');
+                },
+
+                close: function () {
+                    const viewSecondary = $('#view-secondary');
+                    const viewMain = $('.split-view-main');
+                    const splitter = $('#splitter');
+
+                    // Si la vista secundaria ya está oculta, no hacer nada
+                    if (viewSecondary.css('display') === 'none') {
+                        return;
+                    }
+
+                    // Ocultar vista dividida
+                    viewMain.addClass('with-transition').css('width', '100%');
+                    viewSecondary.addClass('with-transition').css({
+                        'width': '0%'
+                    });
+                    splitter.css('display', 'none');
+
+                    // Ocultar la vista secundaria después de la transición
+                    setTimeout(function () {
+                        viewSecondary.css('display', 'none');
+                        viewMain.removeClass('with-transition');
+                        viewSecondary.removeClass('with-transition');
+                    }, 300);
+                }
+            };
+        }
+
+        $f7ready(function () {
+            initializeViews();
+
+            // Asegurarse que la vista principal ocupe toda la pantalla inicialmente
+            $('.split-view-main').css('width', '100%');
+            $('#view-secondary').css('width', '0');
+
+            // Añadir estilos necesarios
+            const style = document.createElement('style');
+            style.textContent = `
+                .split-view-container {
+                    display: flex;
+                    width: 100%;
+                    height: 100%;
+                    overflow: hidden;
+                }
+                .split-views-wrapper {
+                    display: flex;
+                    flex-direction: column;
+                    width: 100%;
+                    height: 100%;
+                }
+                .split-views-tabs {
+                    flex: 1;
+                    display: flex;
+                    overflow: hidden;
+                }
+                .split-view-main {
+                    width: 100%;
+                    min-width: auto;
+                }
+                .split-view-secondary {
+                    min-width: 250px;
+                    width: 0;
+                }
+                .split-view-main.with-transition,
+                .split-view-secondary.with-transition {
+                    transition: width 0.3s ease;
+                }
+                .no-transition {
+                    transition: none !important;
+                }
+                .splitter {
+                    width: 6px;
+                    background-color: var(--f7-theme-color);
+                    cursor: col-resize;
+                    display: none;
+                    position: relative;
+                    z-index: 100;
+                    flex-shrink: 0;
+                    opacity: 0.3;
+                    transition: opacity 0.3s;
+                }
+                .splitter:hover, .splitter-active {
+                    opacity: 0.7;
+                }
+                .splitter::after {
+                    content: "";
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    width: 2px;
+                    height: 30px;
+                    background-color: #fff;
+                    border-radius: 1px;
+                }
+                #splitter-overlay {
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 100%;
+                    z-index: 9999;
+                    display: none;
+                    background-color: transparent;
+                    cursor: col-resize;
+                }
+                #splitter-overlay.active {
+                    display: block;
+                }
+                .no-select {
+                    user-select: none !important;
+                    -webkit-user-select: none !important;
+                    -moz-user-select: none !important;
+                    -ms-user-select: none !important;
+                }
+            `;
+            document.head.appendChild(style);
+        });
+
+        return $render;
+    }
+</script>
+</script>

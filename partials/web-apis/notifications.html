@@ -1,0 +1,155 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Notifications API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Notifications API allows web apps to show local notifications to the user that are displayed outside the app at the system level, even if the app is idle or in the background.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${permission == 'default' ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${enableNotifications}">Enable Notifications</button>
+                    </div>
+                    ` : $h` `}
+                    ${permission == 'granted' ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${showNotification}">Show Notification</button>
+                    </div>
+                    ` : $h` `}
+                    ${permission == 'denied' ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-subtitle">Notifications Permission Denied</div>
+                        <div class="empty-state-text">Please enable notifications from the browser settings.</div>
+                    </div>
+                    ` : $h` `}
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">For push notifications sent from the server, check out <a href="/integrations/firebase/" class="text-underline-dotted">Firebase</a> and <a href="/integrations/onesignal/" class="text-underline-dotted">OneSignal</a> integrations.</div>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.notifications ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Notifications API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Notifications API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Notifications_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let permission = null;
+        let notification = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            permission = Notification.permission;
+            $update();
+        }
+
+        let enableNotifications = function() {
+            Notification.requestPermission()
+                .then(function(state) {
+                    permission = state;
+                    $update();
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        let showNotification = function() {
+            let title = $f7.config.app.title + ' - ' + $f7.config.app.tagline;
+            let options = {
+                body: $f7.config.app.description,
+                dir: 'auto',
+                image: 'https://source.unsplash.com/random/1366x768',
+                icon: 'assets/custom/favicon/icon-512x512.png',
+                badge: 'assets/custom/favicon/notification-icon.png',
+                vibrate: 1000,
+                sound: 'assets/custom/sound/notification.mp3',
+                timestamp: $f7.utils.now(),
+                actions: [
+                    {
+                        title: 'Explore Demo',
+                        action: 'demo'
+                    },
+                    {
+                        title: 'Buy Now',
+                        action: 'buy'
+                    }
+                ]
+            }
+
+            if ($f7.serviceWorker.registrations.length && 'showNotification' in $f7.serviceWorker.registrations[0]) {
+                notification = $f7.serviceWorker.registrations[0].showNotification(title, options);
+            }
+            else {
+                delete options.actions;
+                notification = new Notification(title, options);
+            }
+        }
+
+        return $render;
+    }
+</script>

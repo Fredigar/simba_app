@@ -1,0 +1,992 @@
+#sources-panel{
+    width:400px!important;
+}
+#sources-title {
+    background-color: #141414;
+}
+.avatar-group .avatar{
+    width:20px!important;
+    height:20px!important;
+}
+
+/**
+ * fix-markdown-numbering.css
+ *
+ * Estilos CSS para corregir visualmente problemas de numeración
+ * en listas generadas por LLMs y procesadas por formateadores
+ * de Markdown.
+ */
+
+/*
+ * Solución CSS para listas ordenadas (ol)
+ * Esta solución funciona para listas bien estructuradas pero con
+ * numeración incorrecta
+ */
+
+/* Resetear las listas numeradas */
+ol {
+    counter-reset: section;
+    list-style-type: none !important;
+}
+
+/* Asignar numeración automática a cada ítem */
+ol > li {
+    counter-increment: section;
+    position: relative;
+    padding-left: 2em;
+    margin-bottom: 0.5em;
+}
+
+/* Mostrar el número correcto */
+ol > li::before {
+    content: counter(section) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* Para listas numeradas anidadas */
+ol ol {
+    counter-reset: subsection;
+    margin-top: 0.5em;
+}
+
+ol ol > li {
+    counter-increment: subsection;
+    padding-left: 2.5em;
+}
+
+ol ol > li::before {
+    content: counter(section) "." counter(subsection) ".";
+}
+
+/* Ocultar los números originales si están inline en el contenido */
+ol > li > strong:first-child,
+ol > li > b:first-child {
+    position: relative;
+}
+
+/* Si los encabezados dentro de las listas contienen números al inicio */
+li > h1, li > h2, li > h3, li > h4, li > h5, li > h6 {
+    display: inline-block;
+}
+
+/*
+ * Solución para secciones numeradas que no están en ol/li
+ * (Por ejemplo, encabezados que comienzan con números)
+ */
+.numbered-section,
+[class*="section-"],
+[class*="section_"],
+[class*="paso-"],
+[class*="paso_"],
+[class*="step-"],
+[class*="step_"] {
+    counter-increment: standalone;
+    position: relative;
+    padding-left: 2em;
+}
+
+.numbered-section::before,
+[class*="section-"]::before,
+[class*="section_"]::before,
+[class*="paso-"]::before,
+[class*="paso_"]::before,
+[class*="step-"]::before,
+[class*="step_"]::before {
+    content: counter(standalone) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/*
+ * Aplicar a contenido generado por Markdown donde los párrafos
+ * comienzan con números (como "1. Texto")
+ */
+.markdown-content p {
+    position: relative;
+}
+
+.markdown-content p[data-number]::before {
+    content: attr(data-number) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+.markdown-content p[data-number] {
+    padding-left: 2em;
+}
+
+/*
+ * Solución específica para procedimientos técnicos
+ * (Como el caso del simulador de vuelo)
+ */
+.procedimiento h3 {
+    margin-top: 1.5em;
+    margin-bottom: 0.5em;
+}
+
+.procedimiento ol {
+    counter-reset: procedimiento;
+    padding-left: 0;
+}
+
+.procedimiento ol > li {
+    counter-increment: procedimiento;
+    list-style-type: none;
+    position: relative;
+    padding-left: 2em;
+    margin-bottom: 1em;
+}
+
+.procedimiento ol > li::before {
+    content: counter(procedimiento) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/* Para viñetas dentro de los pasos del procedimiento */
+.procedimiento ul {
+    padding-left: 1.5em;
+    margin-top: 0.5em;
+}
+
+.procedimiento ul > li {
+    list-style-type: disc;
+    margin-bottom: 0.3em;
+}
+
+/*
+ * Clase auxiliar para aplicar a elementos individuales
+ * que tienen numeración incorrecta
+ */
+.fixed-numbered-item {
+    position: relative;
+    padding-left: 2em;
+}
+
+.fixed-numbered-item[data-number]::before {
+    content: attr(data-number) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/*
+ * Clase para aplicar automáticamente a todo el contenido
+ * que necesita corrección de numeración
+ */
+.auto-fix-numbering ol {
+    counter-reset: auto-item;
+    list-style-type: none !important;
+}
+
+.auto-fix-numbering ol > li {
+    counter-increment: auto-item;
+    position: relative;
+    padding-left: 2em;
+}
+
+.auto-fix-numbering ol > li::before {
+    content: counter(auto-item) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/*
+ * Para casos específicos donde los números están en el texto
+ * pero no en listas HTML adecuadas
+ */
+.text-numbered-fix [class*="numero-"],
+.text-numbered-fix [class*="number-"],
+.text-numbered-fix [class*="punto-"],
+.text-numbered-fix [class*="item-"] {
+    counter-increment: text-item;
+    position: relative;
+    padding-left: 2em;
+}
+
+.text-numbered-fix [class*="numero-"]::before,
+.text-numbered-fix [class*="number-"]::before,
+.text-numbered-fix [class*="punto-"]::before,
+.text-numbered-fix [class*="item-"]::before {
+    content: counter(text-item) ".";
+    position: absolute;
+    left: 0;
+    font-weight: bold;
+}
+
+/*
+ * Estilos adicionales para mejorar la legibilidad general
+ * de los procedimientos
+ */
+.procedimiento-mejorado h2,
+.procedimiento-mejorado h3 {
+    color: #2c3e50;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 0.3em;
+}
+
+.procedimiento-mejorado ol {
+    padding-left: 0;
+}
+
+.procedimiento-mejorado ol > li {
+    margin-bottom: 1.5em;
+}
+
+.procedimiento-mejorado ul {
+    margin-top: 0.8em;
+}
+
+.procedimiento-mejorado ul > li {
+    margin-bottom: 0.5em;
+}
+
+.procedimiento-mejorado strong {
+    color: #34495e;
+}
+
+/*SIMBA*/
+     /* Your existing styles */
+@keyframes pulse-animation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.1);
+        opacity: 0.7;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes thinking-animation {
+    0% {
+        transform: scale(1);
+        opacity: 1;
+    }
+    50% {
+        transform: scale(1.5);
+        opacity: 0.3;
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+/* New styles for the centered messagebar container */
+.centered-messagebar-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    display: inline-grid;
+    justify-content: center;
+    align-items: center;
+    top: 0;
+    transition: all 0.3s ease; /* Añadir transición suave */
+    left: 0;
+    /*margin-top: 110px;*/
+}
+
+.device-desktop .dark *, .device-desktop.dark * {
+    scrollbar-color: var(--color-gray-800) #303030 !important;
+}
+
+.centered-messagebar-container.at-bottom {
+    align-items: flex-end;
+    padding-bottom: 15px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    height: auto;
+    padding-bottom: 18px;
+    z-index: 9999;
+    background-color: rgb(33 33 33);
+}
+
+.centered-messagebar {
+    min-width: 25rem !important;
+    max-width: 100% !important;
+    min-height: 56px !important;
+    border-radius: 28px !important;
+    background-color: #303030;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3) !important;
+    display: flex !important;
+    flex-direction: column !important;
+    justify-content: space-between !important;
+    padding: 10px 0 0 0 !important;
+    transition: height 0.2s ease !important;
+}
+
+.centered-messagebar .messagebar-inner {
+    /* display: flex !important;*/
+    flex-direction: row !important;
+    align-items: center !important;
+    width: 96% !important;
+    flex: 1 !important;
+    padding: 0 15px !important;
+    /* background-color: inherit !important;*/
+    margin-left: 10px;
+}
+
+.centered-messagebar .messagebar-area {
+    flex: 1 !important;
+    margin: 0 !important;
+    background-color: inherit !important;
+}
+
+.centered-messagebar textarea {
+    background-color: inherit !important;
+    border: none !important;
+    min-height: 50px !important;
+    max-height: 120px !important;
+    padding: 15px 5px !important;
+    color: #ffffff !important;
+    font-size: 1.1rem !important;
+    resize: none !important;
+    width: 100% !important;
+}
+
+.chip-label {
+/ / font-size: 11 px !important;
+}
+
+.centered-messagebar .messagebar-buttons-bottom {
+    /*display: flex !important;*/
+    align-items: center !important;
+    justify-content: flex-end !important;
+    width: 96% !important;
+    padding: 5px 15px !important;
+    /* background-color: inherit !important;*/
+    margin-bottom: 14px;
+    margin-left: 3px;
+}
+
+
+/* Keep your existing styles */
+#center-indicator {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    width: 1px;
+    height: 1px;
+    pointer-events: none;
+}
+
+.hidden {
+    display: none;
+}
+
+#camera-preview, #captured-image {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    margin: auto;
+}
+
+pre {
+    background-color: #2b2b2b !important;
+    overflow: auto;
+}
+
+pre code {
+    width: 100% !important;
+    display: block;
+}
+
+code:not(pre code) {
+    background-color: darkgray;
+}
+
+.message {
+    max-width: 100% !important;
+    flex-direction: row !important;
+    align-self: normal !important;
+    margin-left: 10px !important;
+    margin-right: 10px !important;
+    text-align: left !important;
+    padding-top: 0px !important;
+}
+
+.message-sent.message-tail .message-bubble:before {
+    border: none !important;
+}
+
+pre .hljs {
+    background-color: inherit !important;
+    color: #fff4f4 !important;
+}
+
+.message-received.message-tail .message-bubble:before {
+    border: none !important;
+}
+
+.message-text {
+    font-size: 1.1em !important;
+    line-height: 1.8;
+}
+
+.message-text-header {
+    float: right !important;
+    margin-bottom: 10px !important;
+    width: 100%;
+    right: 0px;
+    top: -31px;
+    color: white;
+    text-align: right !important;
+}
+
+.message:not(.message-first) .message-name {
+    display: inherit !important;
+}
+
+.message-content {
+    align-items: normal !important;
+    width: 100% !important;
+}
+
+.messages-content {
+    background-color: inherit !important;
+}
+
+.messages {
+    background-color: inherit !important;
+}
+
+.message-bubble {
+    color: inherit !important;
+    background: inherit !important;
+    width: 100% !important;
+    padding-top: 0px !important;
+}
+
+.card-title {
+    font-size: 1.4em;
+}
+
+.message-name {
+    font-weight: 800;
+    font-size: 0.9em;
+    margin-top: 15px !important;
+    padding-left: 0px !important;
+    color: inherit !important;
+}
+
+.language-name {
+    margin-right: -15px;
+    margin-top: -15px;
+    font-size: 10px !important;
+}
+
+.chip-source {
+    width: 200px !important;
+}
+
+.listening-button {
+    animation: pulse-animation 2s infinite;
+}
+
+.card-header {
+    margin-top: 3px !important;
+}
+
+.thinking-icon {
+    bottom: 1px;
+    position: relative;
+    margin-left: 3px;
+    animation: thinking-animation 2s infinite;
+}
+
+.speech-icon {
+    float: right;
+    margin-left: 5px;
+}
+
+#voiceStatus {
+    font-size: 1.3em;
+    font-weight: 500;
+}
+
+.toolbar.messagebar {
+    background-color: inherit !important;
+    border: none !important;
+}
+
+.messagebar-area {
+    background-color: inherit !important;
+}
+
+.messagebar textarea {
+    background-color: inherit !important;
+    border-radius: 20px !important;
+    color: white !important;
+    border: none !important;
+    font-size: 1.1rem !important;
+    width: 96%;
+}
+
+.toolbar.messagebar .link i {
+    color: #ffffff !important;
+}
+
+.message-text {
+    font-size: 1.1rem !important;
+}
+
+:root {
+    --mensaje-altura: 800px; /* Valor predeterminado */
+}
+
+/*   .block-footer{
+     min-height: var(--message-height) !important;
+   }*/
+
+.messages .message:last-child .message-text {
+    min-height: var(--message-height) !important;
+}
+
+.message-received {
+    background-color: inherit !important;
+    box-shadow: none !important;
+}
+
+.message-avatar {
+    top: 15px !important;
+    margin-left: -35px !important;
+    position: absolute !important;
+}
+
+.message-sent {
+    background-color: #303030;
+}
+
+.call-execution {
+    color: #575757 !important;
+}
+
+/* Auto height for textarea */
+.auto-height textarea {
+    /*overflow: hidden !important;*/
+}
+
+/* Text shimmer animation effect - FASTER VERSION */
+@keyframes shimmer {
+    0% {
+        background-position: -200% 0;
+    }
+    100% {
+        background-position: 200% 0;
+    }
+}
+
+code {
+    padding-left: 5px;
+    padding-right: 5px;
+    padding-top: 3px;
+    padding-bottom: 3px;
+    background-color: #424242 !important;
+}
+
+.page-content {
+    scrollbar-color: var(--color-gray-800) #212121 !important;
+}
+
+.shimmer-text-fast {
+    position: relative;
+    display: inline-block;
+    background: linear-gradient(
+            90deg,
+            rgba(255, 255, 255, 0) 0%,
+            rgba(255, 255, 255, 0.8) 50%,
+            rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    background-repeat: no-repeat;
+    background-clip: text;
+    -webkit-background-clip: text;
+    color: transparent;
+    text-fill-color: transparent;
+    -webkit-text-fill-color: transparent;
+    background-color: #a7a9a7; /* Text color (shows through the transparent gradient) */
+    animation: shimmer 1.5s infinite linear; /* Very fast - 0.5s */
+    overflow: hidden;
+    font-size: 18px;
+}
+
+#scrollToBottom a {
+    width: 30px;
+    height: 30px;
+    /* border: solid, 1px, #fffefe; */
+    background-color: #212121 !important;
+}
+
+#scrollToBottom {
+
+    position: sticky;
+    bottom: -8px;
+}
+
+.cod-with-auto {
+    width: auto !important;
+    font-size: 16px !important;
+}
+
+.message-footer-content .actions {
+    display: none;
+    position: absolute;
+}
+
+.message-footer-content .actions {
+    display: none;
+    position: absolute;
+}
+
+.messages .message:last-child .actions {
+    display: block !important;
+}
+
+#dialog-choice-chip {
+    width: 500px !important;
+}
+
+.source-summary {
+    display: -webkit-box !important;
+    -webkit-line-clamp: 4 !important; /* Número de líneas a mostrar */
+    -webkit-box-orient: vertical !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+}
+
+.source-title {
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+    max-width: 300px !important; /* Ajusta según necesites */
+}
+
+.source-extra {
+    color: #b7b75d !important
+}
+
+#sources-panel {
+    z-index: 999999 !important;
+}
+
+#device-list {
+    min-width: 400px;
+    max-width: 600px;
+}
+
+.file-dropzone {
+    width: 100%;
+    height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.file-dropzone.drag-over {
+    height: 30px;
+    opacity: 1;
+    background-color: rgba(100, 100, 100, 0.4);
+    border: 1px dashed #aaa;
+    border-radius: 8px;
+    margin-bottom: 5px;
+}
+
+.file-dropzone.has-files {
+    height: auto;
+    opacity: 1;
+}
+
+.file-preview {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-bottom: 5px;
+    width: 100%;
+}
+
+.file-item {
+    background-color: #424242;
+    border-radius: 4px;
+    padding: 3px 8px;
+    display: flex;
+    align-items: center;
+    font-size: 0.75rem;
+}
+
+.file-item .file-name {
+    margin-left: 5px;
+    max-width: 120px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.file-item .remove-file {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #aaa;
+}
+
+.file-item .remove-file:hover {
+    color: #ff6b6b;
+}
+
+.extracting-indicator {
+    margin-left: 5px;
+    color: #FFC107;
+}
+
+.success-indicator {
+    margin-left: 5px;
+    color: #4CAF50;
+}
+
+.view-text-button {
+    margin-left: 5px;
+    cursor: pointer;
+    color: #2196F3;
+}
+
+.view-text-button:hover {
+    color: #0D47A1;
+}
+
+.error-indicator {
+    margin-left: 5px;
+    color: #FF5252;
+}
+
+.message-files {
+    margin-top: 8px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 8px;
+}
+
+.file-attachment {
+    display: inline-flex;
+    align-items: center;
+    background-color: #3a3a3a;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 2px;
+    font-size: 0.8rem;
+}
+
+.file-attachment i {
+    margin-right: 5px;
+}
+
+/* Estilos para cuando un archivo PDF está siendo procesado */
+.file-item.processing-pdf .extracting-indicator {
+    color: #2196F3;
+}
+
+.ocr-progress {
+    font-size: 0.8rem;
+    color: #2196F3;
+    margin-top: 5px;
+}
+
+.ocr-confidence {
+    font-size: 0.8rem;
+    color: #4CAF50;
+    margin-top: 2px;
+}
+
+.ocr-confidence.low {
+    color: #FF9800;
+}
+
+.ocr-confidence.very-low {
+    color: #F44336;
+}
+
+.file-actions {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 5px;
+}
+
+.file-actions span {
+    margin: 0 2px;
+    cursor: pointer;
+}
+
+.file-actions .view-file i:hover {
+    color: #0d8bf2 !important;
+}
+
+.file-actions .delete-file i:hover {
+    color: #d32f2f !important;
+}
+
+.extracting-indicator {
+    color: #ff9800;
+    margin-left: 5px;
+}
+
+.file-dropzone {
+    width: 96% !important;
+}
+
+/* Añade esto a tu sección de estilos */
+.chip.bg-color-green {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.chip.bg-color-green .chip-media i {
+    color: white;
+}
+
+.chip.bg-color-green:active {
+    background-color: #45a049;
+}
+
+.assistants-suggestions {
+    position: fixed; /* Cambiado de 'absolute' a 'fixed' para mejor posicionamiento */
+    z-index: 10000; /* Aumentado para asegurar que esté por encima de todo */
+    background-color: #303030;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    width: 300px;
+    max-height: 300px;
+    overflow-y: auto;
+    display: none;
+}
+
+.assistants-suggestions-title {
+    padding: 10px 15px;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    color: #ddd;
+}
+
+.assistants-suggestions-list {
+    padding: 5px 0;
+}
+
+.assistant-suggestion-item {
+    padding: 8px 15px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.assistant-suggestion-item:hover,
+.assistant-suggestion-item.selected {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+.assistant-suggestion-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    overflow: hidden;
+    margin-right: 12px;
+}
+
+.assistant-suggestion-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.assistant-suggestion-info {
+    flex: 1;
+}
+
+.assistant-suggestion-name {
+    font-weight: 500;
+    color: #fff;
+    font-size: 14px;
+}
+
+.assistant-suggestion-description {
+    font-size: 12px;
+    color: #aaa;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 200px;
+}
+
+.assistant-search-input {
+    padding: 8px 15px;
+    background-color: rgba(255, 255, 255, 0.1);
+    margin: 0 10px 5px;
+    border-radius: 4px;
+}
+
+.assistant-search-input input {
+    background: transparent;
+    border: none;
+    color: white;
+    width: 100%;
+    outline: none;
+}
+
+.progressbar {
+    max-width: 300px !important;
+}
+
+.progressbar span {
+    background-color: #607d8b;
+}
+
+.export-csv-button {
+    display: inline-block;
+    padding: 5px 10px;
+    background-color: #424242;
+    color: #ffffff;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.export-csv-button:hover {
+    background-color: #606060;
+}
+
+.table-container {
+    position: relative;
+    width: 100%;
+}
+
+.quick-action-chip {
+    padding: 20px !important;
+    background-color: inherit !important;
+}
+
+.quick-action-chip .chip-media {
+    border: none !important;
+}
+
+.toolbar .link {
+    display: inline-flex !important;
+}
+
+/*  .message-footer{
+      margin-top:-30px!important;
+  }*/
+/* Additional JavaScript to make textarea auto-adjust height */

@@ -1,0 +1,181 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="verify-otp">
+
+        <div class="page-content">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-65 large-50 xlarge-40 padding-vertical">
+
+                    <div class="block block-strong small-inset display-flex flex-direction-column align-items-stretch justify-content-space-between height-100 no-hairlines no-margin-vertical no-padding text-align-center">
+
+                        <form name="verify" action="#" method="POST" enctype="multipart/form-data">
+                            <input type="hidden" name="otp" />
+                        </form>
+
+                        <div class="block display-flex flex-direction-column align-items-stretch justify-content-space-between height-100 no-margin-vertical">
+
+                            <div class="margin-vertical">
+                                <div class="font-size-20 font-weight-bold">Verify Your Mobile Number</div>
+                                <div class="margin-top-half text-color-gray">Please enter the OTP we have sent on your mobile number.</div>
+                            </div>
+
+                            <div class="display-flex align-items-center justify-content-center margin-vertical">
+                                ${Array(otpLength).fill().map((item, index) => $h`
+                                <span class="otp-digit shape-container shape-auto size-48 font-size-20 font-weight-bold margin-horizontal-half"></span>
+                                `)}
+                            </div>
+
+                            <div class="margin-vertical">
+                                <span>Didn't receive the OTP?</span>
+                                ${`\u0020`}
+                                <span class="timer-countdown">
+                                    <span class="countdown-result">
+                                        <a href="#" class="link link-button" @click="${resendOtp}">Resend</a>
+                                    </span>
+                                    <span class="countdown-inner">
+                                        <span class="countdown-minutes">00</span>:
+                                        <span class="countdown-seconds">00</span>
+                                    </span>
+                                </span>
+                            </div>
+
+                        </div>
+
+                        <div id="keypad" class="margin-top-auto" style="background-color: var(--f7-keypad-bg-color); border-bottom-left-radius: inherit; border-bottom-right-radius: inherit;"></div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .page[data-name=verify-otp] .otp-digit {
+        background-color: var(--f7-input-fill-bg-color);
+    }
+
+    .page[data-name=verify-otp] .otp-digit.filled {
+        background-color: var(--f7-theme-color);
+        color: #FFFFFF;
+    }
+
+    @media (max-width: 567.98px) {
+        .page[data-name=verify-otp] {
+            background-color: var(--f7-block-strong-bg-color);
+        }
+
+        .page[data-name=verify-otp] .page-content {
+            padding-bottom: 0;
+        }
+
+        .page[data-name=verify-otp] .page-content > .row > .col-100 {
+            padding-bottom: 0 !important;
+        }
+
+        .page[data-name=verify-otp] #keypad {
+            border-radius: 0 !important;
+            padding-bottom: var(--f7-safe-area-bottom);
+        }
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let otpLength = 4;
+        let validOtp = null;
+
+        let keypad = null;
+        let notification = null;
+
+        let generateOtp = function() {
+            validOtp = Math.floor(Math.pow(10, otpLength - 1) + Math.random() * (Math.pow(10, otpLength) - Math.pow(10, otpLength - 1) - 1));
+            $update(function() {
+                showOtpNotification();
+                initializeTimer();
+            });
+        }
+
+        let showOtpNotification = function() {
+            notification = $f7.notification.create({
+                text: 'Your OTP is ' + validOtp,
+                closeTimeout: 10000,
+                closeButton: true
+            });
+            notification.open();
+        }
+
+        let initializeTimer = function() {
+            $el.value.find('.timer-countdown').addClass('countdown-init');
+            $el.value.find('.timer-countdown').attr('data-countdown-datetime', new Date(new Date().getTime() + 30 * 1000).toISOString());
+            $f7.timer.initialize($el.value);
+        }
+
+        let resendOtp = function() {
+            keypad.setValue('');
+            generateOtp();
+        }
+
+        let validateOtp = function(otp) {
+            let value = otp.toString();
+            let length = otp.length;
+
+            $el.value.find('.otp-digit').text('');
+            $el.value.find('.otp-digit').removeClass('filled');
+
+            if (length >= 1 && length <= otpLength) {
+                for (var i = 1; i <= length; i++) {
+                    $el.value.find('.otp-digit:nth-child(' + i + ')').text(value.charAt(i-1));
+                    $el.value.find('.otp-digit:nth-child(' + i + ')').addClass('filled');
+                }
+            }
+
+            if (length == otpLength) {
+                if (value == validOtp) {
+                    $f7.toast.show({
+                        text: 'OTP has been verified.',
+                        cssClass: 'color-green'
+                    });
+                    $f7router.back(null, {
+                        reloadCurrent: true
+                    });
+                }
+                else {
+                    $f7.toast.show({
+                        text: 'OTP is invalid.',
+                        cssClass: 'color-red'
+                    });
+                }
+                keypad.setValue('');
+            }
+        }
+
+        let initializeKeypad = function() {
+            keypad = $f7.keypad.create({
+                containerEl: $el.value.find('#keypad'),
+                inputEl: $el.value.find('input[name=otp]'),
+                valueMaxLength: otpLength,
+                dotButton: false,
+                toolbar: false,
+                on: {
+                    change: function(keypad, value) {
+                        validateOtp(value);
+                    }
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeKeypad();
+            setTimeout(function() {
+                generateOtp();
+            }, 1000);
+        });
+
+        return $render;
+    }
+</script>

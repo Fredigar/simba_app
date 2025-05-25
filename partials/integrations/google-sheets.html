@@ -1,0 +1,138 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Google Sheets</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-green-50);">
+                            <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Google_Sheets_2020_Logo.svg" height="48" alt="" />
+                        </span>
+                        <p>Write data to Google Sheets using Google Apps Script.</p>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Fill the form below and submit. It will be saved into Google Spreadsheet. If your email address is reachable, you will receive a confirmation mail.</p>
+                    </div>
+
+                    <form name="subscribe" action="#" method="GET" enctype="application/x-www-form-urlencoded">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <i class="icon material-icons color-gray">person</i>
+                                                <input type="text" name="name" placeholder="Your Name" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <i class="icon material-icons color-gray">email</i>
+                                                <input type="email" name="email" placeholder="Your Email Address" required />
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical text-align-center">
+                            <button type="submit" class="button button-fill button-large">Submit</button>
+                            <div class="margin-top-half text-color-gray">We won't spam you. It's a promise.</div>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=subscribe]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.preloader.show();
+                    $f7.request({
+                        url: 'https://script.google.com/macros/s/AKfycbx8VUra19SUqoXaNXnv3ASuBkTEvvd5ly0IkUzB47kvGZTL5yYasfXOp6X6OIeXVvs/exec',
+                        method: 'GET',
+                        data: $f7.form.convertToData(form),
+                        dataType: 'json'
+                    })
+                    .then(function(response) {
+                        $f7.preloader.hide();
+                        if (response.data.result == 'success') {
+                            $f7.toast.show({
+                                text: 'Form has been submitted successfully.',
+                                cssClass: 'color-green'
+                            });
+                            form.reset();
+                        }
+                        else {
+                            $f7.toast.show({
+                                text: data.error.message,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    })
+                    .catch(function(response) {
+                        $f7.preloader.hide();
+                        $f7.toast.show({
+                            text: 'An error occured while submitting form. Please try again later.',
+                            cssClass: 'color-red'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

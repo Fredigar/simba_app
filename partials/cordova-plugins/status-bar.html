@@ -1,0 +1,75 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Status Bar</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to control the device status bar.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        ${isStatusBarVisible ? $h`
+                        <button type="button" class="button button-fade" @click="${hideStatusBar}">Hide Status Bar</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill" @click="${showStatusBar}">Show Status Bar</button>
+                        `}
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isStatusBarVisible = ('StatusBar' in window) ? StatusBar.isVisible : false;
+
+        let showStatusBar = function() {
+            if ('StatusBar' in window) {
+                StatusBar.show();
+                isStatusBarVisible = true;
+                $update();
+            }
+        }
+
+        let hideStatusBar = function() {
+            if ('StatusBar' in window) {
+                StatusBar.hide();
+                isStatusBarVisible = false;
+                $update();
+            }
+        }
+
+        return $render;
+    }
+</script>

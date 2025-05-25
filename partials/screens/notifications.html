@@ -1,0 +1,234 @@
+<template>
+    <div class="page" data-name="notifications">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Notifications</div>
+                <div class="right">
+                    <a href="/settings/" class="link icon-only">
+                        <i class="icon material-icons">settings</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="list inset margin-vertical no-chevron">
+                        <ul>
+                            ${notifications.map((item, index) => $h`
+                            <li class="swipeout">
+                                <div class="swipeout-content">
+                                    <div class="item-content">
+                                        <div class="item-inner item-cell padding-vertical">
+                                            <div class="item-row">
+                                                <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                    <a href="/users-single/" class="link color-gray">
+                                                        <img src="${item.avatar}" class="shape-auto" loading="lazy" height="48" width="48" alt="" />
+                                                    </a>
+                                                </div>
+                                                <div class="item-cell align-self-flex-start">
+                                                    <a href="#">
+                                                        <div class="font-size-14 text-color-body" innerHTML="${item.message}"></div>
+                                                        <div class="font-size-12 text-color-gray">${moment(item.created_at).fromNow()}</div>
+                                                    </a>
+                                                    ${item.type == 'article_post' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Read</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Bookmark</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'birthday' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Wish</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'event_invite' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Going</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-fade button-small margin-top-half width-auto color-mono">Maybe</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Not Going</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'follow_request' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Confirm</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Delete</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'link_share' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Visit</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Bookmark</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'payment_request' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Pay</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'podcast_upload' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Listen</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Download</button>
+                                                    </div>
+                                                    `}
+                                                    ${item.type == 'video_upload' && $h`
+                                                    <div class="row justify-content-flex-start">
+                                                        <button type="button" class="col button button-fill button-small margin-top-half width-auto color-mono text-color-mono-invert">Watch</button>
+                                                        ${`\u00A0`}
+                                                        <button type="button" class="col button button-outline button-small margin-top-half width-auto color-mono">Download</button>
+                                                    </div>
+                                                    `}
+                                                </div>
+                                                ${item.media && $h`
+                                                <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                    <a href="#">
+                                                        <img src="${item.media}" class="shape-rounded-square" loading="lazy" height="48" width="48" alt="" />
+                                                    </a>
+                                                </div>
+                                                `}
+                                                ${!item.read && $h`
+                                                <div class="item-cell align-self-flex-start flex-shrink-0 line-height-1 width-auto">
+                                                    <i class="icon material-icons font-size-12 color-primary">circle</i>
+                                                </div>
+                                                `}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="${$f7.rtl ? 'swipeout-actions-right' : 'swipeout-actions-left'}">
+                                    ${item.read ? $h`
+                                    <a href="#" class="swipeout-close color-primary">
+                                        <div class="swipeout-action-icon">
+                                            <i class="icon material-icons">markunread</i>
+                                        </div>
+                                        <div class="swipeout-action-label">Mark as Unread</div>
+                                    </a>
+                                    ` : $h`
+                                    <a href="#" class="swipeout-close color-primary">
+                                        <div class="swipeout-action-icon">
+                                            <i class="icon material-icons">drafts</i>
+                                        </div>
+                                        <div class="swipeout-action-label">Mark as Read</div>
+                                    </a>
+                                    `}
+                                </div>
+                                <div class="${$f7.rtl ? 'swipeout-actions-left' : 'swipeout-actions-right'}">
+                                    <a href="#" class="swipeout-close color-red">
+                                        <div class="swipeout-action-icon">
+                                            <i class="icon material-icons">delete</i>
+                                        </div>
+                                        <div class="swipeout-action-label">Delete</div>
+                                    </a>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let notifications = [
+            {
+                id: 8,
+                type: 'follow_request',
+                avatar: 'https://source.unsplash.com/Pc0ToyoR5Xo/128x128',
+                message: '<b>Gordon Spencer</b> requested to follow you.',
+                media: null,
+                read: true,
+                created_at: '2022-09-20T15:20:25'
+            },
+            {
+                id: 7,
+                type: 'birthday',
+                avatar: 'https://source.unsplash.com/0wRXAXqIp58/128x128',
+                message: 'It\'s <b>Elmira Torphy</b>\'s birthday.',
+                media: 'https://cdn-icons-png.flaticon.com/512/6917/6917462.png',
+                read: false,
+                created_at: '2022-09-07T07:45:10'
+            },
+            {
+                id: 6,
+                type: 'article_post',
+                avatar: 'https://source.unsplash.com/ZHvM3XIOHoE/128x128',
+                message: '<b>Joel Hills</b> posted an article. <i>\'The Origin of Species\'</i>',
+                media: null,
+                read: true,
+                created_at: '2022-08-15T16:30:05'
+            },
+            {
+                id: 5,
+                type: 'video_upload',
+                avatar: 'https://source.unsplash.com/wb9kQq1frtE/128x128',
+                message: '<b>Gudrun Little</b> uploaded a video. <i>\'The Big Bang Theory\'</i>',
+                media: 'https://source.unsplash.com/pYlSLXkduQg/128x128',
+                read: false,
+                created_at: '2022-08-07T11:23:54'
+            },
+            {
+                id: 4,
+                type: 'link_share',
+                avatar: 'https://source.unsplash.com/jzY0KRJopEI/128x128',
+                message: '<b>Garnett Toy</b> shared a link.',
+                media: null,
+                read: true,
+                created_at: '2022-07-27T03:15:45'
+            },
+            {
+                id: 3,
+                type: 'podcast_upload',
+                avatar: 'https://source.unsplash.com/aLLHmLMdHrM/128x128',
+                message: '<b>Jerald Boyle</b> uploaded a podcast on Spotify.',
+                media: 'https://logo.clearbit.com/spotify.com',
+                read: false,
+                created_at: '2022-07-15T14:12:19'
+            },
+            {
+                id: 2,
+                type: 'payment_request',
+                avatar: 'https://source.unsplash.com/tidSLv-UaNs/128x128',
+                message: '<b>Cullen Witting</b> requested a payment of $500.',
+                media: null,
+                read: true,
+                created_at: '2022-05-05T10:20:30'
+            },
+            {
+                id: 1,
+                type: 'event_invite',
+                avatar: 'https://source.unsplash.com/53ouhY5koKY/128x128',
+                message: '<b>Tracy Roberts</b> invited you to an event. <i>\'Sunburn Music Festival\'</i>',
+                media: null,
+                read: false,
+                created_at: '2021-12-31T11:59:00'
+            }
+        ]
+
+        return $render;
+    }
+</script>

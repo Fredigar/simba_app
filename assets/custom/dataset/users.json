@@ -1,0 +1,402 @@
+[
+    {
+        "id": 1,
+        "name": "Roselyn Davis",
+        "avatar": "https://source.unsplash.com/jzY0KRJopEI/128x128",
+        "country": "Pakistan",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 2,
+        "name": "Friedrich Bauch",
+        "avatar": "https://source.unsplash.com/nSBl2cfwnmE/128x128",
+        "country": "Eritrea",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 3,
+        "name": "Garnett Toy",
+        "avatar": "https://source.unsplash.com/SXWSP9XWGvU/128x128",
+        "country": "Angola",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 4,
+        "name": "Willie Keebler",
+        "avatar": "https://source.unsplash.com/n4KewLKFOZw/128x128",
+        "country": "Turkey",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 5,
+        "name": "Kenyon Beer",
+        "avatar": "https://source.unsplash.com/XHVpWcr5grQ/128x128",
+        "country": "Tanzania",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 6,
+        "name": "Roselyn Nolan",
+        "avatar": "https://source.unsplash.com/QCCugbe2AC4/128x128",
+        "country": "Suriname",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 7,
+        "name": "Lynn Nolan",
+        "avatar": "https://source.unsplash.com/6QCZgqodrxI/128x128",
+        "country": "Chad",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 8,
+        "name": "Gretchen Beier",
+        "avatar": "https://source.unsplash.com/vmBik4xv27s/128x128",
+        "country": "Seychelles",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 9,
+        "name": "Emmanuelle Powlowski",
+        "avatar": "https://source.unsplash.com/mNBMGx-xhVI/128x128",
+        "country": "Virgin Islands",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 10,
+        "name": "Wilhelmine Gerhold",
+        "avatar": "https://source.unsplash.com/ViyA5myhBVw/128x128",
+        "country": "Jamaica",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 11,
+        "name": "George Jaskolski",
+        "avatar": "https://source.unsplash.com/ZHvM3XIOHoE/128x128",
+        "country": "Hungary",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 12,
+        "name": "Jerald Boyle",
+        "avatar": "https://source.unsplash.com/aLLHmLMdHrM/128x128",
+        "country": "Mauritania",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 13,
+        "name": "Rasheed Labadie",
+        "avatar": "https://source.unsplash.com/tidSLv-UaNs/128x128",
+        "country": "Papua New Guinea",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 14,
+        "name": "Lue Cremin",
+        "avatar": "https://source.unsplash.com/gw3cp6h5j0E/128x128",
+        "country": "Saint Pierre & Miquelon",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 15,
+        "name": "Matthew West",
+        "avatar": "https://source.unsplash.com/RgoJtqRDuGA/128x128",
+        "country": "Kazakhstan",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 16,
+        "name": "Ethel Boehm",
+        "avatar": "https://source.unsplash.com/qC7A8Lo7iac/128x128",
+        "country": "Ireland",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 17,
+        "name": "Lance Ortiz",
+        "avatar": "https://source.unsplash.com/1w9I6H4aftw/128x128",
+        "country": "Lebanon",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 18,
+        "name": "Ova Mohr",
+        "avatar": "https://source.unsplash.com/ASuIYgjnBFw/128x128",
+        "country": "Bosnia & Herzegovina",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 19,
+        "name": "Georgianna Steuber",
+        "avatar": "https://source.unsplash.com/BZ2PNGD5Emw/128x128",
+        "country": "Comoros",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 20,
+        "name": "Tracy Roberts",
+        "avatar": "https://source.unsplash.com/ff5K3-kYPHA/128x128",
+        "country": "Latvia",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 21,
+        "name": "Zelma Quigley",
+        "avatar": "https://source.unsplash.com/tNCH0sKSZbA/128x128",
+        "country": "Sri Lanka",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 22,
+        "name": "Daphney Rempel",
+        "avatar": "https://source.unsplash.com/3402kvtHhOo/128x128",
+        "country": "Dominican Republic",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 23,
+        "name": "Ozella Zboncak",
+        "avatar": "https://source.unsplash.com/nZ6_RombsA8/128x128",
+        "country": "Isle of Man",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 24,
+        "name": "Kathryne Metz",
+        "avatar": "https://source.unsplash.com/B3VWevRn1oU/128x128",
+        "country": "Guatemala",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 25,
+        "name": "Alvena Orn",
+        "avatar": "https://source.unsplash.com/hF2XIzJimtM/128x128",
+        "country": "Gabon",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 26,
+        "name": "Jonathan DuBuque",
+        "avatar": "https://source.unsplash.com/iEEBWgY_6lA/128x128",
+        "country": "Greece",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 27,
+        "name": "Leone Vandervort",
+        "avatar": "https://source.unsplash.com/MTZTGvDsHFY/128x128",
+        "country": "Romania",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 28,
+        "name": "Zoila Huel",
+        "avatar": "https://source.unsplash.com/3lbxyaAoXbU/128x128",
+        "country": "Angola",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 29,
+        "name": "Enid Rice",
+        "avatar": "https://source.unsplash.com/Vnm4aweBwPA/128x128",
+        "country": "Latvia",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 30,
+        "name": "Rupert O'Hara",
+        "avatar": "https://source.unsplash.com/a6PMA5JEmWE/128x128",
+        "country": "Nicaragua",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 31,
+        "name": "Delia Fadel",
+        "avatar": "https://source.unsplash.com/3skaWa2xrpg/128x128",
+        "country": "Qatar",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 32,
+        "name": "Gudrun Little",
+        "avatar": "https://source.unsplash.com/LLCTFYTgdIM/128x128",
+        "country": "Turkey",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 33,
+        "name": "Elwyn Schiller",
+        "avatar": "https://source.unsplash.com/wyN3LOTIRm0/128x128",
+        "country": "Pitcairn Islands",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 34,
+        "name": "Santos Donnelly",
+        "avatar": "https://source.unsplash.com/p_XnfPS0HeE/128x128",
+        "country": "San Marino",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 35,
+        "name": "Ora Collins",
+        "avatar": "https://source.unsplash.com/sEY1ffAmBlo/128x128",
+        "country": "Belarus",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 36,
+        "name": "Kenyatta Kessler",
+        "avatar": "https://source.unsplash.com/4JZIMWztBqg/128x128",
+        "country": "Antigua & Barbuda",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 37,
+        "name": "Jaylin Stokes",
+        "avatar": "https://source.unsplash.com/M2Hk2bVtNn4/128x128",
+        "country": "Chile",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 38,
+        "name": "Alana Langworth",
+        "avatar": "https://source.unsplash.com/53ouhY5koKY/128x128",
+        "country": "Nigeria",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 39,
+        "name": "Aliya Doyle",
+        "avatar": "https://source.unsplash.com/CbOiVkXZe3k/128x128",
+        "country": "Antarctica",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 40,
+        "name": "Grace Considine",
+        "avatar": "https://source.unsplash.com/VOXb1iOJ314/128x128",
+        "country": "French Guiana",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 41,
+        "name": "Sibyl Ondricka",
+        "avatar": "https://source.unsplash.com/ycrlg4D79aw/128x128",
+        "country": "Hong Kong",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 42,
+        "name": "Tania Leuschke",
+        "avatar": "https://source.unsplash.com/wA1lKuphLvg/128x128",
+        "country": "Georgia",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 43,
+        "name": "Stephon Oberbrunner",
+        "avatar": "https://source.unsplash.com/mLMSGSB5gQA/128x128",
+        "country": "San Marino",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 44,
+        "name": "Afton Marvin",
+        "avatar": "https://source.unsplash.com/v213l-fHiXY/128x128",
+        "country": "Brunei Darussalam",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 45,
+        "name": "Jaqueline O'Keefe",
+        "avatar": "https://source.unsplash.com/ZqH2xVrHc_8/128x128",
+        "country": "Bangladesh",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 46,
+        "name": "Cullen Witting",
+        "avatar": "https://source.unsplash.com/wb9kQq1frtE/128x128",
+        "country": "Palau",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 47,
+        "name": "Addison Graham",
+        "avatar": "https://source.unsplash.com/YiEmZvliwKk/128x128",
+        "country": "Jordan",
+        "following": true,
+        "favorite": false
+    },
+    {
+        "id": 48,
+        "name": "Turner Nader",
+        "avatar": "https://source.unsplash.com/SanJsOPdLtU/128x128",
+        "country": "Jordan",
+        "following": false,
+        "favorite": false
+    },
+    {
+        "id": 49,
+        "name": "Vivianne Monahan",
+        "avatar": "https://source.unsplash.com/uWjxj5Qv1QU/128x128",
+        "country": "Dominican Republic",
+        "following": true,
+        "favorite": true
+    },
+    {
+        "id": 50,
+        "name": "Green VonRueden",
+        "avatar": "https://source.unsplash.com/KIoVP2q4nsc/128x128",
+        "country": "Maldives",
+        "following": false,
+        "favorite": false
+    }
+]

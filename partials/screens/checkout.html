@@ -1,0 +1,413 @@
+<template>
+    <div class="page page-with-subnavbar" data-name="checkout">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Checkout</div>
+            </div>
+        </div>
+
+        <div class="subnavbar">
+            <div class="subnavbar-inner">
+                <div class="segmented color-primary">
+                    <a href="#tab-cart" class="button button-outline button-small tab-link tab-link-active">Cart</a>
+                    <a href="#tab-address" class="button button-outline button-small tab-link disabled">Address</a>
+                    <a href="#tab-payment" class="button button-outline button-small tab-link disabled">Payment</a>
+                    <a href="#tab-done" class="button button-outline button-small tab-link disabled">Done</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="tabs">
+
+            <div id="tab-cart" class="page-content tab tab-active">
+                <div class="card margin-vertical no-shadow">
+                    <div class="card-header">
+                        <span>Products</span>
+                        <span class="chip font-weight-bold justify-content-center no-margin" style="width: 48px;">
+                            <span class="chip-label">${cart.products.length}</span>
+                        </span>
+                    </div>
+                    <div class="card-content">
+                        <div class="list no-safe-areas">
+                            <ul>
+                                ${cart.products.map((item, index) => $h`
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner item-cell padding-vertical">
+                                            <div class="item-row">
+                                                <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                    <img class="shape-rounded-square" src="${item.image}" loading="lazy" height="80" width="80" alt="" />
+                                                </div>
+                                                <div class="item-cell align-self-stretch display-flex flex-direction-column">
+                                                    <div class="row">
+                                                        <div class="col-100 small-80">
+                                                            <a href="#" class="font-size-16 font-weight-600 multi-line-text lines-2 text-color-body">${item.name}</a>
+                                                            ${item.attributes.length ? $h`
+                                                            <div class="font-size-12 single-line-text text-color-gray">${item.attributes.map(attribute => attribute.name + ': ' + attribute.value).join(' | ')}</div>
+                                                            ` : $h` `}
+                                                        </div>
+                                                        <div class="col-100 small-20 width-auto">
+                                                            <div class="font-size-16 font-weight-bold">${'₹' + (item.price * item.quantity).toLocaleString()}</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                    <span class="chip font-weight-bold justify-content-center no-margin" style="width: 48px;">
+                                                        <span class="chip-label">${item.quantity}</span>
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                `)}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="card margin-vertical no-shadow">
+                    <div class="card-header">Order Summary</div>
+                    <div class="card-content">
+                        <div class="list no-safe-areas">
+                            <ul>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Subtotal</div>
+                                            <div class="item-after font-size-16">${'₹' + cart.subtotal}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Discount @ ${cart.discount_percent + '%'}</div>
+                                            <div class="item-after font-size-16">${'₹' + cart.discount_value}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Shipping Charges</div>
+                                            <div class="item-after font-size-16">${'₹' + cart.shipping}</div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <span class="font-size-18 font-weight-bold text-color-body">Grand Total</span>
+                        <span class="font-size-18 font-weight-bold text-color-body">${'₹' + cart.grand_total}</span>
+                    </div>
+                </div>
+                <div class="block margin-vertical">
+                    <button type="button" class="button button-fill button-large" @click="${showTabAddress}">Continue</button>
+                </div>
+            </div>
+
+            <div id="tab-address" class="page-content tab">
+                <form name="address" action="#" method="POST" enctype="multipart/form-data">
+                    <div class="list inset margin-vertical no-hairlines-between">
+                        <ul class="padding-vertical-half">
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Name</div>
+                                        <div class="item-input-wrap">
+                                            <input type="text" name="name" required />
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Mobile</div>
+                                        <div class="item-input-wrap">
+                                            <input type="text" name="mobile" inputmode="tel" required />
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Email</div>
+                                        <div class="item-input-wrap">
+                                            <input type="email" name="email" inputmode="email" required />
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner">
+                                        <div class="item-title item-label">Address</div>
+                                        <div class="item-input-wrap">
+                                            <textarea class="resizable" name="address" required style="min-height: 128px;"></textarea>
+                                            <span class="input-clear-button"></span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="block margin-vertical">
+                        <button type="submit" class="button button-fill button-large">Proceed to Payment</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="tab-payment" class="page-content tab">
+                <form name="payment" action="#" method="POST" enctype="multipart/form-data">
+                    <div class="list cards-list radio-list radio-outline inset margin-vertical no-hairlines-between">
+                        <ul>
+                            <li>
+                                <label class="item-content item-radio color-green">
+                                    <input type="radio" name="method" value="cod" />
+                                    <div class="item-inner item-cell">
+                                        <div class="item-row">
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <span class="shape-container shape-auto size-40 bg-color-green">
+                                                    <i class="icon material-icons color-white">attach_money</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-cell">Cash on Delivery</div>
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <i class="icon icon-radio"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                            <li>
+                                <label class="item-content item-radio color-blue">
+                                    <input type="radio" name="method" value="card" />
+                                    <div class="item-inner item-cell">
+                                        <div class="item-row">
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <span class="shape-container shape-auto size-40 bg-color-blue">
+                                                    <i class="icon material-icons color-white">payment</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-cell">Credit / Debit Card</div>
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <i class="icon icon-radio"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                            <li>
+                                <label class="item-content item-radio color-orange">
+                                    <input type="radio" name="method" value="btc" />
+                                    <div class="item-inner item-cell">
+                                        <div class="item-row">
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <span class="shape-container shape-auto size-40 bg-color-orange">
+                                                    <i class="icon material-icons color-white">currency_bitcoin</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-cell">Bitcoin</div>
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <i class="icon icon-radio"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                            <li>
+                                <label class="item-content item-radio color-mono">
+                                    <input type="radio" name="method" value="apple" />
+                                    <div class="item-inner item-cell">
+                                        <div class="item-row">
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <span class="shape-container shape-auto size-40 bg-color-mono">
+                                                    <i class="icon f7-icons text-color-mono-invert">logo_apple</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-cell">Apple Pay</div>
+                                            <div class="item-cell flex-shrink-0 width-auto">
+                                                <i class="icon icon-radio"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="block margin-vertical">
+                        <button type="submit" class="button button-fill button-large">Make Payment</button>
+                    </div>
+                </form>
+            </div>
+
+            <div id="tab-done" class="page-content tab">
+
+                <div class="empty-state empty-state-strong inset margin-vertical">
+                    <div class="empty-state-media">
+                        <span class="shape-container shape-auto size-96 bg-color-chrome">
+                            <i class="icon material-icons font-size-56 text-gradient-lightgreen">local_mall</i>
+                        </span>
+                    </div>
+                    <div class="empty-state-title">Thank You</div>
+                    <div class="empty-state-text">Your order has been received successfully.</div>
+                    <div class="empty-state-actions">
+                        <a href="/" class="empty-state-action button button-fill button-round">Done</a>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let cart = {
+            products: [
+                {
+                    id: 1,
+                    name: 'Sony PS4 Dualshock Magma - V2',
+                    image: 'https://source.unsplash.com/IuF6G4b4XSI/128x128',
+                    attributes: [
+                        {
+                            name: 'Color',
+                            value: 'Red'
+                        }
+                    ],
+                    price: 4099,
+                    quantity: 1
+                },
+                {
+                    id: 2,
+                    name: 'Xbox One Series X Console',
+                    image: 'https://source.unsplash.com/DPOdCl4bGJU/128x128',
+                    attributes: [
+                        {
+                            name: 'Storage',
+                            value: '512 GB'
+                        },
+                        {
+                            name: 'Resolution',
+                            value: '4K'
+                        }
+                    ],
+                    price: 52990,
+                    quantity: 1
+                },
+                {
+                    id: 3,
+                    name: 'Nintendo Gameboy Color',
+                    image: 'https://source.unsplash.com/v8XaVfyo41Q/128x128',
+                    attributes: [],
+                    price: 5399,
+                    quantity: 1
+                }
+            ],
+            subtotal: Math.round(62488).toLocaleString(),
+            discount_percent: 10,
+            discount_value: Math.round(6249).toLocaleString(),
+            shipping: 50,
+            grand_total: Math.round(56289).toLocaleString()
+        }
+
+        let formValidatorAddress = null;
+        let formValidatorPayment = null;
+
+        let showTabAddress = function() {
+            $el.value.find('[href="#tab-address"]').removeClass('disabled');
+            $f7.tab.show('#tab-address');
+        }
+
+        let initializeFormValidatorAddress = function() {
+            formValidatorAddress = jQuery($el.value.find('form[name=address]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    mobile: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    address: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    mobile: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    address: {
+                        required: 'Please enter address.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $el.value.find('[href="#tab-payment"]').removeClass('disabled');
+                    $f7.tab.show('#tab-payment');
+                }
+            });
+        }
+
+        let initializeFormValidatorPayment = function() {
+            formValidatorPayment = jQuery($el.value.find('form[name=payment]')).validate({
+                rules: {
+                    method: {
+                        required: true
+                    }
+                },
+                messages: {
+                    method: {
+                        required: 'Please select payment method.'
+                    }
+                },
+                invalidHandler: function(event, validator) {
+                    $f7.toast.show({
+                        text: 'Please select payment method.',
+                        cssClass: 'color-red'
+                    });
+                },
+                submitHandler: function(form) {
+                    $el.value.find('[href="#tab-cart"]').addClass('disabled');
+                    $el.value.find('[href="#tab-address"]').addClass('disabled');
+                    $el.value.find('[href="#tab-payment"]').addClass('disabled');
+                    $el.value.find('[href="#tab-done"]').removeClass('disabled');
+                    $f7.tab.show('#tab-done');
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidatorAddress();
+            initializeFormValidatorPayment();
+        })
+
+        return $render;
+    }
+</script>

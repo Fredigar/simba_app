@@ -1,0 +1,127 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Get Installed Related Apps API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Get Installed Related Apps API allows your web app to check whether your Android, iOS, Desktop App or PWA is installed on the user's device.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Get Installed Related Apps API only allows you to check if your apps are installed on the user's device. You cannot get a list of all the installed apps, or check if other third-party apps are installed.</div>
+                    </div>
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${getInstalledRelatedApps}">Get Installed Related Apps</button>
+                    </div>
+                    ${relatedApps ? $h`
+                    ${relatedApps.length ? $h`
+                    <div class="block-header margin-top">Following related apps are installed on this device.</div>
+                    <div class="list simple-list inset margin-bottom">
+                        <ul>
+                            ${relatedApps.map((item, index) => $h`
+                            <li>${platforms[item.platform]}</li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">You have not installed any related apps on this device.</div>
+                    </div>
+                    `}
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.getInstalledRelatedApps ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Get Installed Related Apps API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Get Installed Related Apps API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Navigator#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let platforms = {
+            play: 'Android App',
+            itunes: 'iOS App',
+            windows: 'Windows App',
+            webapp: 'Progressive Web App'
+        }
+
+        let relatedApps = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let getInstalledRelatedApps = function() {
+            navigator.getInstalledRelatedApps()
+                .then(function(apps) {
+                    relatedApps = apps;
+                    $update();
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                    relatedApps = null;
+                    $update();
+                });
+        }
+
+        return $render;
+    }
+</script>

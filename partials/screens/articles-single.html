@@ -1,0 +1,312 @@
+<template>
+    <div class="page" data-name="articles-single">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Articles - Single</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 medium-60 large-65">
+
+                    <div class="card elevation-8 ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content">
+                            <div class="overlay-container shape-rounded-square">
+                                <img src="https://source.unsplash.com/7OslP9tf8Dc/1920x1080" alt="" style="min-height: 288px;" />
+                                <div class="overlay-content align-items-stretch justify-content-space-between text-align-start">
+                                    <div class="ribbon ribbon-clip ribbon-round ${$f7.rtl ? 'ribbon-right-top' : 'ribbon-left-top'} color-white text-color-black">
+                                        <i class="icon material-icons">bolt</i>
+                                        <span>Trending</span>
+                                    </div>
+                                    <a href="#" class="state-toggle link icon-only shape-container shape-circle size-32 align-self-flex-end bg-color-white ripple-color-white" @stateChange="${(event) => toggleBookmark(event.detail)}">
+                                        <i class="state-inactive icon material-icons font-size-20 color-gray">bookmark</i>
+                                        <i class="state-active icon material-icons font-size-20 color-red">bookmark</i>
+                                    </a>
+                                    <div class="margin-top-auto padding-top">
+                                        <div class="margin-bottom-half">
+                                            <span class="badge no-margin color-amber text-color-black">Gaming</span>
+                                        </div>
+                                        <div class="font-size-22 font-weight-bold multi-line-text lines-2">A Look Into The Future: What Will The Gaming Industry Look Like In 10 Years?</div>
+                                        <div class="font-size-12 margin-top-half single-line-text">
+                                            <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/wb9kQq1frtE/56x56" height="28" width="28" alt="" />
+                                            <span class="margin-horizontal-half">${faker.name.firstName()} ${faker.name.lastName()}</span>
+                                            ${`\u2022`}
+                                            <span class="margin-horizontal-half">${moment().format('MMMM DD, YYYY')}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content card-content-padding">
+                            <p class="dropcap">${faker.lorem.sentences(10)}</p>
+                            <img class="shape-rounded-square" src="https://source.unsplash.com/IuF6G4b4XSI/1920x1080" alt="" />
+                            <p>${faker.lorem.sentences(10)}</p>
+                            <video class="shape-rounded-square" controls playsinline preload="metadata">
+                                <source src="https://player.vimeo.com/external/519858979.sd.mp4?s=c190ec51c4db221079668aac1d76a42fec38fa50&profile_id=165" type="video/mp4" />
+                            </video>
+                            <p>${faker.lorem.sentences(10)}</p>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-header">
+                            <span>Comments</span>
+                            <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    ${Array(5).fill().map((item, index) => $h`
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-auto" src="${faker.internet.avatar()}" loading="lazy" height="40" width="40" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <span>${faker.name.firstName()} ${faker.name.lastName()}</span>
+                                                            ${`\u0020`}
+                                                            <span class="text-color-gray">${`\u2022`}</span>
+                                                            ${`\u0020`}
+                                                            <span class="font-size-12 font-weight-normal text-color-gray">${moment(faker.date.recent(90)).format('MMM DD')}</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-text">${faker.lorem.sentences(3)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    `)}
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-header">Add Comment</div>
+                        <div class="card-content">
+                            <form name="comment" action="#" method="POST" enctype="multipart/form-data">
+                                <div class="list no-hairlines no-hairlines-between no-safe-areas">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content item-input item-input-outline">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Name</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" name="name" required />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content item-input item-input-outline">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Email</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="email" name="email" inputmode="email" required />
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content item-input item-input-outline">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-floating-label">Comment</div>
+                                                    <div class="item-input-wrap">
+                                                        <textarea class="resizable" name="comment" required style="min-height: 96px;"></textarea>
+                                                        <span class="input-clear-button"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="padding-horizontal padding-vertical">
+                                    <button type="submit" class="button button-fill button-large">Submit</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-100 medium-40 large-35 sticky sticky-top">
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'} medium-margin-top no-margin-top">
+                        <div class="card-content card-content-padding">
+                            <img class="avatar shape-circle" src="${faker.internet.avatar()}" loading="lazy" height="64" width="64" alt="" />
+                            <div class="card-title margin-top-half">${faker.name.firstName()} ${faker.name.lastName()}</div>
+                            <div class="card-text">${faker.lorem.sentences(3)}</div>
+                            <div class="row margin-top" style="--f7-grid-gap: 8px;">
+                                <a href="#" class="col-50 button button-fill button-round">All Posts</a>
+                                <a href="#" class="col-50 button button-fill button-round color-mono text-color-mono-invert">Follow</a>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                        <div class="card-header">Tags</div>
+                        <div class="card-content card-content-padding">
+                            <a href="#" class="link chip">${faker.address.country()}</a>
+                            <a href="#" class="link chip">${faker.commerce.department()}</a>
+                            <a href="#" class="link chip">${faker.music.genre()}</a>
+                            <a href="#" class="link chip">${faker.science.chemicalElement().name}</a>
+                            <a href="#" class="link chip">${faker.vehicle.manufacturer()}</a>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                        <div class="card-header">
+                            <span>Related Posts</span>
+                            <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://source.unsplash.com/G1jbCAqp5sk/152x112" loading="lazy" height="56" width="76" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-size-14 font-weight-600 multi-line-text lines-3">15 Surprising Stats About Fortnite</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://source.unsplash.com/AHCmAX0k_J4/152x112" loading="lazy" height="56" width="76" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-size-14 font-weight-600 multi-line-text lines-3">Watch Out: How Virtual Reality Games Is Taking Over & What To Do About It</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://source.unsplash.com/bRFtEw30LYw/152x112" loading="lazy" height="56" width="76" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-size-14 font-weight-600 multi-line-text lines-3">Squid Game: What No One Is Talking About</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://source.unsplash.com/fOYg1lkZA7Y/152x112" loading="lazy" height="56" width="76" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-size-14 font-weight-600 multi-line-text lines-3">A Trip Back In Time: How People Talked About Nintendo 25 Years Ago</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://source.unsplash.com/DPOdCl4bGJU/152x112" loading="lazy" height="56" width="76" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-size-14 font-weight-600 multi-line-text lines-3">Why We Love Xbox Console (And You Should, Too!)</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=comment]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    comment: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    comment: {
+                        required: 'Please enter comment.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for the comments.'
+                    });
+                    form.reset();
+                }
+            });
+        }
+
+        let toggleBookmark = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Bookmarks' : 'Removed from Bookmarks',
+                icon: state ? '<i class="icon material-icons color-red">bookmark</i>' : '<i class="icon material-icons color-gray">bookmark</i>',
+                position: 'center'
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

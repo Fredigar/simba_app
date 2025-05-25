@@ -1,0 +1,130 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Create QR Code</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <div id="qrcode-container"></div>
+                        ${!qrcode && $h`
+                        <p class="font-size-12 text-color-gray text-uppercase">Your Generated QR Code Will Appear Here.</p>
+                        `}
+                    </div>
+
+                    <form name="qrcode" action="#" method="GET" enctype="multipart/form-data" @submit="${createQrCode}">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Title</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="title" value="${$f7.config.app.title + ' - ' + $f7.config.app.tagline}" />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Enter QR code title.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Subtitle</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="subtitle" value="Scan QR Code to check out demo." />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Enter QR code subtitle.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Logo</div>
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="logo" value="${$f7.config.app.logos.logomarkDark}" />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Enter URL of your logo.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">Text</div>
+                                            <div class="item-input-wrap">
+                                                <textarea name="text">https://nectar.website/demo</textarea>
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Enter QR code content. It can be text or URL.</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill button-large">Create QR Code</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let qrcode = null;
+
+        let createQrCode = function(event) {
+            event.preventDefault();
+            let qrcodeOptions = $f7.form.convertToData(event.target);
+            console.log(qrcodeOptions);
+            if (qrcode) {
+                qrcode.clear();
+            }
+            qrcode = new QRCode(
+                $el.value.find('#qrcode-container')[0],
+                {
+                    title: qrcodeOptions.title,
+                    titleFont: 'bold 17px Georgia',
+                    titleHeight: 80,
+                    titleTop: 24,
+                    subTitle: qrcodeOptions.subtitle,
+                    subTitleFont: 'normal 13px Arial',
+                    subTitleTop: 48,
+                    text: qrcodeOptions.text,
+                    logo: qrcodeOptions.logo,
+                    logoHeight: 80,
+                    logoWidth: 80,
+                    logoBackgroundTransparent: true,
+                    height: 256,
+                    width: 256
+                }
+            );
+        }
+
+        return $render;
+    }
+</script>

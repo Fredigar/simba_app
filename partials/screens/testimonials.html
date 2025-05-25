@@ -1,0 +1,317 @@
+<template>
+    <div class="page" data-name="testimonials">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Testimonials</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block margin-vertical text-align-center">
+                <div class="font-size-32 font-weight-bold text-color-amber" style="line-height: 1.25;">What Our Customers Are Saying</div>
+                <div class="font-size-16 margin-top text-color-gray">Don't take our word for it, here's what our customers have to say.</div>
+                <lottie-player src="${$f7.config.lottie.assetUrl + 'testimonials.json'}" autoplay background="transparent" speed="1" style="height: 64px;"></lottie-player>
+            </div>
+
+            ${testimonials && testimonials.length ? $h`
+            <div id="swiper" class="swiper margin-vertical padding-horizontal">
+                <div class="swiper-wrapper">
+                    ${testimonials.map((item, index) => $h`
+                    <div class="swiper-slide height-auto">
+                        <blockquote class="quote pull-quote inset height-100 no-margin color-amber" style="padding-bottom: 24px; padding-top: 80px;">
+                            <div class="quote-text multi-line-text lines-3">${item.comment}</div>
+                            <div class="rating rating-init margin-horizontal-auto margin-vertical tooltip-init" data-rateyo-rating="${item.rating}" data-rateyo-star-width="24px" data-tooltip="${item.rating} Stars"></div>
+                            <div class="quote-cite margin-top-auto">
+                                <img class="shape-circle" src="${item.photo}" height="80" width="80" alt="" />
+                                <div class="cite-title margin-top-half">${item.name}</div>
+                                <div class="cite-subtitle">${item.company}</div>
+                            </div>
+                        </blockquote>
+                    </div>
+                    `)}
+                </div>
+            </div>
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+        <div class="fab ${$f7.rtl ? 'fab-left-bottom' : 'fab-right-bottom'} tooltip-init" data-tooltip="Write a Testimonial">
+            <a href="#" @click="${() => popupTestimonial.open()}">
+                <i class="icon material-icons">rate_review</i>
+            </a>
+        </div>
+
+        <div id="popup-testimonial" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Write a Testimonial</div>
+                        <div class="right">
+                            <a href="#" class="link icon-only" @click="${() => popupTestimonial.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="block block-strong inset margin-vertical">
+
+                        <p class="text-align-center">Share about your experience with us.</p>
+
+                        <form name="testimonial" action="#" method="POST" enctype="multipart/form-data">
+
+                            <div class="list no-hairlines no-hairlines-between no-margin-vertical no-safe-areas" style="--f7-list-item-padding-horizontal: 0px;">
+                                <ul>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">person</i>
+                                                    </div>
+                                                    <input type="text" name="name" placeholder="Name" required />
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">email</i>
+                                                    </div>
+                                                    <input type="email" name="email" inputmode="email" placeholder="Email" required />
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">business_center</i>
+                                                    </div>
+                                                    <input type="text" name="company" placeholder="Company" required />
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner item-input item-input-outline">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">stars</i>
+                                                    </div>
+                                                    <input type="hidden" name="rating" required />
+                                                    <div class="rating"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline">
+                                            <div class="item-inner">
+                                                <div class="item-input-wrap">
+                                                    <div class="item-media align-self-flex-start">
+                                                        <i class="icon material-icons">message</i>
+                                                    </div>
+                                                    <textarea class="resizable" name="comment" placeholder="Comment" required style="min-height: 128px;"></textarea>
+                                                    <span class="input-clear-button"></span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="margin-top-half">
+                                <button type="submit" class="button button-fill button-large">Submit</button>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let testimonials = null;
+
+        let swiperSlider = null;
+        let popupTestimonial = null;
+        let formValidator = null;
+
+        let loadData = function() {
+            $f7.request({
+                url: 'assets/custom/dataset/testimonials.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                testimonials = response.data;
+                $update(function() {
+                    initializeSwiperSlider();
+                });
+            })
+            .catch(function(response) {
+                $f7.toast.show({
+                    text: 'An error occured while loading data.',
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        let initializeSwiperSlider = function() {
+            swiperSlider = $f7.swiper.create(
+                $el.value.find('#swiper'),
+                {
+                    effect: 'coverflow',
+                    coverflowEffect: {
+                        rotate: 40,
+                        slideShadows: false
+                    },
+                    autoplay: {
+                        delay: 5000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true
+                    },
+                    breakpoints: {
+                        768: {
+                            slidesPerView: 2
+                        },
+                        1920: {
+                            slidesPerView: 3
+                        }
+                    },
+                    centeredSlides: true,
+                    grabCursor: true,
+                    keyboard: {
+                        enabled: true,
+                        pageUpDown: false
+                    },
+                    loop: true,
+                    slidesPerView: 1,
+                    spaceBetween: 16
+                }
+            );
+            $f7.rating.initialize($el.value);
+        }
+
+        let initializePopupTestimonial = function() {
+            popupTestimonial = $f7.popup.create({
+                el: $el.value.find('#popup-testimonial')
+            });
+        }
+
+        let initializeFormRatingInput = function() {
+            jQuery($el.value.find('form[name=testimonial] .rating')).rateYo({
+                halfStar: true,
+                normalFill: $f7.stylesheet.getPropertyValue('--color-gray-300').trim(),
+                ratedFill: $f7.stylesheet.getPropertyValue('--color-amber-500').trim(),
+                spacing: '2px',
+                starWidth: '20px',
+                onChange: function(rating, rateYoInstance) {
+                    $(formValidator.currentForm).find('input[name=rating]').val(Number(rating).toFixed(1));
+                },
+                onSet: function(rating, rateYoInstance) {
+                    $(formValidator.currentForm).find('input[name=rating]').val(Number(rating).toFixed(1));
+                }
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=testimonial]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    company: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    rating: {
+                        required: true,
+                        min: 1,
+                        max: 5
+                    },
+                    comment: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    company: {
+                        required: 'Please enter company name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    rating: {
+                        required: 'Please select rating.',
+                        min: 'Please select rating between 1 and 5.',
+                        max: 'Please select rating between 1 and 5.'
+                    },
+                    comment: {
+                        required: 'Please enter comment.'
+                    }
+                },
+                submitHandler: function(form) {
+                    form.reset();
+                    jQuery(form).find('.rating').rateYo('rating', 0);
+                    $f7.toast.show({
+                        text: 'Thank you for reviewing us.',
+                        cssClass: 'color-green'
+                    });
+                    popupTestimonial.close();
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+            initializePopupTestimonial();
+            initializeFormRatingInput();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

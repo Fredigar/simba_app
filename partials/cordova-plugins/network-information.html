@@ -1,0 +1,124 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Network Information</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to access information about the network connection in use by the device.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    ${connectionInfo ? $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Connection Type</div>
+                                        <div class="item-after">${connectionInfo.type}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Try connecting and disconnecting the Internet or switching between Cellular and Wi-Fi network.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let connectionInfo = null;
+
+        let updateConnectionInfo = function() {
+            let connectionType = navigator.connection.type;
+            let connectionTypes = {};
+            connectionTypes[Connection.UNKNOWN] = 'Unknown Connection';
+            connectionTypes[Connection.ETHERNET] = 'Ethernet Connection';
+            connectionTypes[Connection.WIFI] = 'Wi-Fi Connection';
+            connectionTypes[Connection.CELL_2G] = 'Cell 2G Connection';
+            connectionTypes[Connection.CELL_3G] = 'Cell 3G Connection';
+            connectionTypes[Connection.CELL_4G] = 'Cell 4G Connection';
+            connectionTypes[Connection.CELL] = 'Cell Generic Connection';
+            connectionTypes[Connection.NONE] = 'No Network Connection';
+            let connectionData = {};
+            connectionData.type = connectionTypes[connectionType];
+            connectionInfo = connectionData;
+            $update();
+        }
+
+        let addEventListeners = function() {
+            document.addEventListener('online', onOnline);
+            document.addEventListener('offline', onOffline);
+        }
+
+        let removeEventListeners = function() {
+            document.removeEventListener('online', onOnline);
+            document.removeEventListener('offline', onOffline);
+        }
+
+        let onOnline = function() {
+            $f7.toast.show({
+                text: 'Connected to Internet',
+                cssClass: 'color-green'
+            });
+            updateConnectionInfo();
+        }
+
+        let onOffline = function() {
+            $f7.toast.show({
+                text: 'No Internet Connection',
+                cssClass: 'color-red'
+            });
+            updateConnectionInfo();
+        }
+
+        $on('pageBeforeIn', function() {
+            updateConnectionInfo();
+            addEventListeners();
+        });
+
+        $on('pageBeforeRemove', function() {
+            removeEventListeners();
+        });
+
+        return $render;
+    }
+</script>

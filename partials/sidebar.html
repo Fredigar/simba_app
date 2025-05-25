@@ -1,0 +1,213 @@
+<template>
+    <div class="page" data-name="sidebar" style="background-color: var(--f7-block-strong-bg-color);">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="title no-margin">
+                    <img class="panel-collapsed-hide if-not-dark" src="${$f7.config.app.logos.logotypeLight}" alt="" />
+                    <img class="panel-collapsed-hide if-dark" src="${$f7.config.app.logos.logotypeDark}" alt="" />
+                    <img class="panel-in-hide panel-breakpoint-hide if-not-dark" src="${$f7.config.app.logos.logomarkLight}" alt="" />
+                    <img class="panel-in-hide panel-breakpoint-hide if-dark" src="${$f7.config.app.logos.logomarkDark}" alt="" />
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content display-flex flex-direction-column justify-content-space-between" style="min-height: 100%;">
+
+            <div class="list menu-list menu-list-fill no-hairlines no-margin-vertical">
+                <ul>
+                    <li>
+                        <a href="/home/" class="item-link panel-close color-bluegray" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Home" data-i18n="[data-tooltip]home">
+                                    <span class="icons">
+                                        <i class="icon f7-icons font-size-20">house<span class="badge badge-dot panel-in-hide panel-breakpoint-hide color-red" style="--f7-badge-size: 9px;"></span></i>
+                                        <i class="icon icon-active f7-icons font-size-20">house_fill<span class="badge badge-dot panel-in-hide panel-breakpoint-hide color-red" style="--f7-badge-size: 9px;"></span></i>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/screens/conversation-list/" class="item-link panel-close color-bluegray" data-view="#view-main" @click="${() => $f7.tab.show('#view-assistant')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Asistente" data-i18n="[data-tooltip]asistente">
+                                    <span class="icons">
+                                        <i class="icon material-icons font-size-20">forum<span class="badge badge-dot panel-in-hide panel-breakpoint-hide color-red" style="--f7-badge-size: 9px;"></span></i>
+                                        <i class="icon icon-active material-icons font-size-20">forum_fill<span class="badge badge-dot panel-in-hide panel-breakpoint-hide color-red" style="--f7-badge-size: 9px;"></span></i>
+                                    </span>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title">Asistente</div>
+                                    <!--div class="item-after">
+                                        <span class="badge color-red">5</span>
+                                    </div-->
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/components/" class="item-link panel-close color-green" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Components" data-i18n="[data-tooltip]components">
+                                    <span class="icons">
+                                        <i class="icon f7-icons font-size-20">square_grid_2x2</i>
+                                        <i class="icon icon-active f7-icons font-size-20">square_grid_2x2_fill</i>
+                                    </span>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="components">Components</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/screens/" class="item-link panel-close color-blue" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Screens" data-i18n="[data-tooltip]screens">
+                                    <span class="icons">
+                                        <i class="icon f7-icons font-size-20">layers_alt</i>
+                                        <i class="icon icon-active f7-icons font-size-20">layers_alt_fill</i>
+                                    </span>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="screens">Screens</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/web-apis/" class="item-link panel-close color-orange" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Web APIs" data-i18n="[data-tooltip]web-apis">
+                                    <span class="icons"></span>
+                                    <i class="icon f7-icons font-size-20">chevron_left_slash_chevron_right</i>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="web-apis">Web APIs</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/cordova-plugins/" class="item-link panel-close color-deeppurple" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Cordova Plugins" data-i18n="[data-tooltip]cordova-plugins">
+                                    <i class="icon f7-icons font-size-20">device_phone_portrait</i>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="cordova-plugins">Cordova Plugins</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="/integrations/" class="item-link panel-close color-pink" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Integrations" data-i18n="[data-tooltip]integrations">
+                                    <span class="icons">
+                                        <i class="icon f7-icons font-size-20">flame</i>
+                                        <i class="icon icon-active f7-icons font-size-20">flame_fill</i>
+                                    </span>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="integrations">Integrations</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block margin-vertical panel-collapsed-hide">
+                <a href="${$f7.config.app.themeforestUrl}" target="${$f7.getExternalUrlTarget()}" class="external button button-fill button-large color-amber text-color-black">
+                    <i class="icon f7-icons">cart</i>
+                    <span class="margin-horizontal-half" data-i18n="buy-now">Buy Now</span>
+                </a>
+            </div>
+
+            <div class="list menu-list no-hairlines no-margin-vertical">
+                <ul>
+                    ${$store.getters.isWebAppInstallable.value && $h`
+                    <li>
+                        <a href="#" class="item-link panel-close color-blue ripple-color-blue text-color-blue" @click="${() => $f7.a2hs.showPrompt()}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Add to Home Screen" data-i18n="[data-tooltip]a2hs">
+                                    <i class="icon f7-icons font-size-20">square_arrow_down</i>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="a2hs">Add to Home Screen</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    `}
+                    <li>
+                        <a href="/settings/" class="item-link panel-close color-bluegray" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Settings" data-i18n="[data-tooltip]settings">
+                                    <span class="icons">
+                                        <i class="icon f7-icons font-size-20">gear_alt</i>
+                                        <i class="icon icon-active f7-icons font-size-20">gear_alt_fill</i>
+                                    </span>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="settings">Settings</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    ${$store.getters.isUserLoggedIn.value ? $h`
+                    <li>
+                        <a href="#" class="item-link panel-close color-red ripple-color-red text-color-red" @click="${() => $store.dispatch('logoutUser')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Log Out" data-i18n="[data-tooltip]log-out">
+                                    <i class="icon material-icons font-size-20">logout</i>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="log-out">Log Out</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    ` : $h`
+                    <li>
+                        <a href="/login/" class="item-link panel-close color-green ripple-color-green text-color-green" data-view="#view-main" @click="${() => $f7.tab.show('#view-main')}">
+                            <div class="item-content">
+                                <div class="item-media tooltip-init" data-tooltip="Log In" data-i18n="[data-tooltip]log-in">
+                                    <i class="icon material-icons font-size-20">login</i>
+                                </div>
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title" data-i18n="log-in">Log In</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                    `}
+                </ul>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let highlightMenuItem = function(routeUrl) {
+            let linkEl = $el.value.find('.menu-list a[href="' + routeUrl + '"]');
+            if (linkEl.length) {
+                $el.value.find('.menu-list .item-selected').removeClass('item-selected');
+                linkEl.addClass('item-selected');
+            }
+        }
+
+        $f7.on('routeChange', function(newRoute, previousRoute, router) {
+            highlightMenuItem(newRoute.url);
+        });
+
+        return $render;
+    }
+</script>

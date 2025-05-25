@@ -1,0 +1,314 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">SQLite</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to manage native SQLite databases.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill button-large" @click="${() => popupTodoList.open()}">Open To-Do List</button>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-todo-list" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">To-Do List</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => popupTodoList.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    ${tasks && tasks.length ? $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${tasks.map((item, index) => $h`
+                            <li>
+                                <label class="item-content item-checkbox no-active-state no-ripple">
+                                    <input type="checkbox" name="complete" value="${item.complete}" @change="${(event) => setTaskStatus(item.id, event.target.checked)}" />
+                                    <i class="icon icon-checkbox"></i>
+                                    <div class="item-inner">
+                                        <div class="item-title">${item.title}</div>
+                                        <div class="item-after">
+                                            <a href="#" class="link icon-only shape-container shape-auto size-24 margin-horizontal-half bg-color-amber ripple-color-amber" @click="${() => editTask(item.id)}">
+                                                <i class="icon material-icons font-size-14 color-white">edit</i>
+                                            </a>
+                                            <a href="#" class="link icon-only shape-container shape-auto size-24 bg-color-red ripple-color-red" @click="${() => deleteTask(item.id)}">
+                                                <i class="icon material-icons font-size-14 color-white">delete</i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </label>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <span class="shape-container shape-auto" style="background-color: var(--color-blue-50);">
+                                <i class="icon material-icons font-size-56 text-gradient-blue">fact_check</i>
+                            </span>
+                        </div>
+                        <div class="empty-state-title">No Tasks</div>
+                        <div class="empty-state-text">Add some tasks and they will appear here.</div>
+                    </div>
+                    `}
+                </div>
+                <div class="fab ${$f7.rtl ? 'fab-left-bottom' : 'fab-right-bottom'} margin-half">
+                    <a href="#" @click="${addTask}">
+                        <i class="icon material-icons">add</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<style>
+    #popup-todo-list input[type=checkbox]:checked ~ .item-inner .item-title {
+        text-decoration: line-through;
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let database = null;
+        let tasks = null;
+        let popupTodoList = null;
+
+        let initializePopupTodoList = function() {
+            popupTodoList = $f7.popup.create({
+                el: $el.value.find('#popup-todo-list'),
+                on: {
+                    open: function() {
+                        openDatabase();
+                    },
+                    close: function() {
+                        closeDatabase();
+                    }
+                }
+            });
+        }
+
+        let openDatabase = function() {
+            database = window.sqlitePlugin.openDatabase(
+                {
+                    name: 'nectar.db',
+                    location: 'default'
+                },
+                function() {
+                    database.executeSql(
+                        'CREATE TABLE IF NOT EXISTS tasks (id INTEGER PRIMARY KEY AUTOINCREMENT, title TEXT NOT NULL, complete INTEGER NOT NULL CHECK (complete IN (0, 1)))',
+                        [],
+                        function(result) {
+                            populateTodoList();
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let closeDatabase = function() {
+            database.close(
+                function() {
+                    tasks = null;
+                    $update();
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let populateTodoList = function() {
+            database.executeSql(
+                'SELECT * FROM tasks',
+                [],
+                function(result) {
+                    let rowsCount = result.rows.length;
+                    if (rowsCount) {
+                        let data = [];
+                        for (i=0; i<rowsCount; i++) {
+                            data.push(result.rows.item(i));
+                        }
+                        tasks = data;
+                        $update(function() {
+                            let checkboxes = popupTodoList.$el.find('input[type=checkbox]');
+                            $(checkboxes).each(function(checkboxEl, index) {
+                                $(checkboxEl).prop('checked', parseInt($(checkboxEl).val()) ? true : false);
+                            });
+                        });
+                    }
+                    else {
+                        tasks = null;
+                        $update();
+                    }
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let addTask = function() {
+            $f7.dialog.prompt(
+                '',
+                'Add Task',
+                function(title) {
+                    if (title.trim().length) {
+                        database.executeSql(
+                            'INSERT INTO tasks (title, complete) VALUES (?,?)',
+                            [title, 0],
+                            function(result) {
+                                populateTodoList();
+                            },
+                            function(error) {
+                                $f7.toast.show({
+                                    text: error.message,
+                                    cssClass: 'color-red'
+                                });
+                            }
+                        );
+                    }
+                }
+            );
+        }
+
+        let editTask = function(id) {
+            database.executeSql(
+                'SELECT * FROM tasks WHERE id=?',
+                [parseInt(id)],
+                function(result) {
+                    if (result.rows.length) {
+                        let title = result.rows.item(0).title;
+                        $f7.dialog.prompt(
+                            '',
+                            'Edit Task',
+                            function(title) {
+                                if (title.trim().length) {
+                                    database.executeSql(
+                                        'UPDATE tasks SET title=? WHERE id=?',
+                                        [title, parseInt(id)],
+                                        function(result) {
+                                            populateTodoList();
+                                        },
+                                        function(error) {
+                                            $f7.toast.show({
+                                                text: error.message,
+                                                cssClass: 'color-red'
+                                            });
+                                        }
+                                    );
+                                }
+                            },
+                            function() {},
+                            title
+                        );
+                    }
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let deleteTask = function(id) {
+            database.executeSql(
+                'DELETE FROM tasks WHERE id=?',
+                [parseInt(id)],
+                function(result) {
+                    populateTodoList();
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let setTaskStatus = function(id, status) {
+            database.executeSql(
+                'UPDATE tasks SET complete=? WHERE id=?',
+                [status == true ? 1 : 0, parseInt(id)],
+                function(result) {
+                    populateTodoList();
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePopupTodoList();
+        });
+
+        return $render;
+    }
+</script>

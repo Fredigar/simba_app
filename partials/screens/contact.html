@@ -1,0 +1,522 @@
+<template>
+    <div class="page" data-name="contact">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Contact Us</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-85 large-70 xlarge-55">
+
+                    <div class="card margin-vertical no-shadow">
+                        <div class="card-header justify-content-center">
+                            <img class="if-not-dark" src="${$f7.config.app.logos.logotypeLight}" height="24" alt="" />
+                            <img class="if-dark" src="${$f7.config.app.logos.logotypeDark}" height="24" alt="" />
+                        </div>
+                        <div class="card-content">
+                            <div class="responsive-container">
+                                <iframe class="responsive-content" src="https://www.google.com/maps/embed/v1/place?key=${$f7.config.googleMaps.apiKey}&q=${faker.address.latitude()},${faker.address.longitude()}"></iframe>
+                            </div>
+                            <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="https://maps.google.com?q=${faker.address.latitude()},${faker.address.longitude()}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40 bg-color-blue">
+                                                        <i class="icon material-icons font-size-20 color-white">place</i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Address</div>
+                                                    </div>
+                                                    <div class="item-text">
+                                                        ${faker.address.secondaryAddress()}, ${faker.address.street()},
+                                                        <br/>
+                                                        ${faker.address.city()}, ${faker.address.state()},
+                                                        <br/>
+                                                        ${faker.address.country()} - ${faker.address.zipCode()}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="tel:${faker.phone.phoneNumber()}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40 bg-color-green">
+                                                        <i class="icon material-icons font-size-20 color-white">phone</i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Phone</div>
+                                                    </div>
+                                                    <div class="item-text">${faker.phone.phoneNumber()}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="mailto:mail@example.org" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40 bg-color-red">
+                                                        <i class="icon material-icons font-size-20 color-white">email</i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Email</div>
+                                                    </div>
+                                                    <div class="item-text">mail@example.org</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://example.org" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40 bg-color-bluegray">
+                                                        <i class="icon material-icons font-size-20 color-white">language</i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Website</div>
+                                                    </div>
+                                                    <div class="item-text">https://example.org</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card margin-vertical no-shadow">
+                        <div class="card-header">Social</div>
+                        <div class="card-content">
+                            <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="https://behance.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-behance));">
+                                                        <i class="icon fa-brands fa-behance color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Behance</div>
+                                                    <div class="item-after">https://behance.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://dribbble.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-dribbble));">
+                                                        <i class="icon fa-brands fa-dribbble color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Dribbble</div>
+                                                    <div class="item-after">https://dribbble.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://facebook.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-facebook));">
+                                                        <i class="icon fa-brands fa-facebook-f color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Facebook</div>
+                                                    <div class="item-after">https://facebook.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://github.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-github));">
+                                                        <i class="icon fa-brands fa-github color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">GitHub</div>
+                                                    <div class="item-after">https://github.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://instagram.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-instagram));">
+                                                        <i class="icon fa-brands fa-instagram color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Instagram</div>
+                                                    <div class="item-after">https://instagram.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://linkedin.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-linkedin));">
+                                                        <i class="icon fa-brands fa-linkedin-in color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">LinkedIn</div>
+                                                    <div class="item-after">https://linkedin.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://medium.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-medium));">
+                                                        <i class="icon fa-brands fa-medium color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Medium</div>
+                                                    <div class="item-after">https://medium.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://twitter.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-twitter));">
+                                                        <i class="icon fa-brands fa-twitter color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">Twitter</div>
+                                                    <div class="item-after">https://twitter.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://whatsapp.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-whatsapp));">
+                                                        <i class="icon fa-brands fa-whatsapp color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">WhatsApp</div>
+                                                    <div class="item-after">https://whatsapp.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="https://youtube.com" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <div class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-youtube));">
+                                                        <i class="icon fa-brands fa-youtube color-white"></i>
+                                                    </div>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title font-weight-600">YouTube</div>
+                                                    <div class="item-after">https://youtube.com</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card margin-vertical no-shadow">
+                        <div class="card-header">
+                            <span>Business Hours</span>
+                            <span class="badge color-green no-margin">Open Today</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Monday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>09:00 AM - 01:00 PM</span>
+                                                    <span>02:00 PM - 05:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Tuesday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>10:00 AM - 06:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Wednesday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>10:00 AM - 06:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Thursday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>10:00 AM - 06:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Friday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>10:00 AM - 06:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Saturday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>10:00 AM - 02:00 PM</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <div class="item-title font-weight-600">Sunday</div>
+                                                <div class="item-after flex-direction-column">
+                                                    <span>Closed</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="fab fab-extended fab-center-bottom" style="min-width: 128px;" @click="${() => popupContact.open()}">
+            <a href="#">
+                <span class="fab-text">Write Us</span>
+            </a>
+        </div>
+
+        <div id="popup-contact" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Write Us</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => popupContact.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <form name="contact" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="block margin-vertical text-align-center">Feel free to drop us a message.</div>
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul class="padding-vertical-half">
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">person</i>
+                                                </div>
+                                                <input type="text" name="name" placeholder="Name" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">email</i>
+                                                </div>
+                                                <input type="email" name="email" inputmode="email" placeholder="Email" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">info_outline</i>
+                                                </div>
+                                                <input type="text" name="subject" placeholder="Subject" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media align-self-flex-start">
+                                                    <i class="icon material-icons">message</i>
+                                                </div>
+                                                <textarea class="resizable" name="message" placeholder="Message" required style="min-height: 128px;"></textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill button-large">Submit</button>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let popupContact = null;
+        let formValidator = null;
+
+        let initializePopupContact = function() {
+            popupContact = $f7.popup.create({
+                el: $el.value.find('#popup-contact'),
+                on: {
+                    close: function(popup) {
+                        formValidator.resetForm();
+                    }
+                }
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=contact]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    subject: {
+                        required: true
+                    },
+                    message: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    subject: {
+                        required: 'Please enter subject.'
+                    },
+                    message: {
+                        required: 'Please enter message.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for writing us. We will get back to you soon.',
+                        cssClass: 'color-green'
+                    });
+                    form.reset();
+                    popupContact.close();
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePopupContact();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,86 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Fingerprint Authentication</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to authenticate the users using their fingerprint scans on supported devices.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${authenticate}">Authenticate</button>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let authenticate = function() {
+            Fingerprint.isAvailable(
+                function() {
+                    Fingerprint.show(
+                        {
+                            description: 'Biometric Authentication Description Goes Here'
+                        },
+                        function() {
+                            $f7.toast.show({
+                                text: 'Authentication Successful',
+                                cssClass: 'color-green'
+                            });
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error.message,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    allowBackup: true
+                }
+            )
+        }
+
+        return $render;
+    }
+</script>

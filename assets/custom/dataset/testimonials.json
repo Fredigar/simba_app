@@ -1,0 +1,51 @@
+[
+    {
+        "name": "Modesto Davis",
+        "company": "Nolan Group",
+        "photo": "https://source.unsplash.com/5vg_SarQimA/128x128",
+        "rating": 4.5,
+        "comment": "Placeat architecto necessitatibus. Sed corrupti soluta accusantium necessitatibus. Aut maiores in maiores."
+    },
+    {
+        "name": "Fidel Macejkovic",
+        "company": "Daugherty Inc",
+        "photo": "https://source.unsplash.com/RzjoEORroMs/128x128",
+        "rating": 4,
+        "comment": "Impedit sint ipsa molestiae reprehenderit. Et eaque rem atque quia. Consectetur quo ducimus ipsum qui dolores sit totam sint distinctio. Labore sit consequuntur est vero aut."
+    },
+    {
+        "name": "Laurie Denesik",
+        "company": "Reinger Group",
+        "photo": "https://source.unsplash.com/nKZuhvCGGQU/128x128",
+        "rating": 5,
+        "comment": "Sed accusantium dolore est exercitationem ut est occaecati. Quod fuga laboriosam soluta consectetur et ad maxime. Quaerat et quibusdam et ab consequatur ex."
+    },
+    {
+        "name": "Elisha Lemke",
+        "company": "Murray LLC",
+        "photo": "https://source.unsplash.com/jzY0KRJopEI/128x128",
+        "rating": 4.5,
+        "comment": "Sunt voluptas maiores quia inventore ut. Ut nisi aut et quis est adipisci molestiae. Ducimus labore qui beatae iure aut praesentium reiciendis modi. Mollitia velit placeat corrupti ut minima quaerat."
+    },
+    {
+        "name": "Edwin Ullrich",
+        "company": "Abshire Inc",
+        "photo": "https://source.unsplash.com/iEEBWgY_6lA/128x128",
+        "rating": 3.5,
+        "comment": "Laborum voluptatem vel doloremque omnis adipisci blanditiis. Ut repellendus officia ut dolor placeat explicabo officia molestiae. Laboriosam nam ipsam soluta sit aliquid."
+    },
+    {
+        "name": "Gilbert Fadel",
+        "company": "Hodkiewicz LLC",
+        "photo": "https://source.unsplash.com/ZHvM3XIOHoE/128x128",
+        "rating": 5,
+        "comment": "Quis nam aspernatur vitae et quaerat ut itaque ex voluptatem. Corporis odit incidunt nihil. Rerum nesciunt voluptatum qui. Doloribus porro et."
+    },
+    {
+        "name": "Dortha Johnson",
+        "company": "Kreiger Group",
+        "photo": "https://source.unsplash.com/0wRXAXqIp58/128x128",
+        "rating": 4.75,
+        "comment": "Excepturi ut sed deserunt et ut et error nobis. Ullam veritatis sit deserunt qui dicta unde. Eos quia quidem dolor consectetur earum."
+    }
+]

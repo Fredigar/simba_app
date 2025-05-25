@@ -1,0 +1,60 @@
+<template>
+    <div class="page" data-name="select-language">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="title">Select Language</div>
+                <div class="right">
+                    <a class="link icon-only back">
+                        <i class="icon material-icons">cancel</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${$f7.i18n.config.enabled ? $h`
+            <div class="list inset margin-vertical">
+                <ul>
+                    ${Object.keys($f7.i18n.config.languages).map((code) => $h`
+                    <li>
+                        <label class="item-content item-radio item-radio-icon-end">
+                            <input type="radio" name="language" value="${$f7.i18n.config.languages[code].code}" checked="${$f7.i18n.config.languages[code].code == $f7.i18n.currentLanguage().code}" @change="${() => $f7.i18n.changeLanguage($f7.i18n.config.languages[code].code)}" />
+                            <i class="icon icon-radio"></i>
+                            <div class="item-media">
+                                <img class="shape-auto" src="${$f7.i18n.config.languages[code].flag}" height="40" width="40" alt="" />
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">
+                                    <span data-i18n="${$f7.i18n.config.languages[code].slug}">${$f7.i18n.config.languages[code].name}</span>
+                                </div>
+                            </div>
+                        </label>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <span class="shape-container shape-auto bg-color-chrome">
+                        <i class="icon material-icons font-size-56">language</i>
+                    </span>
+                </div>
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">This app is not available in multiple languages.</div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

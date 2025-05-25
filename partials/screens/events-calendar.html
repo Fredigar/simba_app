@@ -1,0 +1,189 @@
+<template>
+    <div class="page" data-name="events-calendar">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">
+                    <div>Events - Calendar</div>
+                    <div class="subtitle font-size-12 text-uppercase text-color-gray" style="margin-top: 4px;">Today</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${events ? $h`
+            <div class="row justify-content-center no-gap">
+
+                <div class="col-100 medium-45 large-40 xlarge-35 medium-sticky sticky-top">
+
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical no-padding ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div id="calendar"></div>
+                    </div>
+
+                </div>
+
+                <div class="col-100 medium-55 large-60 xlarge-65">
+
+                    ${calendarEvents && calendarEvents.length ? $h`
+                    <div class="list medium-inset medium-margin-vertical no-hairlines no-hairlines-between no-margin-vertical ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                        <ul class="padding-vertical-half">
+                            ${calendarEvents.map((item, index) => $h`
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner item-cell">
+                                        <div class="item-row">
+                                            <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                <div class="shape-container shape-auto size-56 bg-color-chrome">
+                                                    <div class="font-size-14 font-weight-bold">${moment(item.time).format('h:mm')}</div>
+                                                    <div class="font-size-12">${moment(item.time).format('A')}</div>
+                                                </div>
+                                            </div>
+                                            <div class="item-cell">
+                                                <div class="font-size-16 font-weight-600 text-color-primary">${item.title}</div>
+                                                <div class="font-size-14 text-color-gray">${item.description}</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                        <div class="empty-state">
+                            <div class="empty-state-media">
+                                <span class="shape-container shape-auto size-72 bg-color-chrome">
+                                    <i class="icon f7-icons font-size-40">calendar_today</i>
+                                </span>
+                            </div>
+                            <div class="empty-state-title">No Events</div>
+                            <div class="empty-state-text">Looks like there are no events to show here.</div>
+                            <div class="empty-state-actions">
+                                <button type="button" class="empty-state-action button button-fill button-round">Add Event</button>
+                            </div>
+                        </div>
+                    </div>
+                    `}
+
+                </div>
+
+            </div>
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let events = null;
+        let calendarEvents = null;
+        let calendar = null;
+
+        let loadData = function() {
+            events = [
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().get('date'), 8, 15, 0),
+                    title: 'Gym',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().get('date'), 14, 30, 0),
+                    title: 'Meeting',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().get('date'), 17, 30, 0),
+                    title: 'Shopping',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().add(3, 'days').get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().add(3, 'days').get('date'), 6, 0, 0),
+                    title: 'Yoga',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().add(3, 'days').get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().add(3, 'days').get('date'), 21, 30, 0),
+                    title: 'Party',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().add(9, 'days').get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().add(9, 'days').get('date'), 9, 45, 0),
+                    title: 'Swimming',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                },
+                {
+                    date: new Date(moment().get('year'), moment().get('month'), moment().add(9, 'days').get('date')),
+                    time: new Date(moment().get('year'), moment().get('month'), moment().add(9, 'days').get('date'), 15, 45, 0),
+                    title: 'Cricket',
+                    description: faker.lorem.sentence(10),
+                    color: $f7.stylesheet.getPropertyValue('--f7-theme-color').trim()
+                }
+            ]
+            $update(function() {
+                initializeCalendar();
+            });
+        }
+
+        let initializeCalendar = function() {
+            calendar = $f7.calendar.create({
+                containerEl: $el.value.find('#calendar'),
+                value: [new Date()],
+                events: events,
+                on: {
+                    init: function(calendar) {
+                        let navbarEl = $f7.navbar.getElByPage($el.value);
+                        $(navbarEl).find('.subtitle').text(moment(calendar.value[0]).format('dddd, MMMM DD, YYYY'));
+                        renderEvents(calendar);
+                    },
+                    change: function(calendar) {
+                        let navbarEl = $f7.navbar.getElByPage($el.value);
+                        $(navbarEl).find('.subtitle').text(moment(calendar.value[0]).format('dddd, MMMM DD, YYYY'));
+                        renderEvents(calendar);
+                    }
+                }
+            });
+        }
+
+        let renderEvents = function(calendar) {
+            let calendarDate = calendar.value[0];
+            calendarEvents = events.filter(function(event) {
+                return moment(event.time).isBetween(moment(calendarDate).startOf('day'), moment(calendarDate).endOf('day'));
+            });
+            $update();
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,180 @@
+<template>
+    <div class="page">
+
+        <div class="navbar navbar-transparent bg-color-deeppurple color-white">
+            <div class="navbar-bg bg-color-deeppurple"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title text-color-white">Cordova Plugins</div>
+                <div class="right">
+                    <a href="#" class="link icon-only" @click="${enableSearchbar}">
+                        <i class="icon material-icons">search</i>
+                    </a>
+                </div>
+                <form class="searchbar searchbar-expandable">
+                    <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search" />
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong elevation-12 flexbox-centered height-auto no-hairlines no-margin bg-color-deeppurple color-deeppurple text-color-white" style="min-height: 256px;">
+                <span class="shape-container shape-circle" style="background-color: var(--color-deeppurple-700);">
+                    <i class="icon f7-icons font-size-40 color-white">device_phone_portrait</i>
+                </span>
+                <div class="font-size-24 font-weight-bold margin-top-half">Cordova Plugins</div>
+                <div class="font-size-16 margin-top-half">Cordova Plugins provide access to native device and platform functionalities to the hybrid apps via Cordova.</div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="searchbar-found">
+                        <div class="list links-list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <a href="/cordova-plugins/battery-status/">Battery Status</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/build-info/">Build Info</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/camera/">Camera</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/contacts-info/">Contacts Info</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/device/">Device</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/dialogs/">Dialogs</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/fingerprint-authentication/">Fingerprint Authentication</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/geolocation/">Geolocation</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/in-app-browser/">In-App Browser</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/media-capture/">Media Capture</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/network-information/">Network Information</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/social-sharing/">Social Sharing</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/splash-screen/">Splash Screen</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/sqlite/">SQLite</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/status-bar/">Status Bar</a>
+                                </li>
+                                <li>
+                                    <a href="/cordova-plugins/vibration/">Vibration</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="searchbar-not-found">
+                        <div class="empty-state empty-state-strong inset margin-vertical">
+                            <div class="empty-state-media">
+                                <span class="shape-container shape-auto bg-color-chrome">
+                                    <i class="icon material-icons font-size-32">search_off</i>
+                                </span>
+                            </div>
+                            <div class="empty-state-subtitle">No Search Results</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let searchbar = null;
+
+        let initializeSearchbar = function() {
+            let navbarEl = $f7.navbar.getElByPage($el.value);
+            searchbar = $f7.searchbar.create({
+                el: $(navbarEl).find('.searchbar'),
+                searchContainer: $el.value.find('.list'),
+                searchItem: 'li',
+                searchIn: 'a',
+                backdrop: false,
+                removeDiacritics: true,
+                on: {
+                    enable: function(searchbar) {
+                        searchbar.$el.find('input').focus();
+                    }
+                }
+            });
+            if ($f7route.query.search) {
+                searchSearchbar($f7route.query.search);
+            }
+        }
+
+        let enableSearchbar = function() {
+            if (searchbar) {
+                searchbar.enable();
+            }
+        }
+
+        let disableSearchbar = function() {
+            if (searchbar) {
+                searchbar.disable();
+            }
+        }
+
+        let searchSearchbar = function(query) {
+            if (searchbar) {
+                searchbar.search(query);
+            }
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeSearchbar();
+        });
+
+        $on('pageBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        $on('tabInit', function() {
+            initializeSearchbar();
+        });
+
+        $on('tabBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        return $render;
+    }
+</script>

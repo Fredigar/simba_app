@@ -1,0 +1,100 @@
+{
+  "procedure": {
+    "name": "Preparación Tortilla de Patatas",
+    "description": "Guía paso a paso para preparar una auténtica tortilla española",
+    "equipments": [
+      {"id": 1, "name": "Sartén mediana", "quantity": 1, "unit": "unidad"},
+      {"id": 2, "name": "Cuchillo", "quantity": 1, "unit": "unidad"},
+      {"id": 3, "name": "Bol grande", "quantity": 1, "unit": "unidad"},
+      {"id": 4, "name": "Plato plano", "quantity": 1, "unit": "unidad"},
+      {"id": 5, "name": "Espátula", "quantity": 1, "unit": "unidad"}
+    ],
+    "instructions": [
+      {
+        "guid": "paso-001",
+        "text": "Pele y corte las patatas en láminas finas.",
+        "nextInstruction": 1,
+        "type": "instruction",
+        "equipments": [2],
+        "estimatedTime": 10,
+        "resources": [
+          {
+            "type": "video",
+            "title": "Cómo cortar patatas en láminas",
+            "url": "https://www.youtube.com/watch?v=video_ejemplo",
+            "mandatory": true
+          }
+        ],
+        "capture": {"photo": true, "video": false, "audio": true, "comment": true}
+      },
+      {
+        "guid": "paso-002",
+        "text": "Fría las patatas en aceite hasta que estén tiernas, no doradas.",
+        "nextInstruction": 2,
+        "type": "instruction",
+        "equipments": [1],
+        "estimatedTime": 15,
+        "capture": {"photo": true, "video": false, "audio": true, "comment": true}
+      },
+      {
+        "guid": "paso-003",
+        "text": "Bata los huevos en el bol y mézclelos con las patatas fritas.",
+        "nextInstruction": 3,
+        "type": "instruction",
+        "equipments": [3],
+        "estimatedTime": 5
+      },
+      {
+        "guid": "paso-004",
+        "text": "Vierta la mezcla en la sartén y cocine a fuego medio.",
+        "nextInstruction": 4,
+        "type": "condition",
+        "equipments": [1, 5],
+        "estimatedTime": 5,
+        "params": {
+          "1": {
+            "name": "¿La tortilla está suficientemente cuajada para darle la vuelta?",
+            "alias": "tortilla_cuajada",
+            "record": true,
+            "unit": "",
+            "type": "boolean",
+            "id": 1
+          }
+        },
+        "conditions": {
+          "conditionQuery": "#tortilla_cuajada# == true",
+          "goToInstruction": {"true": 4, "false": 3}
+        },
+        "errorHandling": {
+          "action": "cocinar más tiempo y revisar nuevamente",
+          "nextInstruction": "3"
+        },
+        "capture": {"photo": true, "video": true, "audio": true, "comment": true}
+      },
+      {
+        "guid": "paso-005",
+        "text": "Voltee la tortilla utilizando el plato plano y cocine el otro lado.",
+        "nextInstruction": 5,
+        "type": "instruction",
+        "equipments": [4],
+        "estimatedTime": 2,
+        "capture": {"photo": true, "video": true, "audio": true, "comment": true}
+      },
+      {
+        "guid": "paso-006",
+        "text": "Sirva la tortilla en un plato limpio.",
+        "type": "instruction",
+        "estimatedTime": 1,
+        "linkedProcedures": [
+          {
+            "guid": "receta-alioli-001",
+            "name": "Preparación salsa Alioli",
+            "instructionEntryPoint": "0",
+            "description": "Procedimiento opcional para preparar salsa Alioli como acompañamiento."
+          }
+        ],
+        "capture": {"photo": true, "video": false, "audio": true, "comment": true}
+      }
+    ]
+  }
+}

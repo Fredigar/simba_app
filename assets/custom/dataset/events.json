@@ -1,0 +1,282 @@
+[
+    {
+        "id": 1,
+        "title": "Sunset Yoga",
+        "image": "https://source.unsplash.com/wmZNEGkcsmw/640x320",
+        "date": "2023-01-01T17:30:00",
+        "location": "The Gateway Olympic Plaza,\nSalt Lake City,\nUSA",
+        "category": {
+            "id": 6,
+            "name": "Health & Wellness"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": true
+    },
+    {
+        "id": 2,
+        "title": "Stand-Up Comedy Show",
+        "image": "https://source.unsplash.com/imlD5dbcLM4/640x320",
+        "date": "2023-01-13T15:00:00",
+        "location": "Galerie Ron Mandos,\nAmsterdam,\nNetherlands",
+        "category": {
+            "id": 8,
+            "name": "Performing & Visual Arts"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 3,
+        "title": "Startups Mentorship Program",
+        "image": "https://source.unsplash.com/Y_LgXwQEx2c/640x320",
+        "date": "2023-01-29T10:00:00",
+        "location": "Paris,\nFrance",
+        "category": {
+            "id": 1,
+            "name": "Business & Professional"
+        },
+        "paid": true,
+        "virtual": true,
+        "favorite": false
+    },
+    {
+        "id": 4,
+        "title": "International Rooftop Dinner",
+        "image": "https://source.unsplash.com/O4wSmNb6w18/640x320",
+        "date": "2023-02-03T20:30:00",
+        "location": "Sibilla Ristorante,\nTivoli,\nItaly",
+        "category": {
+            "id": 5,
+            "name": "Food & Drink"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 5,
+        "title": "International Conference on Renewable and Green Energy",
+        "image": "https://source.unsplash.com/tTv6Lo5uQVQ/640x320",
+        "date": "2023-02-17T10:00:00",
+        "location": "Dubai,\nUAE",
+        "category": {
+            "id": 10,
+            "name": "Science & Technology"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": true
+    },
+    {
+        "id": 6,
+        "title": "Escape to Greece",
+        "image": "https://source.unsplash.com/MdTtpxGlrz8/640x320",
+        "date": "2023-03-07T00:00:00",
+        "location": "Santorini,\nGreece",
+        "category": {
+            "id": 12,
+            "name": "Travel & Outdoor"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 7,
+        "title": "Disaster Preparedness Workshop",
+        "image": "https://source.unsplash.com/97NjFpxA5DA/640x320",
+        "date": "2023-03-20T14:00:00",
+        "location": "Tokyo,\nJapan",
+        "category": {
+            "id": 2,
+            "name": "Community & Culture"
+        },
+        "paid": false,
+        "virtual": true,
+        "favorite": false
+    },
+    {
+        "id": 8,
+        "title": "Classical Music Concert",
+        "image": "https://source.unsplash.com/IUn1O500LMI/640x320",
+        "date": "2023-04-05T18:00:00",
+        "location": "Camalane,\nMumbai,\nIndia",
+        "category": {
+            "id": 3,
+            "name": "Dance & Music"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 9,
+        "title": "Discovering Yourself - Through the Eyes of Ancient Culture",
+        "image": "https://source.unsplash.com/41nN3Au57jc/640x320",
+        "date": "2023-04-29T06:00:00",
+        "location": "New Acropolis,\nBengaluru,\nIndia",
+        "category": {
+            "id": 9,
+            "name": "Religion & Sprituality"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": true
+    },
+    {
+        "id": 10,
+        "title": "All-Round Street Basketball",
+        "image": "https://source.unsplash.com/BfphcCvhl6E/640x320",
+        "date": "2023-05-12T16:00:00",
+        "location": "Polideportivo Betero,\nValencia,\nSpain",
+        "category": {
+            "id": 11,
+            "name": "Sports & Fitness"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 11,
+        "title": "Paris City Fashion Week",
+        "image": "https://source.unsplash.com/3mGnYRUNIck/640x320",
+        "date": "2023-05-25T15:00:00",
+        "location": "Hilton Paris Opera,\nParis,\nFrance",
+        "category": {
+            "id": 4,
+            "name": "Fashion & Beauty"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": true
+    },
+    {
+        "id": 12,
+        "title": "Break Up with Overthinking in your Dating Life",
+        "image": "https://source.unsplash.com/Hj8eZ_wK1eM/640x320",
+        "date": "2023-06-03T05:00:00",
+        "location": "Geneva,\nSwitzerland",
+        "category": {
+            "id": 7,
+            "name": "Home & Lifestyle"
+        },
+        "paid": false,
+        "virtual": true,
+        "favorite": false
+    },
+    {
+        "id": 13,
+        "title": "International Food Festival",
+        "image": "https://source.unsplash.com/snnhGYNqm44/640x320",
+        "date": "2023-06-19T09:00:00",
+        "location": "Heiligengeistfeld,\nHamburg,\nGermany",
+        "category": {
+            "id": 5,
+            "name": "Food & Drink"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": true
+    },
+    {
+        "id": 14,
+        "title": "Develop Your Own Successful Virtual Reality Tech Startup Business Today!",
+        "image": "https://source.unsplash.com/5FE2hIfHQzg/640x320",
+        "date": "2023-07-13T13:00:00",
+        "location": "Dubai,\nUAE",
+        "category": {
+            "id": 1,
+            "name": "Business & Professional"
+        },
+        "paid": true,
+        "virtual": true,
+        "favorite": false
+    },
+    {
+        "id": 15,
+        "title": "Finding Meaning Through Art: Creating Mandalas",
+        "image": "https://source.unsplash.com/LirdKxOXi40/640x320",
+        "date": "2023-07-17T15:15:00",
+        "location": "New Delhi,\nIndia",
+        "category": {
+            "id": 8,
+            "name": "Performing & Visual Arts"
+        },
+        "paid": false,
+        "virtual": true,
+        "favorite": false
+    },
+    {
+        "id": 16,
+        "title": "Explore Dubai",
+        "image": "https://source.unsplash.com/2dtvA_QgF6Q/640x320",
+        "date": "2023-08-01T00:00:00",
+        "location": "Dubai,\nUAE",
+        "category": {
+            "id": 12,
+            "name": "Travel & Outdoor"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 17,
+        "title": "Artificial Intelligence and Machine Learning Workshop",
+        "image": "https://source.unsplash.com/2EJCSULRwC8/640x320",
+        "date": "2023-08-09T14:30:00",
+        "location": "Moskva,\nMoscow,\nRussia",
+        "category": {
+            "id": 10,
+            "name": "Science & Technology"
+        },
+        "paid": false,
+        "virtual": true,
+        "favorite": true
+    },
+    {
+        "id": 18,
+        "title": "Caribbean House Party",
+        "image": "https://source.unsplash.com/hwgNU8l8QMU/640x320",
+        "date": "2023-09-18T16:45:00",
+        "location": "Creative Coffee Hub,\nMermaid Beach,\nAustralia",
+        "category": {
+            "id": 3,
+            "name": "Dance & Music"
+        },
+        "paid": true,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 19,
+        "title": "Spiritual Realms Festival",
+        "image": "https://source.unsplash.com/VsI_74zRzAo/640x320",
+        "date": "2023-09-23T09:00:00",
+        "location": "The Salisbury Centre,\nEdinburgh,\nUK",
+        "category": {
+            "id": 9,
+            "name": "Religion & Sprituality"
+        },
+        "paid": false,
+        "virtual": false,
+        "favorite": false
+    },
+    {
+        "id": 20,
+        "title": "Envy Yourself with Beauty Makeup Masterclass",
+        "image": "https://source.unsplash.com/Z1vKFzAmYPI/640x320",
+        "date": "2023-10-11T12:00:00",
+        "location": "Prague,\nCzechia",
+        "category": {
+            "id": 4,
+            "name": "Fashion & Beauty"
+        },
+        "paid": true,
+        "virtual": true,
+        "favorite": false
+    }
+]

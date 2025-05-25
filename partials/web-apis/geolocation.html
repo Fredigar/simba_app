@@ -1,0 +1,202 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Geolocation API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Geolocation API allows web apps to access user's geographical location - using either GPS or network environment.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${geolocationInfo ? $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Latitude</div>
+                                        <div class="item-after">${geolocationInfo.latitude}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Location</div>
+                                        <div class="item-after">${geolocationInfo.longitude}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Location Accuracy</div>
+                                        <div class="item-after">${geolocationInfo.accuracy}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Altitude</div>
+                                        <div class="item-after">${geolocationInfo.altitude}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Altitude Accuracy</div>
+                                        <div class="item-after">${geolocationInfo.altitudeAccuracy}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Heading</div>
+                                        <div class="item-after">${geolocationInfo.heading}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Speed</div>
+                                        <div class="item-after">${geolocationInfo.speed}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ${watchId ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fade" @click="${stopTracking}">Stop Tracking</button>
+                    </div>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">The geolocation information will change when you move your device from one location to another.</div>
+                    </div>
+                    ` : $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${startTracking}">Start Tracking</button>
+                    </div>
+                    `}
+                    ` : $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${getGeolocationInfo}">Get Geolocation Info</button>
+                    </div>
+                    `}
+                    ` : $h`
+                    ${$f7.support.webApi.geolocation ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Geolocation API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Geolocation API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Geolocation_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let geolocationInfo = null;
+        let watchId = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let getGeolocationInfo = function() {
+            navigator.geolocation.getCurrentPosition(onGeolocationSuccess, onGeolocationError);
+        }
+
+        let startTracking = function() {
+            watchId = navigator.geolocation.watchPosition(onGeolocationSuccess, onGeolocationError);
+            $update();
+        }
+
+        let stopTracking = function() {
+            navigator.geolocation.clearWatch(watchId);
+            watchId = null;
+            $update();
+        }
+
+        let onGeolocationSuccess = function(position) {
+            updateGeolocationInfo(position);
+        }
+
+        let onGeolocationError = function(error) {
+            $f7.toast.show({
+                text: error.message,
+                cssClass: 'color-red'
+            });
+        }
+
+        let updateGeolocationInfo = function(position) {
+            let geolocationData = {};
+            geolocationData.latitude = position.coords.latitude != null ? position.coords.latitude + ' deg' : 'Not Available';
+            geolocationData.longitude = position.coords.longitude != null ? position.coords.longitude + ' deg' : 'Not Available';
+            geolocationData.accuracy = position.coords.accuracy != null ? position.coords.accuracy + ' m' : 'Not Available';
+            geolocationData.altitude = position.coords.altitude != null ? position.coords.altitude + ' m' : 'Not Available';
+            geolocationData.altitudeAccuracy = position.coords.altitudeAccuracy != null ? position.coords.altitudeAccuracy + ' m' : 'Not Available';
+            geolocationData.heading = position.coords.heading != null ? position.coords.heading + ' deg' : 'Not Available';
+            geolocationData.speed = position.coords.speed != null ? position.coords.speed + ' m/s' : 'Not Available';
+            geolocationInfo = geolocationData;
+            $update();
+        }
+
+        $on('pageBeforeRemove', function() {
+            if (watchId) {
+                stopTracking();
+            }
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,324 @@
+<template>
+    <div class="page no-tabbar" data-name="jobs-single" style="--f7-toolbar-height: 80px;">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Jobs - Single</div>
+            </div>
+        </div>
+
+        <div class="toolbar toolbar-bottom">
+            <div class="toolbar-inner">
+                <button type="button" class="state-toggle button button-fill button-large flex-shrink-0 margin-horizontal-half width-auto bg-color-chrome" @stateChange="${(event) => toggleSave(event.detail)}">
+                    <i class="state-inactive icon material-icons color-mono">bookmark_outline</i>
+                    <i class="state-active icon material-icons color-red">bookmark</i>
+                </button>
+                <button type="button" class="button button-fill button-large flex-grow-1 margin-horizontal-half">Apply Job</button>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 medium-60 large-65">
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="ribbon ribbon-clip ribbon-round ${$f7.rtl ? 'ribbon-left-top' : 'ribbon-right-top'} color-amber text-color-black">
+                            <i class="icon material-icons font-size-16">bolt</i>
+                            <span>Urgent</span>
+                        </div>
+                        <div class="card-content">
+                            <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">person</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Role</div>
+                                                    <div class="font-weight-600">Product Manager - Builder Platform</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">placemark</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Location</div>
+                                                    <div class="font-weight-600">Irvine, California</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">clock</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Type</div>
+                                                    <div class="font-weight-600">Full-Time</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">briefcase</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Experience</div>
+                                                    <div class="font-weight-600">3-5 Years</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">money_dollar_circle</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Salary</div>
+                                                    <div class="font-weight-600">$100K Per Year</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">flame</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Skills</div>
+                                                    <div style="margin-top: 3px;">
+                                                        <a href="#" class="link badge badge-fade">Java</a>
+                                                        <a href="#" class="link badge badge-fade">Machine Learning</a>
+                                                        <a href="#" class="link badge badge-fade">Python</a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media align-self-flex-start">
+                                                <span class="shape-container shape-rounded-square size-48 bg-color-chrome">
+                                                    <i class="icon f7-icons">clock</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">
+                                                    <div class="item-header">Posted</div>
+                                                    <div class="font-weight-600">${moment().format('dddd, MMMM DD, YYYY')}</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content card-content-padding">
+                            <h3 class="no-margin-top">Job Description</h3>
+                            <p>The Builder Platform team empowers developers at Twitch to create wonderful products used by our creators and viewers. Builder Platform provides the fundamental source code repository and build systems, solutions to complicated infrastructure and access, and highly available global delivery systems.</p>
+                            <p>As a Product Manager, you will report to the Senior Product Manager within Builder Platform and will grow several Builder Platform products from the ground up. You will build products that help teams at Twitch achieve their goals. You will understand the needs of customers and communicate with engineering teams to improve existing products. You will improve the lives of over 1,000 developers building products for millions of customers.</p>
+                            <h3>Responsibility</h3>
+                            <ul>
+                                <li>Manage product strategy for products supporting infrastructure as code (IaC) development at Twitch.</li>
+                                <li>Develop an understanding of how tools can promote IaC operational excellence.</li>
+                                <li>Determine appropriate, measurable goals and metrics for your products to measure success.</li>
+                                <li>Communicate customer-focused trade-off decisions while managing multiple stakeholders and perspectives.</li>
+                            </ul>
+                            <h3>Experience</h3>
+                            <ul>
+                                <li>3+ years of work experience leading products from discovery to harvest phase.</li>
+                                <li>Use continuous discovery methods to solicit input and feedback from technical customers.</li>
+                                <li>Experience managing multiple products within a single portfolio.</li>
+                                <li>Led teams to meet defined project goals through diving into the details, and collaborating with engineers to find creative solutions.</li>
+                            </ul>
+                            <h3>Perks</h3>
+                            <ul>
+                                <li>Medical, Dental, Vision & Disability Insurance</li>
+                                <li>401(k)</li>
+                                <li>Maternity & Parental Leave</li>
+                                <li>Amazon Employee Discount</li>
+                                <li>Monthly Contribution & Discounts for Wellness Related Activities & Programs</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                </div>
+
+                <div class="col-100 medium-40 large-35 sticky sticky-top">
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'} medium-margin-top no-margin-top">
+                        <div class="card-header">About Company</div>
+                        <div class="card-content card-content-padding">
+                            <img src="https://cdn.svgporn.com/logos/twitch.svg" loading="lazy" height="40" alt="" />
+                            <div class="card-title margin-top-half">Twitch Interactive</div>
+                            <div class="card-text">Twitch is an American video live streaming service that focuses on video game live streaming, including broadcasts of esports competitions, in addition to offering music broadcasts, creative content, and 'in real life' streams.</div>
+                            <a href="#" class="button button-fill button-round color-mono text-color-mono-invert margin-top">View All Jobs</a>
+                        </div>
+                    </div>
+
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                        <div class="card-header">
+                            <span>Similar Jobs</span>
+                            <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                        </div>
+                        <div class="card-content">
+                            <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://logo.clearbit.com/konami.com" loading="lazy" height="56" width="56" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Konami</div>
+                                                            <div>Senior Character Artist</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-subtitle">Osaka, Japan</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://logo.clearbit.com/rockstargames.com" loading="lazy" height="56" width="56" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Rockstar Games</div>
+                                                            <div>Gameplay Programmer</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-subtitle">Dundee, Scotland</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://logo.clearbit.com/nokia.com" height="56" width="56" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Nokia</div>
+                                                            <div>Senior Product Manager</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-subtitle">Redmond, Washington</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://logo.clearbit.com/sony.com" loading="lazy" height="56" width="56" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Sony</div>
+                                                            <div>Unity 3D Developer</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-subtitle">Sunnyvale, California</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#" class="item-link">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img class="shape-rounded-square" src="https://icon.horse/icon/disney.com" height="56" width="56" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">
+                                                            <div class="item-header">Disney</div>
+                                                            <div>Software Integration Engineer</div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="item-subtitle">Amsterdam, Netherlands</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let toggleSave = function(state) {
+            $f7.toast.show({
+                text: state ? 'Job Saved' : 'Job Unsaved',
+                icon: state ? '<i class="icon material-icons color-red">bookmark</i>' : '<i class="icon material-icons color-gray">bookmark</i>',
+                position: 'center'
+            });
+        }
+
+        return $render;
+    }
+</script>

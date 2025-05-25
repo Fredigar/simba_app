@@ -1,0 +1,98 @@
+{
+  "procedure": {
+    "name": "Comprobar y anotar la carga de los acumuladores",
+    "description": "Comprobar y anotar la carga de los acumuladores de los bloques 1, 2 y 3 exterior/interior y del acumulador de la HPU.",
+    "equipments": {
+      "1": { "id": 1, "name": "Manómetro U0404/U0405", "quantity": 1, "unit": "unidad" },
+      "2": { "id": 2, "name": "Llave inglesa", "quantity": 1, "unit": "unidad" }
+    },
+    "instructions": {
+      "0": {
+        "guid": "paso-001",
+        "text": "Apagar las bombas desde el MCLlogic",
+        "description": "Apagar las bombas desde el MCLlogic.",
+        "nextInstruction": 1,
+        "type": "instruction",
+        "equipments": [],
+        "estimatedTime": 2,
+        "capture": {
+          "comment": true
+        }
+      },
+      "1": {
+        "guid": "paso-002",
+        "text": "Conectar el manómetro en los acumuladores del bloque 1, 2 y 3",
+        "description": "Conectar el manómetro U0404/U0405 en cada uno de los acumuladores del bloque 1, 2 y 3. Están situados bajo el simulador CN235, son bombonas alargadas azules tumbadas en horizontal.",
+        "nextInstruction": 2,
+        "type": "instruction",
+        "equipments": [1, 2],
+        "estimatedTime": 10,
+        "capture": {
+          "photo": true
+        }
+      },
+      "2": {
+        "guid": "paso-003",
+        "text": "Conectar el manómetro en el acumulador de la HPU",
+        "description": "Conectar el manómetro U0404/U0405 en el acumulador de la HPU ubicado en la sala de hidráulica. Está situado junto al nivel de hidráulico, es una bombona azul como las anteriores de los bloques, esta está colocada en vertical.",
+        "nextInstruction": 3,
+        "type": "instruction",
+        "equipments": [1],
+        "estimatedTime": 5,
+        "capture": {
+          "photo": true
+        }
+      },
+      "3": {
+        "guid": "paso-004",
+        "text": "Anotar las medidas",
+        "description": "Anotar las medidas en la tarea correspondiente de simeng. En caso de que estén por debajo de 80 bares, avisar al responsable de turno para planificar la carga y se investigue el problema.",
+        "nextInstruction": 4,
+        "type": "instruction",
+        "equipments": [],
+        "estimatedTime": 5,
+        "params": {
+          "1": {
+            "name": "Carga del acumulador",
+            "alias": "carga_acumulador",
+            "record": true,
+            "unit": "bares",
+            "type": "decimal",
+            "id": 1
+          }
+        },
+        "conditions": {
+          "conditionQuery": "#carga_acumulador# < 80",
+          "goToInstruction": {
+            "true": 5,
+            "false": 4
+          }
+        },
+        "capture": {
+          "comment": true
+        }
+      },
+      "4": {
+        "guid": "paso-005",
+        "text": "Finalizar tarea",
+        "description": "La tarea ha sido completada exitosamente.",
+        "nextInstruction": -1,
+        "type": "instruction",
+        "equipments": [],
+        "estimatedTime": 1
+      },
+      "5": {
+        "guid": "paso-006",
+        "text": "Avisar al responsable de turno",
+        "description": "Avisar al responsable de turno para planificar la carga y se investigue el problema.",
+        "nextInstruction": 4,
+        "type": "instruction",
+        "equipments": [],
+        "estimatedTime": 5,
+        "capture": {
+          "comment": true
+        }
+      }
+    }
+  }
+}

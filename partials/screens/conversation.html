@@ -1,0 +1,3211 @@
+<template>
+
+    <div class="page no-tabbar" data-name="cart">
+        <!-- Navbar remains unchanged -->
+        <div id="conversation-navbar" class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${chat.title}</div>
+                <div class="right">
+                    <a href="#" data-tooltip="Reproducir conversación" class="link tooltip-init icon-only"><i
+                            class="icon material-icons">play</i></a>
+                    <a href="/screens/conversation" data-tooltip="New conversation"
+                       class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
+
+                    <a href="#" data-tooltip="Configuration" class="link tooltip-init icon-only"
+                       @click="${openPopupConfig}">
+                        <i class="icon material-icons">settings</i>
+                    </a>
+                    ${assistant ? $h`
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-assistants"
+                       data-tooltip="Change Assistant">
+                        <img class="shape-circle" width="40" src="${assistant.avatar}"/>
+
+                    </a>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar messagebar messagebar-chat" style="${showBottomBar ? '' : 'display:none'}">
+            <div id="page-toolbar" class="toolbar-inner" style="min-height: 70px;">
+
+            </div>
+        </div>
+        <!-- Page content with messages and messagebar inside -->
+        <div class="page-content" id="conversationPage">
+            <div class="row justify-content-center no-gap padding-horizontal-half"
+                 style="--f7-card-margin-horizontal: 8px;">
+                <div id="message-area" class="col-100 medium-65 margin-bottom-half margin-top large-70 xlarge-65">
+                    <div style=""
+                         class="messages-content justify-content-center padding-top row">
+                        <div class="col-90 large-60 medium-75 messages xlarge-70" id="messages-space">
+
+                        </div>
+                        <!-- Centered messagebar component (only show when no messages) -->
+
+                        <div id="prompt-area"
+                             class="centered-messagebar-container">
+                            ${!showBottomBar ? $h`
+                            <div class="display-flex justify-content-center width-100">
+                                <img src="${assistant ? assistant.mainImage : ''}" width="300" class=""/>
+                            </div>
+
+                            <div class="block-title-large margin text-align-center">
+                                ${myDevice ?
+                                (assistant ? assistant.greeting : '') :
+                                (chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ?
+                                'Please select a device.' :
+                                (assistant ? assistant.greeting : ''))}
+                            </div>
+                            <!-- Remaining components unchanged -->
+
+                            ` : ''}
+                            <div id="messagebar-chat"
+                                 style=""
+                                 class="messagebar-chat centered-messagebar auto-height">
+
+                                <div class="messagebar-inner">
+                                    <div class="messagebar-area" style="overflow:visible; width: 100%;">
+                                        <div class="file-dropzone invisible" id="file-dropzone">
+                                            <input type="file" id="file-upload" multiple class="file-upload-input"
+                                                   style="display:none;"/>
+                                        </div>
+                                        <textarea
+                                                style="${(chat && chat.mainAssistant && chat.mainAssistant.deviceSelector) ? (myDevice ? '' : 'display:none') : ''}"
+                                                id="prompt"
+                                                placeholder="${(chat && chat.mainAssistant && chat.mainAssistant.deviceSelector && !myDevice) ? 'Ask anything about one particular device (please select a device first)...' : (assistant ? assistant.placeholder : '')}"
+                                                @input="${handlePromptTextArea}"
+                                                @keydown="${handleKeyDown}"
+                                                class="input-with-value resizable keyboard-mode">
+                                    </textarea>
+                                        <div id="assistants-suggestions" class="assistants-suggestions"
+                                             style="display: none;">
+                                            <div class="assistants-suggestions-title">Available Assistants</div>
+                                            <div class="assistants-suggestions-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="messagebar-buttons-bottom">
+                                    <div class="row align-items-center">
+                                        <div class="col-90">
+                                            <div id="device-list"
+                                                 class="block float-left margin-bottom-auto margin-horizontal-auto inset margin-vertical"
+                                                 style="">
+
+                                                ${(myDevice || (chat && chat.mainAssistant &&
+                                                chat.mainAssistant.deviceSelector === false)) ? $h`
+                                                ${chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ? $h`
+                                                <div data-tooltip="Select other device"
+                                                     class="tooltip-init bg-color-blue chip cursor-pointer"
+                                                     @click="${handleOpenDeviceSelection}">
+                                                    <div class="chip-label">${myDevice}</div>
+                                                </div>
+                                                ` : ''}
+
+
+                                                <a href="#" @click="${handleFileUploadClick}"
+                                                   style="height: 35px!important;" data-tooltip="Upload a document"
+                                                   class="tooltip-init link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray"><i
+                                                        class="fa fa-paperclip"></i></a>
+
+                                                ${chat && chat.noSelectionInstructions &&
+                                                chat.noSelectionInstructions.length > 0 ? $h`
+                                                <div data-tooltip="Open toolbox"
+                                                     class="tooltip-init bg-color-bluegray chip cursor-pointer"
+                                                     @click="${() => actionsCustomLayout.open()}">
+                                                    <div class="chip-media">
+                                                        <i class="fa fa-tools fa-icon"></i>
+                                                    </div>
+                                                    <div class="chip-label">${chat.noSelectionInstructions.length} shortcuts
+                                                    </div>
+                                                </div>
+                                                ` : ''}
+
+                                                ` : $h`
+                                                `}
+                                                ${chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ?
+                                                devices.map((device, index) => $h`
+                                                <label style="${myDevice ? 'display:none' : ''}"
+                                                       class="chip-selectable">
+                                                    ${myDevice === device ? $h`
+                                                    <input type="radio" @change="${handleDeviceSelection}"
+                                                           name="chip-selectable-device" checked="checked"
+                                                           value="${device}"/>
+                                                    ` : $h`
+                                                    <input type="radio" @change="${handleDeviceSelection}"
+                                                           name="chip-selectable-device" value="${device}"/>
+                                                    `}
+                                                    <div class="chip">
+                                                        <div class="chip-label">${device}</div>
+                                                    </div>
+                                                </label>
+                                                `)
+                                                : ''}
+                                                ${Object.keys(highlights).length > 0 ? $h`
+                                                <a href="#" @click="${showHighlights}"
+                                                   style="height: 35px!important;"
+                                                   data-tooltip="Review selected text"
+                                                   class="tooltip-init link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray">
+                                                    <i class="fa fa-highlighter" style="color:yellow!important"></i>
+                                                </a>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                        <div class="col-10 display-flex justify-content-right align-items-center">
+                                            ${isResponding ? $h`
+                                            <a href="#" @click="${stopStreaming}" style=""
+                                               data-tooltip=''
+                                               class="link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-stop-circle fa-icon" style="color: #FF5252;"></i>
+                                            </a>
+                                            ` : ((!prompt || !myDevice) && (chat && chat.mainAssistant &&
+                                            chat.mainAssistant.deviceSelector)) ? $h`
+                                            <a href="#" @click="${sendPrompt}" style=""
+                                               data-tooltip='Send message'
+                                               class="disabled link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-arrow-circle-up fa-icon"
+                                                   style="color: #ffffff;"></i>
+                                            </a>
+                                            ` : $h`
+                                            <a href="#" @click="${sendPrompt}" style=""
+                                               data-tooltip='Send message'
+                                               class="link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-arrow-circle-up fa-icon"
+                                                   style="color: #4CAF50;"></i>
+                                            </a>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${quick_actions && quick_actions.length > 0 && !showBottomBar ? $h`
+                            <div class="quick-actions-container no-margin-top text-align-center"
+                                 style="max-width:650px!important">
+                                <div class="block float-left">
+                                    ${quick_actions.map((action, index) => $h`
+                                    <div data-tooltip="${action.description}"
+                                         style="background-color:${action.color} "
+                                         class="quick-action-chip link chip-outline tooltip-init padding chip cursor-pointer"
+                                         @click="${() => {
+                 // Primero crear la conversación
+                 quick_actions = [];
+                 createConversation(assistant.guid).then(() => {
+                     // Luego ejecutar el código de la acción
+                     if (action.code) {
+                         eval(action.code);
+                     }
+                 });
+             }}">
+                                        <div style="color:white" class="chip-media">
+                                            <i class="fa ${action.icon || 'fa-bolt'} fa-icon"
+                                               style="color:${action.color}"></i>
+                                        </div>
+                                        <div class="font-size-16 chip-label">${action.shortTitle}</div>
+                                    </div>
+                                    `)}
+                                </div>
+                            </div>
+                            ` : ''}
+                            <div id="legal-info" class="margin-bottom-half legal-info text-align-center">SIMBA may make
+                                mistakes. Consider verifying
+                                important information. See the <a href="/screens/terms/" class="link">disclaimer</a> for
+                                details.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="scrollToBottom" @click="${scrollToBottom}"
+                 class="fab fab-center-bottom hidden color-gray opacity-75">
+                <a href="#">
+                    <i class="fa fa-arrow-down"></i>
+                </a>
+            </div>
+            <div class="block-footer"></div>
+        </div>
+
+        <!-- Fixed bottom messagebar (only show when there are messages) -->
+        <!-- Fixed bottom messagebar (only show when there are messages) -->
+
+
+        <div id="dialog-choice-chip" class="dialog">
+            <div class="dialog-inner">
+                <div class="dialog-title">Choose te reason for your feedback</div>
+                <form name="dialog-choice-chip" action="#" method="POST" enctype="multipart/form-data"
+                      @submit="${(event) => event.preventDefault()}">
+                    <div class="block margin-top no-margin-bottom no-padding-horizontal">
+                        ${unlikeReasons.map((option, index) => $h`
+                        <label data-tooltip="${option.description}" class="tooltip-init chip-selectable">
+                            <input type="checkbox" name="interests" value="${option.value}"/>
+                            <div class="chip color-pink">
+                                <div class="chip-label">${option.reason}</div>
+                            </div>
+                        </label>
+                        `)}
+                        <textarea class="padding margin"
+                                  style="width:90%;height:200px;background-color:#333333!important"
+                                  placeholder="Please describe your feedback"></textarea>
+
+                    </div>
+                </form>
+            </div>
+            <div class="dialog-buttons">
+                <span class="dialog-button color-gray" @click="${closeDialogChoiceChip}">Cancel</span>
+                <span class="dialog-button" @click="${submitFormDialogChoiceChip}">OK</span>
+            </div>
+        </div>
+
+
+        <div id="popup-ticket" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Confirm Support Ticket</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => closePopupTicket(false)}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">Confirm Support Ticket</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">Please confirm the details of your
+                                support request.
+                            </div>
+                        </div>
+                    </div>
+                    <form name="ticket" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list inset margin-vertical">
+                            <ul class="padding-vertical-half">
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">devices</i>
+                                                </div>
+                                                <input type="text" value="${ticket.device}" name="device"
+                                                       placeholder="Device" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">title</i>
+                                                </div>
+                                                <input type="text" name="problem_title" value="${ticket.problem_title}"
+                                                       placeholder="Title" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media align-self-flex-start">
+                                                    <i class="icon material-icons">description</i>
+                                                </div>
+                                                <textarea name="problem_description" class="resizable"
+                                                          placeholder="Description" required style="min-height: 128px;">${ticket.problem_description}</textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <button type="submit" class="button button-fill button-large">Confirm Ticket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div id="actions-custom-layout" class="actions-modal">
+            <div class="actions-group text-align-center">
+                <a href="#" class="link shape-container shape-circle overflow-hidden ripple-color-gray"
+                   style="background-color: var(--f7-list-bg-color);" @click="${() => actionsCustomLayout.close()}">
+                    <i class="icon material-icons text-color-mono">close</i>
+                </a>
+            </div>
+            <div class="actions-group">
+                <div class="list media-list inset no-chevron no-hairlines-between no-margin">
+                    <ul>
+
+                        ${chat.instructions.map((option, index) => option.isSelection === 0 ? $h`
+                        <li>
+                            <a href="#" class="item-link" @click="${(e) => {
+                e.preventDefault();
+
+                if (option.code !== null && option.code !== undefined) {
+                   eval(option.code);
+                } else {
+                 setPrompt(option.prompt);
+                }
+                actionsCustomLayout.close()
+            }}">
+                                <div class="item-content">
+                                    <div class="item-media">
+<span style="background-color:${option.color}"
+      class="shape-container shape-auto size-40">
+    <i class="fa ${option.icon} font-size-20 color-white"></i>
+</span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${option.promptName}</div>
+                                        </div>
+                                        <div class="item-text">${option.prompt}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ` : '')}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="popover-selection" class="popover">
+            <div class="popover-inner">
+                <div class="list no-chevron no-hairlines-between">
+                    <ul>
+                        <li>
+                            <div class="item-content item-input item-input-outline item-input-with-info">
+                                <div class="item-inner no-padding-bottom">
+                                    <div class="item-title item-floating-label">Ask to SIMBA</div>
+                                    <div class="item-input-wrap no-border">
+                                        <input type="text" @input="${handlePromptTextArea}" id="ask-simba" class=""/>
+                                        <span class="input-clear-button"></span>
+                                        <a href="#" class="link popover-close" @click="${() => setPrompt(prompt,1)}"><i
+                                                class="icon f7-icons">arrow_up</i></a></div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a href="#" class="item-link" @click="${highlightForReporting}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-highlighter color-yellow"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Highlight for reporting</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ${chat.instructions.map((option, index) => option.isSelection === 1 ? $h`
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${() => setPrompt(option.prompt,1)}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+            <span style="background-color:${option.color}"
+                  class="shape-container shape-auto size-40">
+                <i class="fa ${option.icon} color-white"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${option.promptName}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ` : '')}
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${copyToClipboard}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-copy color-white"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Copy to clipboard</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="popover-assistants" class="popover" style="min-width: 192px;">
+            <div class="popover-inner">
+                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                    <ul>
+                        ${assistants.map((item, index) => $h`
+                        <li>
+                            <a href="#" class="popover-close" @click="${() => switchAssistant(item.guid)}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img class="shape-circle" width="40" height="40" src="${item.avatar}"/>
+
+                                    </div>
+                                    <div data-tooltip="${item.name}" class="tooltip-init item-inner">
+                                        <div class="item-title">${item.name}</div>
+                                        ${item.guid == assistant.guid && $h`
+                                        <i class="icon margin-left f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                        `}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <input type="file" id="document-upload" style="display: none;" multiple/>
+        <div id="popup-config" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">API Configuration</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupConfig}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <form name="config" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list accordion-list inset margin-vertical">
+                            <!-- API Configuration Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">api</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">API Configuration</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">mySim API URL</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">link</i>
+                                                            </div>
+                                                            <input type="text" value="${config.assistantApiUrl}" name="api_url"
+                                                                   placeholder="API URL" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Api Key</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">vpn_key</i>
+                                                            </div>
+                                                            <input type="password" name="token" value="${config.assistantAuthToken}"
+                                                                   placeholder="Authentication token" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Completion URL</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">cloud</i>
+                                                            </div>
+                                                            <input type="text" name="completion_url"
+                                                                   value="${config.completionsApiUrl}"
+                                                                   placeholder="Completion service URL" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">API Key</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">security</i>
+                                                            </div>
+                                                            <input type="password" name="api_key"
+                                                                   value="${config.completionsApiKey}"
+                                                                   placeholder="API Key for the service" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Model Parameters Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">tune</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Model Parameters</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Model</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">memory</i>
+                                                            </div>
+                                                            <input type="text" name="model" value="${config.model || DEFAULT_MODEL}"
+                                                                   placeholder="Model name" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Summary Model</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">summarize</i>
+                                                            </div>
+                                                            <input type="text" name="summary_model" value="${config.summaryModel || SUMMARY_MODEL}"
+                                                                   placeholder="Model for summaries" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Temperature</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">thermostat</i>
+                                                            </div>
+                                                            <input type="number" name="temperature" value="${config.temperature || DEFAULT_TEMPERATURE}"
+                                                                   placeholder="Temperature (0-2)" min="0" max="2" step="0.1" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Tool Temperature</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">build</i>
+                                                            </div>
+                                                            <input type="number" name="tool_temperature" value="${config.toolTemperature || 0.1}"
+                                                                   placeholder="Temperature for tool calls (0-2)" min="0" max="2" step="0.1" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Token Limits Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">format_list_numbered</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Token Limits</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Max Tokens</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">format_list_numbered</i>
+                                                            </div>
+                                                            <input type="number" name="max_tokens" value="${config.maxTokens || MAX_TOKENS}"
+                                                                   placeholder="Maximum tokens" min="100" max="100000" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Token Limit</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">storage</i>
+                                                            </div>
+                                                            <input type="number" name="token_limit" value="${config.tokenLimit || TOKEN_LIMIT}"
+                                                                   placeholder="Token limit for optimization" min="1000" max="200000" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save Button -->
+                            <div class="list inset margin-top">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <button type="submit" class="button button-fill button-large">Save Configuration</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="popup popup-highlights" id="popup-highlights">
+            <div class="view">
+                <div class="page">
+                    <div class="navbar">
+                        <div class="navbar-bg"></div>
+                        <div class="navbar-inner">
+                            <div class="title">Highlighted Texts</div>
+                            <div class="right">
+                                <a href="#" class="link popup-close">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <div class="card margin-vertical no-shadow">
+                            <div class="card-header">
+                                <span>Highlights (${Object.keys(highlights).length})</span>
+                                <a href="#" class="link icon-only" @click="${toggleSortableDisable}">
+                                    <i class="icon material-icons">sort</i>
+                                </a>
+                            </div>
+                            <div class="card-content">
+                                <div id="sortable-highlights-list" class="list sortable no-safe-areas">
+                                    <ul>
+                                        ${Object.keys(highlights).length > 0 ? Object.keys(highlights).map((key, index) => $h`
+                                        <li data-highlight-id="${key}">
+                                            <div class="cursor-pointer item-content"
+                                                 @click="${() => scrollToHighlight(key)}">
+                                                <div class="item-inner">
+                                                    <div class="item-title"
+                                                         style="padding-right: 50px; word-wrap: break-word; overflow-wrap: break-word;">
+                                                        ${highlights[key].text}
+                                                    </div>
+                                                    <div class="item-after"
+                                                         style="position: absolute; right: 25px; top: 50%; transform: translateY(-50%); min-width: 30px;">
+                                                        <a href="#" class="link margin-right" data-highlight-id="${key}"
+                                                           @click="${(e) => removeHighlightFromPopup(e, key)}">
+                                                            <i class="fa fa-trash color-red"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="sortable-handler"></div>
+                                        </li>
+                                        `) : $h`
+                                        <li class="no-sorting">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">No highlights found</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        `}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="button button-fill button-large" @click="${generalAction}">
+                                    <i class="fa fa-pencil margin-right"></i>
+                                    Create report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="popover-text" class="popover">
+            <div class="popover-inner" style="max-height:200px!important">
+                ${myReference ? $h`
+                <div class="block-title align-items-center margin-top">
+                    <span>${myReference.name}</span>
+
+                </div>
+                <div class="block margin-bottom">
+                    <p>${myReference.content}</p>
+                    <span class="font-size-16 font-weight-normal text-color-gray">Page: ${myReference.page} Section: ${myReference.section}</span>
+                </div>
+                ` : $h`
+                <div class="block text-align-center">
+                    <span key="preloader" class="preloader"></span>
+                </div>
+                `}
+            </div>
+            <div class="popover-footer padding">
+                <a href="#" id="view-source"
+                   class="button float-left margin-bottom button-small button-round color-white bg-color-chrome link popover-close">
+                    <i class="fa fa-file margin-right-half"></i>
+                    <span>View source</span>
+                </a>
+                <a href="#" id="view-document"
+                   class="margin-left-half float-left button margin-bottom button-small button-round color-white bg-color-chrome link popover-close">
+                    <i class="fa fa-eye margin-right-half"></i>
+                    <span>View document</span>
+                </a>
+
+            </div>
+        </div>
+    </div>
+</template>
+
+
+<script>
+
+
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        // ===========================================
+        // INITIALIZATION OF SIMBA MANAGERS
+        // ===========================================
+
+        const configManager = new window.SIMBA.ConfigManager();
+        const messageManager = new window.SIMBA.MessageManager();
+        const sourceManager = new window.SIMBA.SourceManager();
+        const highlightManager = new window.SIMBA.HighlightManager();
+        let toolManager = null; // Will be initialized after chat is loaded
+        let mentionManager = null; // Will be initialized after assistants are loaded
+
+        // ===========================================
+        // ORIGINAL TEMPLATE VARIABLES (NO CHANGES)
+        // ===========================================
+
+        let response = '';
+        let isScrolling = false;
+        let isResponding = null;
+        let notFinishedMessage = '';
+        let prompt = null;
+        let messages = [];
+        let messagebar = null;
+        let processingToolResponse = false;
+        let sources = [];
+        let dialogChoiceChip = null;
+        let actionsCustomLayout = null;
+        let usageData = null;
+        let highlights = {};
+        let popupHighlights = null;
+
+        // Framework7 specific state
+        let scrollToBottomBtn = null;
+        let pageContent = null;
+        let breakAutoScroll = false;
+        let showCenteredBar = messageManager.getHistory().length === 1;
+        let showBottomBar = messageManager.getHistory().length > 1;
+
+        // User and Assistant data
+        let user = {
+            guid: '05F1A0C-54F6-5A83-25E0-13EB149B237'
+        };
+        let assistant = null;
+        let assistants = [];
+        let quick_actions = [];
+
+        // Chat data
+        let chat = {
+            guid: $f7route.params.guid,
+            title: 'New chat',
+            instructions: [],
+            noSelectionInstructions: []
+        };
+
+        // Device and form data
+        let devices = [
+            "FFS CN235", "FFS C295 TS03", "FFS C295 EA03", "FFS A400M", "FTD A400M",
+            "CHT-E", "CMOS A400M", "FFS A330 MRTT", "CPTT", "DT-MRTT", "FMS A400M",
+            "LMWS", "MPRS", "GENERAL"
+        ];
+        let myDevice = null;
+        let ticket = {
+            device: '',
+            problem_title: "",
+            problem_description: ""
+        };
+
+        // UI Elements
+        let popupTicket = null;
+        let formTicketValidator = null;
+        let popupConfig = null;
+        let formConfigValidator = null;
+        let popoverSelection = null;
+        let popoverText = null;
+        let myReference = null;
+        let selectedText = "";
+        let uploadedFiles = [];
+        let isResponseInBackground = false;
+        let streamingProgress = 0;
+        let fullStreamingResponse = "";
+        let currentStreamingRequest = null;
+
+        // Configuration
+        let config = configManager.getConfig();
+
+        // Constants
+        let TOKEN_LIMIT = 32000;
+        let MAX_TOKENS = 10000;
+        let DEFAULT_TEMPERATURE = 0;
+        let DEFAULT_MODEL = "mistral-small-24B-instruct-2501";
+        let SUMMARY_MODEL = "mistral-small-24B-instruct-2501";
+        const footerTemplate = '<div class="message-footer-content"><div class="sources margin-bottom float-left"></div><div class="actions margin-top-half width-100 text-align-right float-right"></div></div>';
+
+        // Dislike reasons
+        const unlikeReasons = [
+            {
+                value: "no_solution",
+                reason: "Doesn't solve the issue",
+                description: "I followed the steps but the problem persists."
+            },
+            {value: "incorrect", reason: "Contains errors", description: "The information or steps are wrong."},
+            {value: "incomplete", reason: "Missing information", description: "Key steps or details are omitted."},
+            {
+                value: "unclear",
+                reason: "Hard to understand",
+                description: "The instructions are confusing or too technical."
+            },
+            {
+                value: "not_applicable",
+                reason: "Not applicable to my setup",
+                description: "The steps don't fit my hardware or configuration."
+            },
+            {value: "other", reason: "Other (please specify)", description: "The issue doesn't match any of the above."}
+        ];
+
+        // ===========================================
+        // TEMPLATE DATA SYNC FUNCTION
+        // ===========================================
+
+        /**
+         * Syncs SIMBA managers data to template variables
+         * Call this before every $update()
+         */
+        function syncTemplateData() {
+            highlights = highlightManager.getAll();
+            sources = sourceManager.getTempSources();
+            showCenteredBar = messageManager.getHistory().length === 1;
+            showBottomBar = messageManager.getHistory().length > 1;
+            config = configManager.getConfig();
+        }
+
+        /**
+         * Enhanced update function that syncs data before updating template
+         */
+        function updateTemplate() {
+            syncTemplateData();
+            $update();
+        }
+
+        // ===========================================
+        // MARKDOWN SETUP
+        // ===========================================
+
+        hljs.registerLanguage('stask', function (hljs) {
+            return hljs.getLanguage('json');
+        });
+
+        let md = window.markdownit({
+            html: true,
+            linkify: true,
+            typographer: true,
+            highlight: function (str, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return '<pre class="no-margin-top hljs" data-lang="' + lang + '"><code class="cod-with-auto">' +
+                            hljs.highlight(str.replace('<span class="thinking-icon">' + (assistant?.thinkIcon || '') + '</span>', '').replace('```', ""), {
+                                language: lang,
+                                ignoreIllegals: true
+                            }).value +
+                            '</code></pre>';
+                    } catch (__) {
+                    }
+                }
+                return '<pre class="no-margin-top hljs"><code>' + md.utils.escapeHtml(str.replace('<span class="thinking-icon">' + (assistant?.thinkIcon || '') + '</span>', '').replace('```', "")) + '</code></pre>';
+            }
+        }).use(window.texmath, {engine: window.katex, delimiters: 'brackets'});
+
+        // ===========================================
+        // CORE FUNCTIONS USING SIMBA MANAGERS
+        // ===========================================
+
+        /**
+         * Creates a new conversation using the chat API
+         */
+        let createConversation = function (guid) {
+            return new Promise((resolve, reject) => {
+                $f7.request({
+                    url: `${window.config.api_methods.create_chat}?assistant=` + guid,
+                    method: 'GET',
+                    headers: {
+                        'x-auth-token': window.config.token,
+                        'Content-Type': 'application/json'
+                    },
+                    dataType: 'json'
+                }).then((response) => {
+                    chat = response.data.data;
+                    chat.noSelectionInstructions = chat.instructions ? chat.instructions.filter(instruction => !instruction.isSelection) : [];
+
+                    // Update message manager with system message
+                    messageManager.updateSystemMessage(chat.mainAssistant.system);
+
+                    // Initialize tool manager now that we have chat
+                    toolManager = new window.SIMBA.ToolManager(chat, configManager.getConfig());
+
+                    assistant.name = chat.mainAssistant.name;
+                    assistant.avatar = 'https://survey.simeng.es' + chat.mainAssistant._myMedias.avatars[0].realPath;
+                    assistant.mainImage = 'https://survey.simeng.es' + chat.mainAssistant._myMedias.mainImage[0].realPath;
+                    assistant.greeting = chat.mainAssistant.greeting;
+                    assistant.placeholder = chat.mainAssistant.placeholder;
+                    assistant.thinkIcon = chat.mainAssistant.thinkIcon || '🤔';
+
+                    updateTemplate();
+                    console.log('Conversation created:', response.data);
+                    resolve(response.data);
+                }).catch((error) => {
+                    console.error('Error creating conversation:', error);
+                    reject(error);
+                });
+            });
+        };
+
+        /**
+         * Loads available assistants
+         */
+        let loadAssistants = function () {
+            return new Promise((resolve, reject) => {
+                $f7.request({
+                    url: window.config.api_methods.load_assistants,
+                    method: 'GET',
+                    headers: {
+                        'X-AUTH-TOKEN': window.config.token
+                    },
+                    success: function (responseText) {
+                        var data = JSON.parse(responseText);
+                        assistants = data.data.assistants;
+                        quick_actions = data.data.quick_actions;
+
+                        // Initialize mention manager with assistants
+                        mentionManager = new window.SIMBA.AssistantMentionManager(assistants, switchAssistant);
+
+                        if (assistants.length > 0) {
+                            if ('assistant' in $f7route.query) {
+                                assistant = assistants.find(assistant => assistant.guid === $f7route.query.assistant);
+                            } else {
+                                assistant = assistants[0];
+                                switchAssistant(assistant.guid);
+                            }
+                            updateTemplate();
+                            resolve({assistant: assistant, quick_actions: quick_actions});
+                        } else {
+                            console.error("The 'assistants' array is empty.");
+                            resolve({assistant: null, quick_actions: quick_actions});
+                        }
+                    },
+                    error: function (xhr, status, error) {
+                        $f7.toast.show({
+                            text: 'An error occurred: ' + error,
+                            cssClass: 'color-red'
+                        });
+                        reject(error);
+                    }
+                });
+            });
+        };
+
+        /**
+         * Switches to a different assistant
+         */
+        let switchAssistant = function (guid) {
+            let foundAssistant = assistants.find(item => item.guid === guid);
+            if (foundAssistant) {
+                assistant = foundAssistant;
+                createConversation(assistant.guid);
+                updateTemplate();
+            } else {
+                console.error("No assistant found with the specified GUID.");
+            }
+        };
+
+        /**
+         * Calls a tool using the tool manager
+         */
+        let callTool = function (name, params) {
+            console.log(`Calling tool: ${name} with params:`, params);
+
+            if (!toolManager) {
+                console.error('Tool manager not initialized');
+                return Promise.reject(new Error('Tool manager not initialized'));
+            }
+
+            const toolSetup = chat.tools_setup?.[name] || {};
+            const inProgressMessage = toolSetup.in_progress_message || 'Calling tool';
+            const toolIcon = toolSetup.icon || "fa-database";
+            const humanReadableMessage = `<p><div class="call-execution shimmer-text-fast"><i class="fa ${toolIcon} margin-right-half"></i>${inProgressMessage} <strong>${params.text || ''}</strong></div></p>`;
+
+            $el.value.find('.message:last-child .message-text').html(humanReadableMessage);
+
+            if (toolSetup.ask_for_execution && name === "action_open_support_ticket") {
+                ticket = params;
+                updateTemplate();
+                openPopupTicket();
+                return Promise.resolve({status: 'awaiting_user_confirmation'});
+            }
+
+            sourceManager.setTempSources([]);
+
+            return toolManager.callTool(name, params, myDevice)
+                .then(toolResponse => {
+                    console.log("Tool call completed successfully:", toolResponse);
+
+                    if (toolResponse.data?.data?.tool_domain === 'action') {
+                        console.log("Action tool processed", toolResponse.data);
+                        return toolResponse;
+                    }
+
+                    if (toolResponse.data?.data?.sources) {
+                        const sourcesData = toolResponse.data.data.sources;
+                        sourceManager.setTempSources(sourcesData);
+
+                        if (sourcesData.some(source => source.text)) {
+                            const simbaPrompt = sourceManager.buildSimbaPrompt(sourcesData);
+                            messageManager.updateSystemMessage(
+                                messageManager.getHistory()[0].content +
+                                '\n\n\n\nPLEASE USE THIS RETRIEVED CONTEXT FOR ANSWERING:\n\n' +
+                                simbaPrompt
+                            );
+
+                            $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+                            return {...toolResponse, sourcesAdded: true};
+                        } else {
+                            return handleNoSourcesFound();
+                        }
+                    } else {
+                        return handleUnexpectedResponse(toolResponse);
+                    }
+                })
+                .catch(error => {
+                    console.error("Tool call failed:", error);
+                    return handleToolError(error);
+                });
+        };
+
+        /**
+         * Handles the case when no sources are found
+         */
+        let handleNoSourcesFound = function () {
+            console.log("No relevant sources found");
+            const noInfoMsgId = window.SIMBA.Utils.generateUniqueId("assistant-no-info");
+
+            messages.addMessage({
+                attrs: {"data-id": noInfoMsgId, "id": noInfoMsgId},
+                isTitle: false,
+                text: '<p>Sorry, no records were found. Please rephrase your question.</p>',
+                name: assistant.name,
+                cssClass: 'card no-margin-top padding-half',
+                textFooter: footerTemplate,
+                avatar: assistant.avatar,
+                type: 'received',
+            }, 'append', true);
+
+            onMessageAdded($('#' + noInfoMsgId));
+            saveSourcesForMessage(noInfoMsgId);
+
+            messageManager.addMessage('assistant', "Sorry, no records were found. Please rephrase your question.");
+
+            return callCompletion(false, noInfoMsgId)
+                .then(() => ({sourcesAdded: false, messageId: noInfoMsgId}));
+        };
+
+        /**
+         * Handles unexpected tool responses
+         */
+        let handleUnexpectedResponse = function (response) {
+            console.log("Unexpected response structure");
+            const structureErrorMsgId = window.SIMBA.Utils.generateUniqueId("assistant-structure-error");
+
+            messages.addMessage({
+                attrs: {"data-id": structureErrorMsgId, "id": structureErrorMsgId},
+                isTitle: false,
+                text: '<p>Processing your query...</p>',
+                name: assistant.name,
+                cssClass: 'card no-margin-top padding-half',
+                textFooter: footerTemplate,
+                avatar: assistant.avatar,
+                type: 'received',
+            }, 'append', true);
+
+            onMessageAdded($('#' + structureErrorMsgId));
+            saveSourcesForMessage(structureErrorMsgId);
+
+            const lastUserQuestion = getLastUserQuestion();
+            messageManager.addMessage('user',
+                `Regarding my question: "${lastUserQuestion}", there was a problem trying to find additional information. Please respond based on your general knowledge and mention any limitations in your response.`
+            );
+
+            return callCompletion(false, structureErrorMsgId)
+                .then(() => ({sourcesAdded: true, messageId: structureErrorMsgId}));
+        };
+
+        /**
+         * Handles tool execution errors
+         */
+        let handleToolError = function (error) {
+            console.error("Tool execution error:", error);
+            const apiErrorMsgId = window.SIMBA.Utils.generateUniqueId("assistant-api-error");
+
+            messages.addMessage({
+                attrs: {"data-id": apiErrorMsgId, "id": apiErrorMsgId},
+                isTitle: false,
+                text: '<p>Processing your query...</p>',
+                name: assistant.name,
+                cssClass: 'card no-margin-top padding-half',
+                textFooter: footerTemplate,
+                avatar: assistant.avatar,
+                type: 'received',
+            }, 'append', true);
+
+            onMessageAdded($('#' + apiErrorMsgId));
+            saveSourcesForMessage(apiErrorMsgId);
+
+            const lastUserQuestion = getLastUserQuestion();
+            messageManager.addMessage('user',
+                `Regarding my question: "${lastUserQuestion}", there was an error trying to connect to the information source. Please respond based on your general knowledge and mention any limitations in your response.`
+            );
+
+            return callCompletion(false, apiErrorMsgId)
+                .then(() => ({sourcesAdded: true, messageId: apiErrorMsgId}));
+        };
+
+        /**
+         * Gets the last user question from message history
+         */
+        let getLastUserQuestion = function () {
+            const history = messageManager.getHistory();
+            for (let i = history.length - 1; i >= 0; i--) {
+                if (history[i].role === 'user') {
+                    return history[i].content;
+                }
+            }
+            return "";
+        };
+
+        /**
+         * Saves sources for a specific message
+         */
+        let saveSourcesForMessage = function (messageId, params = {}) {
+            const tempSources = sourceManager.getTempSources();
+            if (tempSources.length > 0) {
+                sourceManager.saveToStorage(messageId, tempSources, params);
+                console.log('Sources saved for message:', messageId);
+            }
+        };
+
+        /**
+         * Main completion function using message manager
+         */
+        let callCompletion = function (withTool = true, messageId, stream = true) {
+            messageId = messageId || window.SIMBA.Utils.generateUniqueId("assistant-thinking");
+            isResponseInBackground = assistant && chat.mainAssistant.responseOnBackground === true;
+
+            const messagesHistory = messageManager.getHistory();
+
+            const currentConfig = configManager.getConfig();
+            let payload = {
+                stream: stream,
+                model: currentConfig.model || DEFAULT_MODEL,
+                messages: messagesHistory,
+                max_tokens: currentConfig.maxTokens || MAX_TOKENS
+            };
+
+            if (stream) {
+                payload['stream_options'] = {'include_usage': true};
+            }
+
+            if (chat.tools && withTool) {
+                payload['tool_choice'] = "auto";
+                payload['tools'] = chat.tools;
+                delete payload['tools']["icon"];
+                payload['temperature'] = currentConfig.toolTemperature || 0.1;
+            } else {
+                payload['temperature'] = currentConfig.temperature || DEFAULT_TEMPERATURE;
+            }
+
+            isResponding = true;
+            updateTemplate();
+
+            return new Promise((resolve, reject) => {
+                let responseData = [];
+                let acumulatedText = "";
+                let fullResponse = "";
+                let isNoTool = false;
+                let extractingContent = false;
+                let isFunctionCall = false;
+                let newMessageId = "";
+
+                // Variables para el nuevo formato de tool_calls
+                let isToolCallsFormat = false;
+                let accumulatedToolCalls = [];
+                let currentToolCall = null;
+
+                // Function to get the message element using the ID
+                const getMessageElement = function () {
+                    return $('#' + messageId);
+                };
+
+                if (isResponseInBackground && !isToolCallsFormat) {
+                    const progressHTML = `
+                    <div class="background-response-container margin-top padding-top">
+                        <div class="progressbar" id="response-progress">
+                            <span></span>
+                        </div>
+                        <div class="progress-percentage"></div>
+                    </div>
+                    <div class="collapsible-container">
+                        <div class="toggle-button">
+                            <a href="#" class="toggle-content">
+                                <i class="fa fa-chevron-down"></i>
+                            </a>
+                        </div>
+                        <div class="response-content" style="display:none">
+                            <p>Processing response...</p>
+                        </div>
+                    </div>
+                `;
+
+                    getMessageElement().find('.message-text').html(progressHTML);
+
+                    // Inicializar la barra de progreso
+                    const progressBarEl = getMessageElement().find('.progressbar')[0];
+                    if (progressBarEl) {
+                        app.progressbar.set(progressBarEl, 0);
+                    }
+
+                    // Event listener para el botón de colapsar
+                    getMessageElement().find('.toggle-content').on('click', function (e) {
+                        e.preventDefault();
+                        const container = this.closest('.collapsible-container');
+                        const content = container.querySelector('.response-content');
+                        const icon = this.querySelector('i');
+
+                        const isVisible = window.getComputedStyle(content).display !== 'none';
+
+                        if (isVisible) {
+                            content.style.display = 'none';
+                            icon.classList.remove('fa-chevron-up');
+                            icon.classList.add('fa-chevron-down');
+                        } else {
+                            content.style.display = 'block';
+                            icon.classList.remove('fa-chevron-down');
+                            icon.classList.add('fa-chevron-up');
+                        }
+                    });
+                }
+
+                function updateProgress(value) {
+                    if (isResponseInBackground && !isToolCallsFormat) {
+                        const progressBarEl = getMessageElement().find('.progressbar')[0];
+                        if (progressBarEl) {
+                            app.progressbar.set(progressBarEl, value);
+                            progressBarEl.setAttribute('data-label', 'Creating step by step guide ' + value + '%');
+                        }
+                    }
+                }
+
+                // Función para procesar y acumular tool calls
+                const processToolCalls = function (delta) {
+                    if (delta.tool_calls && delta.tool_calls.length > 0) {
+                        isToolCallsFormat = true;
+
+                        delta.tool_calls.forEach(toolCallDelta => {
+                            const index = toolCallDelta.index;
+
+                            if (!accumulatedToolCalls[index]) {
+                                accumulatedToolCalls[index] = {
+                                    index: index,
+                                    id: toolCallDelta.id || "",
+                                    type: toolCallDelta.type || "function",
+                                    function: {
+                                        name: "",
+                                        arguments: ""
+                                    }
+                                };
+                            }
+
+                            if (toolCallDelta.id) {
+                                accumulatedToolCalls[index].id = toolCallDelta.id;
+                            }
+
+                            if (toolCallDelta.type) {
+                                accumulatedToolCalls[index].type = toolCallDelta.type;
+                            }
+
+                            if (toolCallDelta.function) {
+                                if (toolCallDelta.function.name !== null && toolCallDelta.function.name !== undefined) {
+                                    accumulatedToolCalls[index].function.name =
+                                        (accumulatedToolCalls[index].function.name || "") +
+                                        (toolCallDelta.function.name || "");
+                                }
+
+                                if (toolCallDelta.function.arguments !== null && toolCallDelta.function.arguments !== undefined) {
+                                    accumulatedToolCalls[index].function.arguments =
+                                        (accumulatedToolCalls[index].function.arguments || "") +
+                                        (toolCallDelta.function.arguments || "");
+                                }
+                            }
+
+                            currentToolCall = accumulatedToolCalls[index];
+                            isFunctionCall = true;
+                        });
+
+                        if (currentToolCall &&
+                            currentToolCall.function &&
+                            currentToolCall.function.name &&
+                            currentToolCall.function.arguments &&
+                            currentToolCall.function.arguments.includes('}')) {
+
+                            const args = currentToolCall.function.arguments;
+                            if (args.trim().endsWith('}') && !processingToolResponse) {
+                                try {
+                                    JSON.parse(args);
+                                    console.log("Tool call appears complete, processing:", currentToolCall);
+                                    processCompleteToolCall();
+                                } catch (e) {
+                                    console.log("Arguments appear complete but JSON is not valid yet:", e);
+                                }
+                            }
+                        }
+
+                        return true;
+                    }
+                    return false;
+                };
+
+                // Función para procesar un tool call completo
+                const processCompleteToolCall = function () {
+                    if (!currentToolCall || !currentToolCall.function) {
+                        console.warn("Incomplete or invalid tool call:", currentToolCall);
+                        return false;
+                    }
+
+                    if (processingToolResponse) {
+                        console.log("Already processing a tool call, ignoring duplicate");
+                        return false;
+                    }
+
+                    try {
+                        const toolName = currentToolCall.function.name || "";
+                        if (!toolName) {
+                            console.warn("Tool call without function name:", currentToolCall);
+                            return false;
+                        }
+
+                        let toolParams;
+
+                        try {
+                            toolParams = JSON.parse(currentToolCall.function.arguments);
+                        } catch (e) {
+                            console.warn("Error parsing function arguments, trying to clean:", e);
+                            const cleanedArgs = currentToolCall.function.arguments.trim()
+                                .replace(/^['"]+|['"]+$/g, '')
+                                .replace(/\\"/g, '"');
+
+                            try {
+                                if (cleanedArgs.startsWith('{')) {
+                                    toolParams = JSON.parse(cleanedArgs);
+                                } else {
+                                    toolParams = {text: cleanedArgs};
+                                }
+                            } catch (e2) {
+                                console.error("Could not parse arguments after cleaning:", e2);
+                                toolParams = {text: currentToolCall.function.arguments};
+
+                                newMessageId = "assistant-thinking-" + Date.now();
+                                callCompletion(true, newMessageId, false)
+                                    .then(() => {
+                                        processingToolResponse = false;
+                                        addSourcesToMessage($('#' + newMessageId));
+                                        addActionsToMessage($('#' + newMessageId));
+                                    })
+                                    .catch(error => {
+                                        processingToolResponse = false;
+                                        console.error("Error in continuation:", error);
+                                    });
+                                return;
+                            }
+                        }
+
+                        callTool(toolName, toolParams)
+                            .then(toolResponse => {
+                                console.log("Tool response processed:", toolResponse);
+                                $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                                if (toolResponse.sourcesAdded) {
+                                    console.log("Continuing conversation with added sources");
+
+                                    newMessageId = "assistant-thinking-" + Date.now();
+
+                                    messages.addMessage({
+                                        attrs: {
+                                            "data-id": newMessageId,
+                                            "id": newMessageId
+                                        },
+                                        isTitle: false,
+                                        text: '<p>Processing retrieved information...</p>',
+                                        textFooter: footerTemplate,
+                                        name: assistant.name,
+                                        cssClass: 'card no-margin-top padding-half',
+                                        avatar: assistant.avatar,
+                                        type: 'received',
+                                    }, 'append', true);
+
+                                    saveSourcesForMessage(newMessageId, toolParams);
+                                    onMessageAdded($('#' + newMessageId));
+
+                                    callCompletion(false, newMessageId)
+                                        .then(() => {
+                                            processingToolResponse = false;
+                                            addSourcesToMessage($('#' + newMessageId));
+                                            addActionsToMessage($('#' + newMessageId));
+                                        })
+                                        .catch(error => {
+                                            processingToolResponse = false;
+                                            console.error("Error in continuation:", error);
+                                        });
+                                } else {
+                                    processingToolResponse = false;
+                                }
+                            })
+                            .catch(error => {
+                                processingToolResponse = false;
+                                console.error("Error calling tool:", error);
+                            });
+
+                        return true;
+                    } catch (error) {
+                        console.error("Error processing complete tool call:", error);
+                        processingToolResponse = false;
+                        return false;
+                    }
+                };
+
+                try {
+                    const requestConfig = {
+                        url: window.config.completion.url,
+                        method: 'POST',
+                        data: payload,
+                        contentType: 'application/json',
+                        dataType: 'text',
+                        headers: {
+                            'Authorization': `Bearer ${window.config.completion.apiKey}`,
+                            'Accept': 'text/event-stream'
+                        },
+                        xhrFields: {
+                            onprogress: function (e) {
+                                if (!isResponding) {
+                                    if (currentStreamingRequest &&
+                                        currentStreamingRequest.xhr &&
+                                        typeof currentStreamingRequest.xhr.abort === 'function') {
+                                        currentStreamingRequest.xhr.abort();
+                                    }
+                                    return;
+                                }
+
+                                const newText = e.target.responseText.substring(acumulatedText.length);
+                                acumulatedText = e.target.responseText;
+
+                                const lines = newText.split('\n');
+                                for (const line of lines) {
+                                    if (line.startsWith('data: ')) {
+                                        try {
+                                            const jsonData = line.substring(6);
+                                            if (jsonData.trim() === '') continue;
+
+                                            const parsedData = JSON.parse(jsonData);
+                                            responseData.push(parsedData);
+
+                                            if (parsedData.choices &&
+                                                parsedData.choices.length > 0 &&
+                                                parsedData.choices[0].delta) {
+
+                                                const delta = parsedData.choices[0].delta;
+
+                                                if (processToolCalls(delta)) {
+                                                    continue;
+                                                }
+
+                                                if (delta.content) {
+                                                    const content = delta.content;
+                                                    fullResponse += content;
+                                                    fullStreamingResponse += content;
+
+                                                    if (isResponseInBackground && !isToolCallsFormat) {
+                                                        streamingProgress += 1;
+                                                        const percentage = Math.min(Math.round((streamingProgress / 10)), 99);
+                                                        updateProgress(percentage);
+                                                        getMessageElement().find('.response-content').html(md.render(window.SIMBA.Utils.preprocessMarkdown(fullStreamingResponse) + '<span class="thinking-icon">' + (assistant?.thinkIcon || '🤔') + '</span>'));
+                                                    } else {
+                                                        getMessageElement().find('.message-text').html(md.render(window.SIMBA.Utils.preprocessMarkdown(fullResponse) + '<span class="thinking-icon">' + (assistant?.thinkIcon || '🤔') + '</span>'));
+                                                    }
+                                                }
+                                            }
+
+                                            checkScrollPosition();
+
+                                            if (parsedData.choices &&
+                                                parsedData.choices.length > 0 &&
+                                                parsedData.choices[0].finish_reason !== null) {
+
+                                                if (isResponseInBackground && !isToolCallsFormat) {
+                                                    updateProgress(100);
+                                                }
+
+                                                if (isToolCallsFormat && currentToolCall) {
+                                                    processCompleteToolCall();
+                                                } else if (!isToolCallsFormat && !withTool) {
+                                                    messageManager.addMessage('assistant', fullResponse);
+                                                    console.log("Adding ASSISTANT with tool");
+                                                }
+
+                                                if (isResponseInBackground && !isToolCallsFormat) {
+                                                    const progressBarEl = getMessageElement().find('.progressbar')[0];
+                                                    if (progressBarEl) {
+                                                        $f7.progressbar.set(progressBarEl, 100);
+                                                    }
+
+                                                    getMessageElement().find('.response-content').html(md.render(window.SIMBA.Utils.preprocessMarkdown(fullResponse)));
+
+                                                    if (chat.mainAssistant.onResponseComplete !== null && chat.mainAssistant.onResponseComplete !== undefined) {
+                                                        try {
+                                                            eval(chat.mainAssistant.onResponseComplete);
+                                                        } catch (error) {
+                                                            console.error("Error executing onResponseComplete:", error);
+                                                        }
+                                                    }
+                                                }
+
+                                                if (chat.tools && withTool && !isToolCallsFormat) {
+                                                    if (!processingToolResponse && !isToolCallsFormat && (isFunctionCall || (!isNoTool && !extractingContent))) {
+                                                        console.log("Showing tool JSON on finish");
+                                                        messageManager.addMessage('assistant', fullResponse);
+                                                    }
+                                                }
+
+                                                const completedId = "message-completed-" + Date.now();
+
+                                                if (isNoTool && !isToolCallsFormat) {
+                                                    getMessageElement().attr("id", completedId).attr('data-id', completedId);
+                                                }
+
+                                                addActionsToMessage($('#' + completedId));
+                                                console.log("SSE streaming completed");
+                                            }
+
+                                        } catch (error) {
+                                            console.error("Error processing SSE line:", error, line);
+                                        }
+                                    }
+                                }
+                            }
+                        },
+                        success: function (data) {
+                            console.log("Request completed successfully");
+                            $(".thinking-icon").remove();
+                            currentStreamingRequest = null;
+                            isResponding = false;
+                            updateTemplate();
+
+                            $(".reference").each(function () {
+                                $(this).off('click');
+                                $(this).on("click", function (e) {
+                                    openPopoverText(e);
+                                });
+
+                                const $parentLi = $(this).closest('li');
+                                if ($parentLi.length) {
+                                    $parentLi.css('list-style-type', 'none');
+                                }
+                            });
+
+                            // Extract token usage information
+                            if (typeof data === 'string') {
+                                const lines = data.split('\n');
+                                for (const line of lines) {
+                                    if (line.startsWith('data: ')) {
+                                        try {
+                                            const jsonData = line.substring(6).trim();
+                                            if (!jsonData || jsonData === '') continue;
+
+                                            const chunkData = JSON.parse(jsonData);
+                                            if (chunkData.usage) {
+                                                usageData = chunkData.usage;
+                                            }
+                                        } catch (e) {
+                                            console.error("Error parsing chunk:", e);
+                                        }
+                                    }
+                                }
+                            } else if (data && data.usage) {
+                                usageData = data.usage;
+                            } else if (responseData && responseData.length > 0) {
+                                const lastChunk = responseData[responseData.length - 1];
+                                if (lastChunk && lastChunk.usage) {
+                                    usageData = lastChunk.usage;
+                                }
+                            }
+
+                            if (usageData) {
+                                console.log("%c === TOKEN USAGE INFORMATION ===", "color: blue; font-weight: bold");
+                                console.log(`Prompt tokens: ${usageData.prompt_tokens}`);
+                                console.log(`Completion tokens: ${usageData.completion_tokens}`);
+                                console.log(`Total tokens: ${usageData.total_tokens}`);
+
+                                setTimeout(async () => {
+                                    try {
+                                        const result = await messageManager.optimizeIfNeeded($f7, configManager.getConfig());
+                                        if (result && result.optimized) {
+                                            console.log(`🎉 Optimized: Saved ${result.tokenReduction} tokens!`);
+                                        } else {
+                                            console.log("📊 No optimization needed");
+                                        }
+                                    } catch (error) {
+                                        console.error("Optimization failed:", error);
+                                    }
+                                }, 1000);
+                            }
+
+                            addCodeHeaders();
+                            addActionsToMessage(getMessageElement());
+
+                            $('table').each(function (index) {
+                                this.classList.add('data-table');
+                                const tableId = this.id || 'data-table-' + Date.now();
+                                this.id = tableId;
+
+                                const container = document.createElement('div');
+                                container.className = 'table-container margin-bottom';
+                                container.style.overflow = 'overlay';
+                                container.id = 'container-' + tableId;
+
+                                const exportButton = document.createElement('span');
+                                exportButton.className = 'export-csv-button link float-right margin-bottom-half margin-right-half';
+                                exportButton.innerHTML = '<i class="fa fa-download"></i> CSV';
+                                exportButton.dataset.table = tableId;
+                                exportButton.addEventListener('click', function (e) {
+                                    e.preventDefault();
+                                    e.stopPropagation();
+                                    const targetTableId = this.dataset.table;
+                                    exportTableToCSV(document.getElementById(targetTableId));
+                                });
+
+                                const parent = this.parentNode;
+                                parent.insertBefore(container, this);
+                                container.appendChild(exportButton);
+                                container.appendChild(this);
+                            });
+
+                            if (isResponseInBackground && !isToolCallsFormat) {
+                                getMessageElement().find('.progress-bar').css('width', '100%');
+                                getMessageElement().find('.progress-percentage').text('');
+
+                                if (!messageManager.getHistory().some(msg =>
+                                    msg.role === 'assistant' && msg.content === fullResponse)) {
+                                    messageManager.addMessage('assistant', fullResponse);
+                                    console.log("Adding ASSISTANT in success handler (background mode)");
+                                }
+                            }
+
+                            // Handle full completion format (not streaming)
+                            let parsedData;
+                            if (typeof data === 'string') {
+                                try {
+                                    parsedData = JSON.parse(data);
+                                } catch (e) {
+                                    console.log("Data is not JSON or is already parsed");
+                                    parsedData = data;
+                                }
+                            } else {
+                                parsedData = data;
+                            }
+
+                            if (parsedData &&
+                                parsedData.choices &&
+                                parsedData.choices.length > 0 &&
+                                parsedData.choices[0].message &&
+                                parsedData.choices[0].message.tool_calls &&
+                                parsedData.choices[0].message.tool_calls.length > 0) {
+
+                                console.log("Detected full completion with tool_calls");
+
+                                const toolCall = parsedData.choices[0].message.tool_calls[0];
+                                const toolName = toolCall.function.name;
+                                let toolParams;
+
+                                try {
+                                    toolParams = JSON.parse(toolCall.function.arguments);
+                                } catch (e) {
+                                    console.warn("Error parsing tool arguments:", e);
+                                    const cleanedArgs = toolCall.function.arguments.trim()
+                                        .replace(/^['"]+|['"]+$/g, '')
+                                        .replace(/\\"/g, '"');
+
+                                    try {
+                                        toolParams = JSON.parse(cleanedArgs);
+                                    } catch (e2) {
+                                        console.error("Could not parse arguments after cleaning:", e2);
+                                        toolParams = {text: toolCall.function.arguments};
+                                    }
+                                }
+
+                                callTool(toolName, toolParams)
+                                    .then(toolResponse => {
+                                        console.log("Tool response processed:", toolResponse);
+                                        $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                                        if (toolResponse.sourcesAdded) {
+                                            console.log("Continuing conversation with added sources");
+
+                                            newMessageId = "assistant-thinking-" + Date.now();
+
+                                            messages.addMessage({
+                                                attrs: {
+                                                    "data-id": newMessageId,
+                                                    "id": newMessageId
+                                                },
+                                                isTitle: false,
+                                                text: '<p>Processing retrieved information...</p>',
+                                                textFooter: footerTemplate,
+                                                name: assistant.name,
+                                                cssClass: 'card no-margin-top padding-half',
+                                                avatar: assistant.avatar,
+                                                type: 'received',
+                                            }, 'append', true);
+
+                                            saveSourcesForMessage(newMessageId, toolParams);
+                                            onMessageAdded($('#' + newMessageId));
+
+                                            callCompletion(false, newMessageId)
+                                                .then(() => {
+                                                    processingToolResponse = false;
+                                                    addSourcesToMessage($('#' + newMessageId));
+                                                    addActionsToMessage($('#' + newMessageId));
+                                                })
+                                                .catch(error => {
+                                                    processingToolResponse = false;
+                                                    console.error("Error in continuation:", error);
+                                                });
+                                        } else {
+                                            processingToolResponse = false;
+                                        }
+                                    })
+                                    .catch(error => {
+                                        processingToolResponse = false;
+                                        console.error("Error calling tool:", error);
+                                    });
+                            } else {
+                                let responseContent;
+
+                                if (chat.tools) {
+                                    if (isToolCallsFormat) {
+                                        responseContent = JSON.stringify(accumulatedToolCalls, null, 2);
+                                    } else {
+                                        responseContent = fullResponse;
+                                    }
+                                } else {
+                                    responseContent = fullResponse;
+                                }
+
+                                messageManager.updateSystemMessage(messageManager.getHistory()[0].content);
+
+                                resolve({
+                                    chunks: responseData,
+                                    fullResponse: fullResponse,
+                                    content: responseContent,
+                                    isNoTool: isNoTool,
+                                    processingTool: processingToolResponse,
+                                    toolCalls: isToolCallsFormat ? accumulatedToolCalls : null
+                                });
+                            }
+                        },
+                        error: function (xhr, status, error) {
+                            if (status === 'abort') {
+                                console.log("Request cancelled by user");
+                                resolve({
+                                    status: 'aborted',
+                                    message: 'Response interrupted by user'
+                                });
+                            } else {
+                                $f7.toast.show({
+                                    text: 'Unable to connect to completion service.',
+                                    position: 'center',
+                                    closeTimeout: 3000,
+                                    cssClass: 'color-red'
+                                });
+
+                                if (isResponseInBackground) {
+                                    getMessageElement().find('.progress-container').addClass('error');
+                                    getMessageElement().find('.progress-percentage').text('Error');
+                                }
+                            }
+                            isResponding = false;
+                            updateTemplate();
+                            reject(error);
+                        }
+                    };
+
+                    currentStreamingRequest = $f7.request(requestConfig);
+
+                    window.addEventListener('completion_stop_requested', function handleStop() {
+                        if (currentStreamingRequest &&
+                            currentStreamingRequest.xhr &&
+                            typeof currentStreamingRequest.xhr.abort === 'function') {
+                            currentStreamingRequest.xhr.abort();
+                        }
+                        window.removeEventListener('completion_stop_requested', handleStop);
+                    }, {once: true});
+
+                } catch (initError) {
+                    console.error("Error starting request:", initError);
+                    isResponding = false;
+                    updateTemplate();
+
+                    $f7.toast.show({
+                        text: 'Unable to connect to completion service.',
+                        position: 'center',
+                        closeTimeout: 3000,
+                        cssClass: 'color-red'
+                    });
+
+                    reject(initError);
+                }
+            });
+        };
+
+        /**
+         * Sends a prompt using the enhanced message management
+         */
+        let sendPrompt = function () {
+            if ((prompt && prompt.length && myDevice) || !chat.mainAssistant.deviceSelector) {
+                if (notFinishedMessage === '') {
+                    response = '';
+                    updateTemplate();
+
+                    const userMsgId = window.SIMBA.Utils.generateUniqueId("user-msg");
+
+                    messages.addMessage({
+                        attrs: {"data-id": userMsgId, "id": userMsgId},
+                        isTitle: false,
+                        text: '<p class="no-margin-top float-left">' + prompt + '</p>',
+                        textHeader: '<div class="margin-bottom margin-left-half padding-bottom" id="header-' + userMsgId + '"></div>',
+                        name: 'Alfredo García',
+                        cssClass: 'sent card no-margin-top padding-half',
+                        type: 'received',
+                        avatar: 'https://ui-avatars.com/api/?name=Alfredo%20García',
+                        textFooter: footerTemplate
+                    }, 'append', true);
+
+                    // Handle file uploads
+                    let extractedContents = "";
+                    if (window.myFileDropzone) {
+                        extractedContents = window.myFileDropzone.getCombinedExtractedText();
+                        window.myFileDropzone.renderFileItems('header-' + userMsgId);
+                    }
+
+                    let messageContent = prompt;
+                    if (extractedContents) {
+                        messageContent = extractedContents + "\n\n" + prompt;
+                    }
+
+                    // Add to message manager
+                    messageManager.addMessage('user', messageContent);
+
+                    // Clear files
+                    if (window.myFileDropzone) {
+                        window.myFileDropzone.clearFiles();
+                    }
+
+                    onMessageAdded($('#' + userMsgId));
+                    scrollToBottom();
+
+                    if (navigator.onLine) {
+                        const thinkingMsgId = window.SIMBA.Utils.generateUniqueId("assistant-thinking");
+
+                        messages.addMessage({
+                            attrs: {"data-id": thinkingMsgId, "id": thinkingMsgId},
+                            isTitle: false,
+                            text: '<p><span class="thinking-icon">' + (assistant?.thinkIcon || '🤔') + '</span></p>',
+                            name: assistant.name,
+                            cssClass: 'card no-margin-top padding-half',
+                            textFooter: footerTemplate,
+                            type: 'received',
+                            avatar: assistant.avatar,
+                        }, 'append', true);
+
+                        onMessageAdded($('#' + thinkingMsgId));
+                        addActionsToMessage($('#' + thinkingMsgId));
+
+                        $el.value.find('.messagebar-chat textarea')[0].value = '';
+                        $el.value.find('#prompt')[0].focus();
+                        scrollToBottom();
+
+                        callCompletion(true, thinkingMsgId);
+                    }
+                }
+            } else {
+                $f7.toast.show({
+                    text: 'Please select a Training Device before submitting a query.',
+                    position: 'center',
+                    horizontalPosition: 'center'
+                });
+            }
+        };
+
+        // ===========================================
+        // UI HELPER FUNCTIONS
+        // ===========================================
+
+        let addSourcesToMessage = function (object) {
+            const messageSources = sourceManager.getByMessageId(object.attr('id'));
+            if (!messageSources || messageSources.length === 0) return;
+
+            let $footer = object.find('.message-text-footer');
+            $footer.appendTo(object.find('.message-text'));
+
+            if ($footer.length === 0) {
+                $footer = $('<div class="message-text-footer"></div>');
+                object.find('.message-text').append($footer);
+                $footer.html(footerTemplate);
+            }
+
+            const $leftSection = $footer.find('.sources');
+
+            // Group sources by icon
+            const groupedByIcon = {};
+            messageSources.forEach(source => {
+                const iconClass = source.icon || 'fa-solid fa-question';
+                if (!groupedByIcon[iconClass]) {
+                    groupedByIcon[iconClass] = {icon: iconClass, count: 0, names: []};
+                }
+                groupedByIcon[iconClass].count++;
+                groupedByIcon[iconClass].names.push(source.name);
+            });
+
+            const uniqueIcons = Object.values(groupedByIcon);
+            const visibleIcons = uniqueIcons.slice(0, 5);
+
+            let sourcesHTML = '<span id="source-' + object.attr('id') + '" class="link font-size-14 badge badge-round badge-outline">';
+
+            visibleIcons.forEach(iconGroup => {
+                const tooltipText = iconGroup.names.join(', ');
+                sourcesHTML += `<i data-tooltip="${tooltipText}" class="margin-half ${iconGroup.icon} fa-icon"></i>`;
+            });
+
+            sourcesHTML += '<span class="margin-left-half">Sources</span></span>';
+            $leftSection.html(sourcesHTML);
+
+            $("#source-" + object.attr('id')).on('click', function () {
+                openSourcePanel(object.attr('id'));
+            });
+        };
+
+        let addActionsToMessage = function (object) {
+            let $footer = object.find('.message-text-footer');
+            $footer.appendTo(object.find('.message-text'));
+
+            if ($footer.length === 0) {
+                $footer = $('<div class="message-text-footer"></div>');
+                object.find('.message-text').append($footer);
+                $footer.html(footerTemplate);
+            }
+
+            $footer.find('.message-footer-content').attr('data-message-id', object.attr('id'));
+            const $rightSection = $footer.find('.actions');
+
+            const actionsHTML = `
+            <a class="link action-button margin-left-half" data-action="edit" data-message-id="${object.attr('id')}">
+                <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="Edit content">edit</i>
+            </a>
+            <a class="link action-button margin-left-half" data-action="copy" data-message-id="${object.attr('id')}">
+                <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="Copy message">content_copy</i>
+            </a>
+            <a class="link action-button margin-left-half" data-action="like" data-message-id="${object.attr('id')}">
+                <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="This response is useful">thumb_up</i>
+            </a>
+            <a class="link action-button margin-left-half" data-action="dislike" data-message-id="${object.attr('id')}">
+                <i class="tooltip-init color-gray font-size-16 icon material-icons-outlined" data-tooltip="This response is not useful">thumb_down</i>
+            </a>
+        `;
+
+            $rightSection.html(actionsHTML);
+
+            $rightSection.find('.action-button').on('click', function () {
+                const action = $(this).data('action');
+                const messageId = $(this).data('message-id');
+
+                switch (action) {
+                    case 'copy':
+                        const targetElement = document.getElementById(messageId);
+                        const text = $(targetElement).find(".message-text").text();
+                        window.SIMBA.Utils.copyToClipboard(text)
+                            .then(() => {
+                                $f7.toast.show({
+                                    text: 'Message copied to clipboard',
+                                    position: 'center',
+                                    closeTimeout: 1500
+                                });
+                            })
+                            .catch(err => console.error('Copy failed:', err));
+                        break;
+                    case 'like':
+                        likeMessage(messageId);
+                        break;
+                    case 'dislike':
+                        dialogChoiceChip.open();
+                        break;
+                    case 'edit':
+                        editContent(extractMessageTextWithoutFooter(messageId), "my_editor", "my_file");
+                        break;
+                    default:
+                        console.log('Unknown action:', action);
+                }
+            });
+        };
+
+        function extractMessageTextWithoutFooter(messageId) {
+            var targetElement = document.getElementById(messageId);
+            if (!targetElement) {
+                console.error("Element with ID " + messageId + " not found");
+                return null;
+            }
+
+            var messageTextElement = targetElement.querySelector(".message-text");
+            if (!messageTextElement) {
+                console.error("Element with class 'message-text' not found");
+                return null;
+            }
+
+            var messageTextClone = messageTextElement.cloneNode(true);
+            var footers = messageTextClone.querySelectorAll(".message-text-footer");
+            footers.forEach(function (footer) {
+                footer.parentNode.removeChild(footer);
+            });
+
+            return messageTextClone.innerHTML;
+        }
+
+        let openPopoverText = function (event) {
+            const targetElement = event.target;
+            const guid = $(targetElement).attr('data-guid');
+            const messageElement = $(targetElement).closest('.message');
+            const messageId = messageElement.attr('id');
+
+            const page = parseInt($(targetElement).attr('data-page'), 10) || undefined;
+            const section = parseInt($(targetElement).attr('data-section'), 10) || undefined;
+            const name = $(targetElement).attr('data-filename') || 'Reference not found';
+            const content = $(targetElement).attr('data-content') || 'Could not find reference information.';
+
+            const sources = sourceManager.getByMessageId(messageId);
+            const result = getObjectAndTextByGuid(sources, guid, page, section);
+
+            if (!result) {
+                myReference = {name, page: page || "", section: section || "", content: "..." + content + "..."};
+            } else {
+                myReference = {
+                    name: result.sourceObject.id || result.sourceObject.name || "No name",
+                    page: page || (result.sourceObject.extra && result.sourceObject.extra.page) || "",
+                    section: section || (result.sourceObject.extra && result.sourceObject.extra.section) || "",
+                    content: result.extractedText || "No content",
+                    source: 'https://itc.simeng.es/' + result.sourceObject.source + '#phrase=true&page=' + page + '&search=' + result.extractedText
+                };
+            }
+
+            popoverText.open(targetElement);
+            updateTemplate();
+
+            $update(function () {
+                $("#view-source").on('click', function () {
+                    openSourcePanel(messageId);
+                    $(".source").parent().removeClass('bg-color-chrome');
+                    $(".source[id='" + guid + "']").parent().addClass('bg-color-chrome');
+                });
+                $("#view-document").on('click', function () {
+                    console.log(myReference.source);
+                    viewDocument(myReference.source, myReference.name, true);
+                });
+            });
+        };
+
+        // ===========================================
+        // HIGHLIGHT MANAGEMENT FUNCTIONS
+        // ===========================================
+
+        let showHighlights = function () {
+            updateTemplate();
+            if (!popupHighlights) {
+                popupHighlights = $f7.popup.create({
+                    el: $el.value.find('#popup-highlights')[0],
+                    swipeToClose: false,
+                    on: {
+                        opened: function () {
+                            app.on('sortableSort', function (listEl, data) {
+                                updateHighlightsOrder();
+                            });
+                        }
+                    }
+                });
+            }
+            popupHighlights.open();
+        };
+
+        let updateHighlightsOrder = function () {
+            const sortableEl = document.getElementById('sortable-highlights-list');
+            const listItems = sortableEl.querySelectorAll('li[data-highlight-id]');
+            const orderedIds = Array.from(listItems).map(item => item.getAttribute('data-highlight-id'));
+
+            highlightManager.updateOrder(orderedIds);
+            updateTemplate();
+        };
+
+        let removeHighlightFromPopup = function (e, highlightId) {
+            e.preventDefault();
+
+            highlightManager.remove(highlightId);
+
+            const highlightEl = document.getElementById(highlightId);
+            if (highlightEl) {
+                const parent = highlightEl.parentNode;
+                parent.insertBefore(document.createTextNode(highlightEl.textContent), highlightEl);
+                parent.removeChild(highlightEl);
+            }
+
+            updateTemplate();
+        };
+
+        let scrollToHighlight = function (highlightId) {
+            const highlightElement = document.getElementById(highlightId);
+            if (highlightElement) {
+                highlightElement.scrollIntoView({
+                    behavior: 'smooth',
+                    block: 'center',
+                    inline: 'nearest'
+                });
+
+                highlightElement.style.transition = 'all 0.3s ease';
+                highlightElement.style.transform = 'scale(1.05)';
+                highlightElement.style.boxShadow = '0 0 20px rgba(255, 255, 0, 0.8)';
+
+                setTimeout(() => {
+                    highlightElement.style.transform = 'scale(1)';
+                    highlightElement.style.boxShadow = 'none';
+                }, 1000);
+
+                app.toast.create({
+                    text: 'Scrolled to highlighted text',
+                    position: 'center',
+                    closeTimeout: 1500,
+                }).open();
+            } else {
+                app.toast.create({
+                    text: 'Highlight not found on page',
+                    position: 'center',
+                    closeTimeout: 1500,
+                }).open();
+            }
+        };
+
+        let toggleSortableDisable = function () {
+            const sortableEl = document.getElementById('sortable-highlights-list');
+            if (sortableEl) {
+                $f7.sortable.toggle(sortableEl);
+            }
+        };
+
+        let generalAction = function () {
+            const highlightTexts = highlightManager.getAllTexts();
+            const myText = "Please create a technical report using only the following information: '" + highlightTexts.join('\n') + "'";
+            isResponseInBackground = true;
+            setPrompt(myText);
+
+            setTimeout(() => {
+                isResponseInBackground = false;
+            }, 1000);
+        };
+
+        // ===========================================
+        // EVENT HANDLERS
+        // ===========================================
+
+        let handlePromptTextArea = function (e) {
+            prompt = e.target.value.length > 0 ? e.target.value : null;
+            updateTemplate();
+        };
+
+        let handleKeyDown = function (e) {
+            if (e.key === 'Enter' && e.shiftKey) return;
+            if (e.key === 'Enter' && !e.shiftKey && !mentionManager?.isSuggestionsVisible) {
+                e.preventDefault();
+                sendPrompt();
+            }
+        };
+
+        let handleDeviceSelection = function (e) {
+            myDevice = e.target.value;
+            updateTemplate();
+            document.getElementById('prompt').focus();
+        };
+
+        let handleOpenDeviceSelection = function (e) {
+            myDevice = null;
+            prompt = null;
+            updateTemplate();
+        };
+
+        let setPrompt = function (myPrompt, isSelection = 0) {
+            $("#prompt").val(myPrompt);
+            prompt = myPrompt;
+            if (isSelection) {
+                prompt = prompt + ': ' + selectedText;
+            }
+            sendPrompt();
+            popoverSelection.close();
+        };
+
+        /**
+         * Handles message addition with sources and actions
+         */
+        let onMessageAdded = function (object) {
+            syncTemplateData();
+
+            if (showBottomBar) {
+                const pageToolbar = document.getElementById('page-toolbar');
+                const promptArea = document.getElementById('prompt-area');
+                if (pageToolbar && promptArea) {
+                    pageToolbar.appendChild(promptArea);
+                }
+            }
+
+            // Style message elements
+            object.find('.message-name').addClass('card-header').remove();
+
+            // Handle tables
+            object.find('table').each(function (index) {
+                this.classList.add('data-table');
+                const tableId = this.id || 'data-table-' + Date.now() + '-' + index;
+                this.id = tableId;
+
+                const container = document.createElement('div');
+                container.className = 'table-container margin-bottom';
+                container.id = 'container-' + tableId;
+
+                const exportButton = document.createElement('a');
+                exportButton.href = '#';
+                exportButton.className = 'export-csv-button float-right margin-bottom-half margin-right-half';
+                exportButton.innerHTML = '<i class="fa fa-download"></i> CSV';
+                exportButton.dataset.table = tableId;
+                exportButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    exportTableToCSV(document.getElementById(tableId));
+                });
+
+                const parent = this.parentNode;
+                parent.insertBefore(container, this);
+                container.appendChild(exportButton);
+                container.appendChild(this);
+            });
+
+            // Handle code blocks
+            object.find('pre').each(function () {
+                $(this).addClass('block block-strong inset margin-vertical');
+                const codeClass = $(this).find('code').attr('class');
+                if (codeClass) {
+                    const language = codeClass.match(/language-(\w+)/)?.[1];
+                    if (language) {
+                        $(this).prepend('<div class="bg-color-black float-right padding-half small language-name">' + language + '</div>');
+                    }
+                }
+            });
+
+            // Add hover effects for message actions
+            object.on('mouseenter touchstart', function () {
+                $(this).find(".message-footer-content .actions").show();
+            }).on('mouseleave touchend', function () {
+                $(this).find(".message-footer-content .actions").hide();
+            });
+        };
+
+        /**
+         * Stops streaming response
+         */
+        let stopStreaming = function () {
+            isResponding = false;
+            updateTemplate();
+
+            try {
+                if (currentStreamingRequest) {
+                    if (typeof currentStreamingRequest.abort === 'function') {
+                        currentStreamingRequest.abort();
+                    } else if (currentStreamingRequest.xhr && typeof currentStreamingRequest.xhr.abort === 'function') {
+                        currentStreamingRequest.xhr.abort();
+                    }
+                    currentStreamingRequest = null;
+                }
+            } catch (error) {
+                console.error("Error stopping stream:", error);
+            }
+
+            const messageElement = $('.message:last-child .message-text');
+            if (messageElement.length) {
+                messageElement.append('<p><em>Response interrupted by user.</em></p>');
+                messageElement.find('.thinking-icon').remove();
+            }
+
+            $f7.toast.show({
+                text: 'Response interrupted by user',
+                position: 'center',
+                closeTimeout: 2000,
+            });
+        };
+
+        /**
+         * Scrolls to bottom of chat
+         */
+        let scrollToBottom = function () {
+            if (pageContent) {
+                pageContent.scrollTo({
+                    top: pageContent.scrollHeight,
+                    behavior: 'smooth'
+                });
+            }
+        };
+
+        /**
+         * Checks scroll position and shows/hides scroll button
+         */
+        let checkScrollPosition = function () {
+
+            if ((pageContent.offsetHeight + pageContent.scrollTop) >= pageContent.scrollHeight - 50) {
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        };
+
+        // ===========================================
+        // POPUP AND DIALOG INITIALIZATION
+        // ===========================================
+
+        let initializeDialogChoiceChip = function () {
+            dialogChoiceChip = $f7.dialog.create({
+                el: $el.value.find('#dialog-choice-chip'),
+                on: {
+                    close: function (dialog) {
+                        dialog.$el.find('form')[0].reset();
+                    }
+                }
+            });
+        };
+
+        let closeDialogChoiceChip = function () {
+            dialogChoiceChip.close();
+        };
+
+        let submitFormDialogChoiceChip = function () {
+            const form = dialogChoiceChip.$el.find('form');
+            const formData = $f7.form.convertToData(form);
+            form[0].reset();
+
+            if (formData.interests?.length) {
+                $f7.toast.show({
+                    text: 'Your feedback(s): ' + formData.interests.join(', ')
+                });
+            }
+            dialogChoiceChip.close();
+        };
+
+        let initializePopupTicket = function () {
+            popupTicket = $f7.popup.create({
+                el: $el.value.find('#popup-ticket')
+            });
+        };
+
+        let openPopupTicket = function () {
+            popupTicket.open();
+        };
+
+        let closePopupTicket = function (created = false) {
+            if (assistant) {
+                if (created) {
+                    formTicketValidator.resetForm();
+                } else {
+                    const newMessageId = window.SIMBA.Utils.generateUniqueId("assistant-thinking");
+                    $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                    const message = "<em class='margin-top-half'>Support ticket creation canceled by user</em>";
+                    messages.addMessage({
+                        attrs: {"data-id": newMessageId, "id": newMessageId},
+                        isTitle: false,
+                        text: message,
+                        textFooter: footerTemplate,
+                        cssClass: 'card no-margin-top padding-half',
+                        avatar: assistant.avatar,
+                        type: 'received',
+                    }, 'append', true);
+
+                    messageManager.addMessage('assistant', message);
+                }
+                popupTicket.close();
+            }
+        };
+
+        let initializeFormValidator = function () {
+            formTicketValidator = jQuery($el.value.find('form[name=ticket]')).validate({
+                rules: {
+                    problem_title: {required: true},
+                    problem_description: {required: true},
+                    device: {required: true}
+                },
+                messages: {
+                    problem_title: {required: 'Please enter a quick description of the issue.'},
+                    problem_description: {required: 'Please enter a full description and details of the issue.'},
+                    device: {required: 'Please enter the simulator/device.'}
+                },
+                submitHandler: function (form) {
+                    const payload = {
+                        name: 'action_open_support_ticket',
+                        params: $f7.form.convertToData(form),
+                        chat: chat.guid
+                    };
+
+                    $f7.request({
+                        url: window.config.api_methods.call_tool,
+                        method: 'POST',
+                        data: payload,
+                        contentType: 'application/json',
+                        dataType: 'json',
+                        headers: {'x-auth-token': window.config.token},
+                        success: function (data) {
+                            if (data?.data?.tool_domain === 'action') {
+                                $f7.toast.show({
+                                    text: 'Thank you for opening a Service Request. We will get back to you soon.',
+                                    cssClass: 'color-green'
+                                });
+
+                                const newMessageId = window.SIMBA.Utils.generateUniqueId("assistant-thinking");
+                                $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                                const message = md.render(buildServiceRequestMessage(data.data));
+                                messages.addMessage({
+                                    attrs: {"data-id": newMessageId, "id": newMessageId},
+                                    isTitle: false,
+                                    text: message,
+                                    textFooter: footerTemplate,
+                                    cssClass: 'card no-margin-top padding-half',
+                                    avatar: assistant.avatar,
+                                    type: 'received',
+                                }, 'append', true);
+
+                                messageManager.addMessage('assistant', message);
+                                closePopupTicket(true);
+                            }
+                        }
+                    });
+                }
+            });
+        };
+
+        let buildServiceRequestMessage = function (response) {
+            const {ticket_id, guid, url, created_at} = response;
+            const formattedDate = window.SIMBA.Utils.formatDate(created_at);
+
+            return `
+## Service Request Created Successfully
+
+Your service request has been submitted and assigned the following ID:
+
+**${ticket_id}**
+
+Created on: ${formattedDate}
+
+You can <a href="#" onclick="viewDocument('${url}','${ticket_id}')" class="link icon-only" target="_blank">click here to view details</a> or track the progress of your request.
+
+Thank you for your patience. Our support team will review your request shortly.
+`;
+        };
+
+        let initializeActionsCustomLayout = function () {
+            actionsCustomLayout = $f7.actions.create({
+                el: $el.value.find('#actions-custom-layout'),
+                closeByBackdropClick: false,
+                closeByOutsideClick: false,
+                closeOnEscape: false
+            });
+        };
+
+        let initPopoverSelection = function () {
+            popoverSelection = $f7.popover.create({
+                el: $el.value.find('#popover-selection')
+            });
+
+            document.addEventListener('contextmenu', function (event) {
+                const selection = window.getSelection();
+                const selectedTextValue = selection.toString().trim();
+
+                if (selectedTextValue.length > 0) {
+                    event.preventDefault();
+                    selectedText = selectedTextValue; // <-- AÑADIR ESTA LÍNEA
+                    handleTextSelection(event, selectedTextValue, selection);
+                }
+            });
+        };
+
+        /**
+         * Handles text selection for highlighting
+         */
+        let handleTextSelection = function (event, selectedText, selection) {
+            const targetElement = event.target;
+            let isMessageText = false;
+            let isAlreadyHighlighted = false;
+
+            // Check if already highlighted
+            if (targetElement.classList?.contains('highlighted-text') ||
+                targetElement.classList?.contains('reporting-highlight')) {
+
+                const elementId = targetElement.id;
+                if (elementId) {
+                    highlightManager.remove(elementId);
+
+                    // Remove from DOM
+                    const parent = targetElement.parentNode;
+                    parent.insertBefore(document.createTextNode(targetElement.textContent), targetElement);
+                    parent.removeChild(targetElement);
+
+                    updateTemplate();
+                    selection.removeAllRanges();
+                    return;
+                }
+            }
+
+            // Check if in message text
+            let currentElement = targetElement;
+            while (currentElement && currentElement !== document.body) {
+                if (currentElement.classList?.contains('message-text')) {
+                    isMessageText = true;
+                    break;
+                }
+                currentElement = currentElement.parentElement;
+            }
+
+            if (isMessageText && !isAlreadyHighlighted) {
+                try {
+                    const range = selection.getRangeAt(0);
+                    const highlightSpan = document.createElement('span');
+                    highlightSpan.style.backgroundColor = '#415c8d';
+                    highlightSpan.style.color = 'black';
+                    highlightSpan.className = 'highlighted-text';
+
+                    const myId = window.SIMBA.Utils.generateUniqueId('highlight');
+                    highlightSpan.id = myId;
+
+                    try {
+                        range.surroundContents(highlightSpan);
+                    } catch (e) {
+                        const contents = range.extractContents();
+                        highlightSpan.appendChild(contents);
+                        range.insertNode(highlightSpan);
+                    }
+
+                    const rect = highlightSpan.getBoundingClientRect();
+                    const tempTarget = document.createElement('div');
+                    tempTarget.style.cssText = `position:absolute;left:${rect.left}px;top:${rect.bottom}px;width:1px;height:1px;pointer-events:none;`;
+                    tempTarget.id = 'temp-popover-target';
+                    document.body.appendChild(tempTarget);
+
+                    const popoverEl = document.getElementById('popover-selection');
+                    if (popoverEl) {
+                        popoverEl.setAttribute('data-selected-text', selectedText);
+                        popoverEl.setAttribute('data-selected-id', myId);
+                    }
+
+                    popoverEl.addEventListener('popover:close', () => {
+                        setTimeout(() => {
+                            app.$("#popover-selection").find('.input-clear-button').trigger("click");
+                        }, 1000);
+                        clearHighlights();
+                    });
+
+                    if (popoverSelection) {
+                        popoverSelection.open('#temp-popover-target');
+                    }
+
+                    setTimeout(() => {
+                        const tempEl = document.getElementById('temp-popover-target');
+                        if (tempEl) {
+                            document.body.removeChild(tempEl);
+                        }
+                    }, 100);
+
+                } catch (error) {
+                    console.error('Error in highlighting process:', error);
+                }
+            }
+        };
+
+        let copyToClipboard = function () {
+            const popoverEl = document.getElementById('popover-selection');
+            const selectedText = popoverEl.getAttribute('data-selected-text');
+
+            if (selectedText) {
+                window.SIMBA.Utils.copyToClipboard(selectedText)
+                    .then(() => {
+                        app.toast.create({
+                            text: 'Text copied to clipboard',
+                            position: 'center',
+                            closeTimeout: 1500,
+                        }).open();
+                    })
+                    .catch(err => {
+                        console.error('Copy failed:', err);
+                        app.toast.create({
+                            text: 'Failed to copy text',
+                            position: 'center',
+                            closeTimeout: 1500,
+                        }).open();
+                    });
+            }
+        };
+
+        let highlightForReporting = function () {
+            const popoverEl = document.getElementById('popover-selection');
+            const selectedId = popoverEl.getAttribute('data-selected-id');
+            const selectedText = popoverEl.getAttribute('data-selected-text');
+
+            const highlightEl = document.getElementById(selectedId);
+            if (highlightEl) {
+                highlightEl.style.backgroundColor = 'yellow';
+                highlightEl.style.color = 'black';
+                highlightEl.classList.add('reporting-highlight');
+
+                // Use SIMBA highlight manager
+                highlightManager.add(selectedId, selectedText);
+
+                highlightEl.setAttribute('data-persistent', 'true');
+                updateTemplate();
+                popoverSelection.close();
+            }
+        };
+
+        let clearHighlights = function () {
+            // Clear temporary highlights that don't have data-persistent
+            document.querySelectorAll('.highlighted-text:not([data-persistent])').forEach(el => {
+                const parent = el.parentNode;
+                parent.insertBefore(document.createTextNode(el.textContent), el);
+                parent.removeChild(el);
+            });
+        };
+
+        // ===========================================
+        // CONFIGURATION MANAGEMENT
+        // ===========================================
+
+        let initializePopupConfig = function () {
+            popupConfig = $f7.popup.create({
+                el: $el.value.find('#popup-config')
+            });
+        };
+
+        let openPopupConfig = function () {
+            popupConfig.open();
+        };
+
+        let closePopupConfig = function () {
+            formConfigValidator.resetForm();
+            popupConfig.close();
+        };
+
+        let initializeConfigFormValidator = function () {
+            formConfigValidator = jQuery($el.value.find('form[name=config]')).validate({
+                rules: {
+                    api_url: {required: true, url: true},
+                    token: {required: true},
+                    completion_url: {required: true, url: true},
+                    api_key: {required: true},
+                    model: {required: true},
+                    max_tokens: {required: true, min: 100, max: 100000},
+                    token_limit: {required: true, min: 1000, max: 200000},
+                    temperature: {required: true, min: 0, max: 2},
+                    tool_temperature: {required: true, min: 0, max: 2},
+                    summary_model: {required: true}
+                },
+                messages: {
+                    api_url: {required: 'Please enter the API URL.', url: 'Please enter a valid URL.'},
+                    token: {required: 'Please enter the authentication token.'},
+                    completion_url: {
+                        required: 'Please enter the completion service URL.',
+                        url: 'Please enter a valid URL.'
+                    },
+                    api_key: {required: 'Please enter the API Key.'}
+                },
+                submitHandler: function (form) {
+                    const formData = $f7.form.convertToData(form);
+
+                    // Update configuration using SIMBA config manager
+                    configManager.updateConfig({
+                        assistantApiUrl: formData.api_url,
+                        assistantAuthToken: formData.token,
+                        completionsApiUrl: formData.completion_url,
+                        completionsApiKey: formData.api_key,
+                        model: formData.model,
+                        maxTokens: parseInt(formData.max_tokens),
+                        tokenLimit: parseInt(formData.token_limit),
+                        temperature: parseFloat(formData.temperature),
+                        toolTemperature: parseFloat(formData.tool_temperature),
+                        summaryModel: formData.summary_model
+                    });
+
+                    // Update global variables
+                    TOKEN_LIMIT = parseInt(formData.token_limit);
+                    MAX_TOKENS = parseInt(formData.max_tokens);
+                    DEFAULT_TEMPERATURE = parseFloat(formData.temperature);
+                    DEFAULT_MODEL = formData.model;
+                    SUMMARY_MODEL = formData.summary_model;
+
+                    // Update tool manager config if it exists
+                    if (toolManager) {
+                        toolManager.updateConfig(configManager.getConfig());
+                    }
+
+                    $f7.toast.show({
+                        text: 'Configuration saved successfully',
+                        cssClass: 'color-green',
+                        closeTimeout: 3000
+                    });
+
+                    closePopupConfig();
+                }
+            });
+        };
+
+        let initializePopoverText = function () {
+            popoverText = $f7.popover.create({
+                el: $el.value.find('#popover-text'),
+                on: {
+                    closed: function () {
+                        myReference = null;
+                        updateTemplate();
+                    }
+                }
+            });
+        };
+
+        // ===========================================
+        // UTILITY FUNCTIONS
+        // ===========================================
+
+        let setupDocumentUpload = function () {
+            const fileInput = document.getElementById('document-upload');
+            fileInput.addEventListener('change', function (e) {
+                if (e.target.files && e.target.files.length > 0) {
+                    if (window.myFileDropzone) {
+                        window.myFileDropzone.handleFiles(e.target.files);
+                    }
+                }
+            });
+        };
+
+        let handleFileUploadClick = function () {
+            const fileInput = document.getElementById('document-upload');
+            fileInput.click();
+        };
+
+        let openSourcePanel = function (messageId) {
+            if (messageId) {
+                const messageSources = sourceManager.getByMessageId(messageId);
+                if (messageSources && messageSources.length > 0) {
+                    renderSourcesInPanel(messageSources);
+
+                    $(".source").each(function () {
+                        $(this).on('mouseover touchstart', function () {
+                            const elementId = $(this).attr('id');
+                            $('.reference[data-guid="' + elementId + '"]').addClass('listening-button');
+                        }).on('mouseout touchend', function () {
+                            const elementId = $(this).attr('id');
+                            $('.reference[data-guid="' + elementId + '"]').removeClass('listening-button');
+                        });
+                    });
+
+                    app.panel.open('right');
+                }
+            }
+        };
+
+        let renderSourcesInPanel = function (sources) {
+            const container = document.getElementById('panel-sources-content');
+            if (!container) return;
+
+            container.innerHTML = `
+            <div class="no-shadow">
+                <div class="card-content">
+                    <div class="list media-list margin-top-auto">
+                        <ul>
+                            ${sources.map((item) => `
+                                <li>
+                                    <a href="#" onclick="viewDocument('https://itc.simeng.es/${item.source}','${item.name}')" id="${item.guid}" class="source color-white link icon-only">
+                                        <div class="item-content">
+                                            <div class="item-media"><i class="${item.icon}"></i></div>
+                                            <div class="item-inner">
+                                                <div class="source-title item-title">${item.name}</div>
+                                                <div class="source-summary item-text">${item.summary}</div>
+                                                <div class="source-extra item-text">${item.site} - ${item.device} - ${item.id}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        `;
+        };
+
+        let getObjectAndTextByGuid = function (sources, guid, page, section) {
+            if (!sources || !Array.isArray(sources)) return null;
+
+            const foundObject = sources.find(item => item.guid === guid);
+            if (!foundObject) return null;
+
+            let extractedText = null;
+            if (page !== undefined && section !== undefined && foundObject.references) {
+                const foundReference = foundObject.references.find(ref =>
+                    ref.page === page && ref.section === section
+                );
+                if (foundReference) {
+                    extractedText = foundReference.text;
+                }
+            }
+
+            if (extractedText === null && foundObject.text) {
+                const words = foundObject.summary ? foundObject.summary.split(/\s+/) : foundObject.text.split(/\s+/);
+                extractedText = words.slice(0, 10).join(' ') + (words.length > 10 ? '...' : '');
+            }
+
+            return {
+                sourceObject: foundObject,
+                extractedText: extractedText
+            };
+        };
+
+        let addCodeHeaders = function () {
+            $('table').each(function (index) {
+                this.classList.add('data-table');
+                const tableId = this.id || 'data-table-' + Date.now();
+                this.id = tableId;
+
+                const container = document.createElement('div');
+                container.className = 'table-container margin-bottom';
+                container.style.overflow = 'overlay';
+                container.id = 'container-' + tableId;
+
+                const exportButton = document.createElement('span');
+                exportButton.className = 'export-csv-button link float-right margin-bottom-half margin-right-half';
+                exportButton.innerHTML = '<i class="fa fa-download"></i> CSV';
+                exportButton.dataset.table = tableId;
+                exportButton.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    const targetTableId = this.dataset.table;
+                    exportTableToCSV(document.getElementById(targetTableId));
+                });
+
+                const parent = this.parentNode;
+                parent.insertBefore(container, this);
+                container.appendChild(exportButton);
+                container.appendChild(this);
+            });
+        };
+
+        let likeMessage = function (messageId) {
+            console.log('Message liked:', messageId);
+            $f7.toast.show({
+                text: 'Thank you for your feedback!',
+                cssClass: 'color-green',
+                closeTimeout: 2000
+            });
+        };
+
+        let exportTableToCSV = function (table) {
+            if (!table) return;
+
+            const rows = table.querySelectorAll('tr');
+            const csv = [];
+
+            rows.forEach(row => {
+                const cols = row.querySelectorAll('td, th');
+                const rowData = [];
+                cols.forEach(col => {
+                    rowData.push('"' + col.textContent.replace(/"/g, '""') + '"');
+                });
+                csv.push(rowData.join(','));
+            });
+
+            const csvContent = csv.join('\n');
+            const blob = new Blob([csvContent], {type: 'text/csv'});
+            const url = window.URL.createObjectURL(blob);
+
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'table-export.csv';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            window.URL.revokeObjectURL(url);
+        };
+
+        /**
+         * Handles stask execution from file dropzone
+         */
+        let handleStaskExecution = function (file, text) {
+            const stask = {file: file, procedure: text};
+            localStorage.setItem('stask', JSON.stringify(stask));
+
+            app.popup.create({
+                content: `
+                <div class="popup popup-tablet-fullscreen">
+                    <div class="view">
+                        <div class="page">
+                            <div class="navbar">
+                                <div class="navbar-bg"></div>
+                                <div class="navbar-inner">
+                                    <div class="title">${text.procedure.name}</div>
+                                    <div class="right">
+                                        <a href="#" class="link popup-close"><i class="fa fa-close"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="page-content hide-navbar-on-scroll">
+                                <iframe src="https://assistant.simeng.es/#!/screens/walkthrough/"
+                                    style="width:100%; height:100%; border:none;"
+                                    frameborder="0"></iframe>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `,
+                on: {
+                    opened: function () {
+                        console.log('Stask popup opened');
+                    }
+                }
+            }).open();
+        };
+
+        // ===========================================
+        // INITIALIZATION FUNCTIONS
+        // ===========================================
+
+        let initializeMessagebar = function () {
+            messagebar = $f7.messagebar.create({
+                el: $el.value.find('.messagebar-chat'),
+                textareaEl: $el.value.find('.messagebar-chat textarea')
+            });
+        };
+
+        let initializeMessages = function () {
+            messages = $f7.messages.create({
+                el: $el.value.find('.messages'),
+                scrollMessages: true,
+                autoLayout: true,
+                scrollMessagesOnEdge: true,
+                firstMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message && !message.isTitle && (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name)) {
+                        return true;
+                    }
+                    return false;
+                },
+                lastMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message && !message.isTitle && (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)) {
+                        return true;
+                    }
+                    return false;
+                },
+                tailMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message && !message.isTitle && (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name)) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        };
+
+        // ===========================================
+        // FRAMEWORK7 LIFECYCLE HOOKS
+        // ===========================================
+
+        $on('pageBeforeIn', function () {
+            scrollToBottomBtn = document.getElementById('scrollToBottom');
+            pageContent = document.getElementById('conversationPage');
+
+            // Initialize various dialogs and popups
+            initializeDialogChoiceChip();
+            initializePopupTicket();
+            initializeActionsCustomLayout();
+            initializeFormValidator();
+            initPopoverSelection();
+        });
+
+        $on('pageAfterIn', function () {
+            const hasAcceptedTerms = localStorage.getItem('terms_accepted');
+
+            if (!hasAcceptedTerms) {
+                $f7.views.main.router.navigate('/screens/terms/', {
+                    reloadCurrent: true,
+                    clearPreviousHistory: true
+                });
+                return;
+            }
+
+            loadAssistants().then(myAssistant => {
+                console.log("Assistant loaded:", myAssistant);
+                if (myAssistant) {
+                    // Initialize mention manager
+                    if (mentionManager) {
+                        mentionManager.init();
+                    }
+
+                    // Initialize file dropzone
+                    window.myFileDropzone = new FileDropzone({
+                        dropzoneId: 'file-dropzone',
+                        fileInputId: 'file-upload',
+                        textareaId: 'prompt',
+                        useSimbaDocumentTags: true,
+                        framework7: $f7,
+                        onFileAdded: function (file) {
+                            console.log("File added:", file.name);
+                        },
+                        onFileRemoved: function (file) {
+                            console.log("File removed:", file.name);
+                        },
+                        onTextExtracted: function (file, text) {
+                            console.log("Text extracted from", file.name);
+                        },
+                        onStaskExecuted: function (file, text) {
+                            handleStaskExecution(file, text);
+                        },
+                        onAllFilesProcessed: function (files) {
+                            console.log("All files processed:", files.length);
+                        }
+                    });
+
+                    scrollToBottomBtn = document.getElementById('scrollToBottom');
+                    pageContent.addEventListener('scroll', checkScrollPosition);
+                    checkScrollPosition();
+                    updateTemplate();
+                } else {
+                    $f7.toast.show({
+                        text: 'No assistant is available',
+                        cssClass: 'color-red'
+                    });
+                }
+            }).catch(error => {
+                console.error("Error loading assistants:", error);
+            });
+
+            initializeMessagebar();
+            initializeMessages();
+            setupDocumentUpload();
+            initializePopupConfig();
+            initializePopoverText();
+            initializeConfigFormValidator();
+        });
+
+        // ===========================================
+        // RETURN TEMPLATE RENDERER
+        // ===========================================
+
+        return $render;
+    }
+</script>
+

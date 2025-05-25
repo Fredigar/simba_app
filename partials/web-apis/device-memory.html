@@ -1,0 +1,91 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Device Memory API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Device Memory API returns how much RAM the device has in gigabytes, rounded down to the nearest power of two.</p>
+                        <p>This allows us to make runtime decisions about what resources to serve based on the returned device memory value, for example, serve a 'lite' version of the app to the users on low-memory devices.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        ${deviceMemory ? $h`
+                        <div class="font-size-32 font-weight-bold">${deviceMemory}</div>
+                        ` : $h`
+                        <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        <div class="font-size-16 margin-top-half text-color-gray">Couldn't get information about the device memory.</div>
+                        `}
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.deviceMemory ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Device Memory API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Device Memory API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Device_Memory_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let deviceMemory = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                getDeviceMemory();
+            });
+        }
+
+        let getDeviceMemory = function() {
+            deviceMemory = navigator.deviceMemory ? '~ ' + navigator.deviceMemory + ' GB' : null;
+            $update();
+        }
+
+        return $render;
+    }
+</script>

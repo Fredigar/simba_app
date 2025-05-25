@@ -1,0 +1,2402 @@
+<template>
+    <div class="page no-tabbar" data-name="cart">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">${chat.title}</div>
+                <div class="right">
+                    <a href="#" data-tooltip="Reproducir conversación" class="link tooltip-init icon-only"><i
+                            class="icon material-icons">play</i></a>
+                    <a href="#" data-tooltip="Nueva conversación" @click="${createChat}"
+                       class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
+                    <a href="/screens/conversation-list/${assistant.guid}" data-tooltip="Histórico de conversaciones"
+                       class="tooltip-init link icon-only"><i class="icon material-icons">forum</i></a>
+                    <a href='#' id="chat_setup" data-tooltip="Más opciones" class='tooltip-init link  icon-only'><i
+                            class='icon f7-icons'>ellipsis_vertical</i></a>
+                </div>
+            </div>
+        </div>
+
+        <div class="${isResponding ? $h`disabled`:$h``}  toolbar messagebar messagebar-chat">
+
+            <div id="voiceStatus" ${speechToText ? $h`` : $h`style="display:none" `}
+                 class="${speechToText ? $h`block` : $h``} mic-mode text-align-center">${speechToText}
+            </div>
+
+            <div class="toolbar-inner" style="min-height: 70px;"><a data-tooltip='Upload a picture' href="#"
+                                                                    @click="${takePhotoHtml5}"
+                                                                    class="tooltip-init link margin-right-half margin-left-half ripple-color-gray"><i
+                    class="icon f7-icons">camera</i></a>
+                <div class="messagebar-area" style="overflow:visible">
+                    <div class="fab fab-center-center mic-mode margin-bottom" style="display:none">
+
+                        <canvas id="canvas-speaker" @click="${stopAllAudios}" style="display:none" width="70"
+                                height="50"></canvas>
+
+                        <a id="btn-recognition" @click="${startRecognition}" href="#"
+                           class="${isRecognizing ? $h`listening-button` : $h` `}">
+                            <i class="fa fa-icon fa-${isRecognizing ? $h`close` : $h`microphone`}"> </i>
+                        </a>
+
+                    </div>
+                    <textarea id="prompt" @input="${handlePromptTextArea}" @keydown="${handleKeyDown}"
+                              placeholder="Message"
+                              class="input-with-value resizable keyboard-mode"></textarea></div>
+                <a href="#" @click="${initKeyboard}" data-tooltip='Write the message' style="display:none"
+                   class="tooltip-init mic-mode link margin-left-half margin-right-half margin-left-half ripple-color-gray">
+                    <i class="icon f7-icons">keyboard</i></a>
+                ${!prompt ? $h`
+                <a href="#" @click="${initSpeech}" data-tooltip='Speech the message'
+                   class="link tooltip-init margin-left-half margin-right-half keyboard-mode ripple-color-gray">
+                    <i class="icon f7-icons">mic</i>
+                </a>
+                ` : $h`
+                <a href="#" @click="${sendPrompt}" data-tooltip='Send message'
+                   class="link tooltip-init margin-left-half margin-right-half keyboard-mode ripple-color-gray">
+                    <i class="icon material-icons">send</i>
+                </a>op
+                `}
+            </div>
+        </div>
+        <div class="page-content" id="conversationPage">
+            <!--div class="block block-strong card margin-half inset display-flex flex-direction-column align-items-center justify-content-flex-start no-margin-vertical text-align-center">
+                <div><img class="avatar shape-circle" src= src="${assistant.avatar}" height="96" alt=""/></div>
+                <div class="font-size-16 font-weight-600 margin-top">${assistant.name}</div>
+                <div class="font-size-14 margin-top text-color-gray">${assistant.description}</div>
+
+            </div-->
+            <div class="messages-content justify-content-center padding-top row">
+                <div class="col-100 large-60 medium-75 messages xlarge-70" id="messages-space">
+                </div>
+            </div>
+            <div class="block-footer"></div>
+
+        </div>
+        <div id="scrollToBottom" @click="${scrollToBottom}" class="fab fab-center-bottom color-gray opacity-75">
+            <a href="#">
+                <i class="fa fa-arrow-down"></i>
+            </a>
+        </div>
+        ${isResponding ? $h`
+        <div class="fab fab-extended fab-center-bottom"><a href="#" @click="${stopTransmition}"><i class="icon material-icons">stop</i><span class="fab-text">Stop</span></a></div>
+        `:$h``}
+        <div id="window-media-audio" class="notification">
+            <div class="notification-header">
+                <span class="notification-close-button"></span>
+            </div>
+            <div class="notification-content">
+
+                <div class="notification-text">
+                    <div class="row audio-controls">
+                        <div class="col-30 text-align-center">
+                            <div class="col" id="audio-timer">00:00/01:30</div>
+                        </div>
+                        <div class="col-70 row">
+                            <div class="col col-15">
+                                <a class="link button audio-control" id="prev-audio" href="#">
+                                    <i class="material-icons">skip_previous</i>
+                                </a>
+                            </div>
+                            <div class="col col-15">
+                                <a class="link button audio-control" id="rewind-10s" href="#">
+                                    <i class="material-icons">replay_10</i>
+                                </a>
+                            </div>
+                            <div class="col col-15">
+                                <a class="link button audio-control" id="play-pause" href="#">
+                                    <i class="material-icons"> ${isPlaying ? $h`pause`:$h`play_arrow`}</i>
+                                </a>
+                            </div>
+                            <div class="col col-15">
+                                <a class="link button audio-control" id="forward-10s" href="#">
+                                    <i class="material-icons">forward_10</i>
+                                </a>
+                            </div>
+                            <div class="col col-15">
+                                <a class="link button audio-control" id="next-audio" href="#">
+                                    <i class="material-icons">skip_next</i>
+                                </a>
+                            </div>
+                            <div class="col col-15">
+                                <div class="chip" id="playback-speed">
+                                    <div class="chip-label">1x</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="notification-media">
+                <audio style="display:none" controls preload="metadata">
+                    <source type="audio/mp3"/>
+                </audio>
+            </div>
+        </div>
+
+        <div id="popup-camera" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">
+                            <div>Capture the moment</div>
+                            <div class="subtitle">Make a picture</div>
+                        </div>
+                        <div class="right">
+                            ${$f7.device.cordova ? $h`
+                            ${!imageTaken ? $h`
+                            <!--<a class="link icon-only" @click="${toggleCameraTorch}">
+                                <i class="icon material-icons color-white">${isTorchOn ? $h`flash_on` : $h`flash_off`}</i>
+                            </a-->
+
+                            <a href="#" data-tooltip='Use system camera' class="link tooltip-init icon-only"
+                               @click="${takePhoto}">
+                                <i class="icon material-icons">camera_enhance</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                            ${multipleCamera ? $h`
+                            ${!imageTaken ? $h`
+                            <a data-tooltip='Change picture' class="link tooltip-init icon-only"
+                               @click="${toggleCamera}">
+                                <i class="icon material-icons color-white">flip_camera_ios</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar messagebar">
+
+                    <div ${speechToText ? $h`` : $h`style="display:none" `}
+                         class="${speechToText ? $h`block` : $h``} mic-mode text-align-center">${speechToText}
+                    </div>
+
+                    <div class="toolbar-inner" style="min-height: 70px;">
+                        ${imageTaken ? $h`
+                        <a href="#" @click="${toggleCameraView}"
+                           class="link margin-left ripple-color-gray"><i
+                                class="icon material-icons">close</i></a>
+                        ` : $h` `}
+                        <div class="messagebar-area" style="overflow:visible">
+                            <div class="fab fab-center-center margin-bottom">
+                                <a id="btn-capture" @click="${captureAndSendImage}" href="#" data-tooltip='Take picture'
+                                   class="tooltip-init">
+                                    <i class="icon material-icons">camera</i>
+                                </a>
+                            </div>
+                        </div>
+                        ${imageTaken ? $h`<a @click="${sendImage}" data-tooltip='Use this picture' href="#"
+                                             class="link tooltip-init margin-right ripple-color-gray"><i
+                            class="icon material-icons">check</i></a>
+                        ` : $h` `}
+
+
+                    </div>
+                </div>
+                <div class="page-content">
+                    <video id="camera-preview" autoplay></video>
+                    <img id="captured-image" src="" style="display:none" alt="Imagen Capturada"/>
+                </div>
+            </div>
+        </div>
+
+        <div id="center-indicator"></div>
+        <div id="popover-media" class="popover">
+            <div class="popover-inner">
+                <div class="block margin-vertical">
+                    <div class="responsive-container">
+                        <iframe id="youtube-player" style="width:600px" class="responsive-content shape-rounded-square" src="" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</template>
+<style>
+
+    @keyframes pulse-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    @keyframes thinking-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.5);
+            opacity: 0.3;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    #center-indicator {
+        position: fixed;
+        left: 50%;
+        top: 50%;
+        width: 1px;
+        height: 1px;
+        pointer-events: none;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+    #camera-preview, #captured-image {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
+    }
+
+    pre {
+        background-color: #2b2b2b !important;
+        overflow: auto;
+    }
+
+    pre code {
+        width: 100% !important;
+        display: block;
+    }
+
+    code:not(pre code) {
+        background-color: darkgray;
+    }
+
+    .message {
+        max-width: 100% !important;
+        /* text-align: right; */
+        flex-direction: row !important;
+        align-self: normal !important;
+        margin-left: 10px !important;
+        margin-right: 10px !important;
+        text-align: left !important;
+        padding-top: 0px !important;
+    }
+
+
+    .message-sent.message-tail .message-bubble:before {
+        border: none !important;
+    }
+
+    pre .hljs {
+        background-color: inherit !important;
+        color: #fff4f4 !important;
+    }
+
+    .message-received.message-tail .message-bubble:before {
+        border: none !important;
+    }
+
+    .message-text {
+        font-size: 1.1em !important;
+    }
+
+    .message-text-header {
+        float: right !important;
+        position: absolute;
+        width: 100%;
+        right: 0px;
+        top: -31px;
+        color: white;
+        text-align: right !important;
+    }
+
+    .message:not(.message-first) .message-name {
+        display: inherit !important;
+    }
+
+    .message-content {
+        align-items: normal !important;
+        width: 100% !important;
+    }
+
+    .messages-content {
+        background-color: inherit !important;
+    }
+
+    .messages {
+        background-color: inherit !important;
+    }
+
+    .message-bubble {
+
+        color: inherit !important;
+        background: inherit !important;
+        width: 100% !important;
+        padding-top: 0px !important;
+    }
+    .card-title{
+        font-size:1.4em;
+    }
+    .message-name {
+        font-weight: 800;
+        font-size: 0.9em;
+        margin-top: 15px !important;
+        padding-left: 0px !important;
+        color: inherit;
+    !important
+    }
+
+    .language-name {
+        margin-right: -15px;
+        margin-top: -15px;
+        font-size: 10px !important;
+    }
+
+    /*.message-text-footer {
+        visibility: hidden;
+    }*/
+
+    .chip-source {
+        width:200px!important;
+    }
+
+    .listening-button {
+        animation: pulse-animation 2s infinite;
+    }
+
+    .card-header {
+        margin-top: 3px !important;
+    }
+
+    .thinking-icon {
+        bottom: 1px;
+        position: relative;
+        animation: thinking-animation 2s infinite;
+    }
+
+    .speech-icon {
+        float: right;
+        margin-left: 5px;
+    }
+
+    #voiceStatus {
+        font-size: 1.3em;
+        font-weight: 500;
+    }
+</style>
+<script>
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let photo = null;
+        let photo_description = '';
+        let audio = null;
+        let mode = 'keyboard';
+        let response = '';
+        let recognition = null;
+        let lastRecognizedText = null;
+        let lastCancelStreaming = '';
+        let lastTextStreaming = '';
+        let isRecognizing = false;
+        let autoPlay = false;
+        let isPlaying = false;
+        let mute = true;
+        let audioQueue = [];
+        let historyAudio = [];
+        let currentMessageId = null;
+        let windowMediaAudio = null;
+        const playbackSpeeds = [1, 1.5, 2];
+        // Índice de la velocidad de reproducción actual
+        let currentSpeedIndex = 0;
+        let speechToText = null;
+        let recognitionMode = "html5"//'html5'//'system' | 'auto'
+        let popupCamera = null;
+        let faceMode = 'environment' //user
+        let videoStream = null;
+        let isTorchOn = false;
+        let isVibrating = false;
+        let isScrolling = false;
+        let isResponding = null;
+        let notFinishedMessage = '';
+        let track;
+        let multipleCamera = false;
+        let imageTaken = null;
+        let base64Image = null;
+        let prompt = null;
+        let messages = null;
+        let messagebar = null;
+        let videos = [];
+        let player = null;
+        let currentVideo = null;
+        let ctx = new (window.AudioContext || window.webkitAudioContext || window.mozAudioContext)();
+        let analyser = ctx.createAnalyser();
+        let popoverLinks = null;
+        let converter = new showdown.Converter({
+            tables: true,
+            extensions: [
+                showdownKatex({
+                    throwOnError: true,
+                    displayMode: true,
+                    errorColor: '#1500ff',
+                    delimiters: [
+                        { left: "\\(", right: "\\)", display: false },
+                        { left: "\\[ ", right: " \\]", display: true },
+                        { left: '$', right: '$', display: true },
+                        { left: '~', right: '~', display: false },
+                        { left: '&&', right: '&&', display: true },
+                    ],
+                }),
+            ]
+        });
+
+        let breakAutoScroll = false;
+        let user = {
+            guid: '05F1A0C-54F6-5A83-25E0-13EB149B237'
+        }
+        let assistant = {
+            name: 'Boot Assistant',
+            thinkIcon: "▮",
+            avatar:'',
+            description:''
+        };
+
+        let chat = {
+            guid: $f7route.params.guid,
+            title: 'New chat'
+        }
+        $update();
+        let frequencyData = new Uint8Array(analyser.frequencyBinCount);
+        analyser.fftSize = 2048; // Esto es un ejemplo, puedes aumentarlo según tus necesidades
+        // Reducir el smoothingTimeConstant para una respuesta más inmediata
+        analyser.smoothingTimeConstant = 0.3; // Valores más bajos = menos suavizado
+        let scrollToBottomBtn = null;
+        let pageContent = null;
+        let popoverMedia =  null;
+        let parseFormulas = function(text) {
+            //      return text.replace('\\[','&&').replace('\\]','&&').replace('\(','~').replace('\)','~')
+            text = text.replaceAll('\\[', '```latex\n')
+                .replaceAll('\\]', '\n```')
+                .replaceAll('\\(', '~')
+                .replaceAll('\\)', '~');
+            return text;
+
+        }
+
+        let initializeWindowMediaAudio = function () {
+            windowMediaAudio = $f7.notification.create({
+                el: $el.value.find('#window-media-audio'),
+                on: {
+                    open: function (notification) {
+
+                        // Retroceder 10 segundos
+                        notification.$el.find('#rewind-10s').on('click', function () {
+                            rewind10Seconds();
+                        });
+
+                        // Reproducir o pausar
+                        notification.$el.find('#play-pause').on('click', function () {
+                            togglePlayPause();
+                        });
+
+                        // Avanzar 10 segundos
+                        notification.$el.find('#forward-10s').on('click', function () {
+                            forward10Seconds();
+                        });
+
+                        // Reproducir el audio anterior
+                        notification.$el.find('#prev-audio').on('click', function () {
+                            playPreviousAudio();
+                        });
+
+                        // Reproducir el siguiente audio
+                        notification.$el.find('#next-audio').on('click', function () {
+                            playNextAudio2();
+                        });
+
+                        // Cambiar la velocidad de reproducción
+                        notification.$el.find('#playback-speed').on('click', function () {
+                            changePlaybackSpeed();
+                        });
+                    },
+                    close: function (notification) {
+                        audio.pause();
+                    }
+                }
+            });
+        }
+
+        let updateAudioTimer = function (audioElement) {
+            audioElement.addEventListener('timeupdate', function () {
+                var currentTime = formatTime(audioElement.currentTime);
+                var duration = formatTime(audioElement.duration);
+                document.getElementById('audio-timer').textContent = currentTime + '/' + duration;
+            });
+        }
+
+        let formatTime = function (time) {
+            var minutes = Math.floor(time / 60);
+            var seconds = Math.floor(time % 60);
+            minutes = (minutes < 10) ? '0' + minutes : minutes;
+            seconds = (seconds < 10) ? '0' + seconds : seconds;
+            return minutes + ":" + seconds;
+        }
+
+        let changePlaybackSpeed = function () {
+            if (!audio) return;
+
+            // Incrementa el índice de velocidad actual y vuelve a 0 si supera la longitud del array
+            currentSpeedIndex = (currentSpeedIndex + 1) % playbackSpeeds.length;
+            // Establece la nueva velocidad de reproducción
+            audio.playbackRate = playbackSpeeds[currentSpeedIndex];
+            // Actualiza la etiqueta del chip con la nueva velocidad
+            $('#playback-speed .chip-label').text(playbackSpeeds[currentSpeedIndex] + 'x');
+        };
+
+        let rewind10Seconds = function () {
+            if (audio && isPlaying) {
+                audio.currentTime = Math.max(audio.currentTime - 10, 0);
+            }
+        };
+
+        // Función para avanzar 10 segundos
+        let forward10Seconds = function () {
+            if (audio && isPlaying) {
+                audio.currentTime = Math.min(audio.currentTime + 10, audio.duration);
+            }
+        };
+
+        // Función para reproducir el audio anterior
+        let playPreviousAudio = function () {
+            if (!currentMessageId) return;
+
+            // Encuentra el messageId anterior en el historial
+            let previousMessageId = null;
+            for (let id in historyAudio) {
+                if (id === currentMessageId) break;
+                previousMessageId = id;
+            }
+
+            if (previousMessageId) {
+                playAudio2(historyAudio[previousMessageId], previousMessageId);
+            }
+        };
+
+// Función para reproducir el próximo audio
+        let playNextAudio2 = function () {
+            let nextMessageId = findNextMessageId(currentMessageId);
+            if (nextMessageId) {
+                playAudio2(historyAudio[nextMessageId], nextMessageId);
+            }
+        };
+
+// Función para encontrar el próximo messageId en el historial
+        let findNextMessageId = function (currentId) {
+            let foundCurrent = false;
+            for (let id in historyAudio) {
+                if (foundCurrent) return id;
+                if (id === currentId) foundCurrent = true;
+            }
+            return null;
+        };
+
+
+        let openWindowMediaAudio = function () {
+            //  console.log(historyAudio);
+            windowMediaAudio.open();
+
+
+        }
+
+        let scrollToBottom = function () {
+            pageContent.scrollTo({
+                top: pageContent.scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+// Función para comprobar si estamos cerca del final del contenido
+        let checkScrollPosition = function () {
+            if ((pageContent.offsetHeight + pageContent.scrollTop) >= pageContent.scrollHeight - 50) {
+                // Ocultar el botón si estamos cerca del final
+                scrollToBottomBtn.classList.add('hidden');
+            } else {
+                // Mostrar el botón en otro caso
+                scrollToBottomBtn.classList.remove('hidden');
+            }
+        }
+        let onMessageAdded = function (object) {
+            object.find('.message-name').addClass('card-header')
+            object.find('table').addClass('data-table')
+            object.find('pre').each(function () {
+
+                $(this).addClass('block block-strong inset margin-vertical')
+                var codeClass = $(this).find('code').attr('class');
+                if (typeof codeClass !== 'undefined' && codeClass != null) {
+                    var language = codeClass.match(/language-(\w+)/)[1];
+                    $(this).prepend('<div class="bg-color-black float-right padding-half small language-name">' + language + '</div>');
+                }
+            })
+            hljs.highlightAll()
+            object.on('mouseenter touchstart', function () { // Reemplaza '.object-selector' con tu selector real
+                if (!isScrolling) {
+                    //$(this).find('.message-text-footer').css('visibility', 'visible');
+                    //navigator.vibrate(200);
+                }
+            }).on('mouseleave touchend', function () {
+                if (!isScrolling) {
+                    // navigator.vibrate(0);
+                    // $(this).find('.message-text-footer').css('visibility', 'hidden');
+                }
+            });
+            scrollToBottom();
+
+
+        }
+        let initializeSetupChat = function (obj) {
+            obj.on('click', function () {
+                var button = $(this);
+                var dynamicPopover = app.popover.create({
+                    targetEl: button,
+                    content: '<div class="popover">' +
+                        '<div class="popover-inner">' +
+                        '<div class="list no-chevron no-hairlines-between">\n' +
+                        '                    <ul>\n' +
+                        '                        <li>\n' +
+                        '                            <a href="/screens/conversation-settings/' + chat.guid + '" class="item-link popover-close">\n' +
+                        '                                <div class="item-content">\n' +
+                        '                                    <div class="item-media">\n' +
+                        '                                        <i class="fa fa-cog"></i>\n' +
+                        '                                    </div>\n' +
+                        '                                    <div class="item-inner">\n' +
+                        '                                        <div class="item-title">Configuración</div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </a>\n' +
+                        '                        </li>\n' +
+                        '                        <li>\n' +
+                        '                            <a href="#" id="btn_deleteconversation" style="color:red!important" class="item-link color-red popover-close">\n' +
+                        '                                <div class="item-content">\n' +
+                        '                                    <div class="item-media">\n' +
+                        '                                        <i class="fa fa-trash"></i>\n' +
+                        '                                    </div>\n' +
+                        '                                    <div class="item-inner">\n' +
+                        '                                        <div class="item-title">Eliminar</div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </a>\n' +
+                        '                        </li>\n' +
+                        '                    </ul>\n' +
+                        '                </div>' +
+                        '</div>',
+                    on: {
+                        open: function (popover) {
+                            console.log('Popover opened');
+                            popover.$el.find("#btn_deleteconversation").on('click', function () {
+                                deleteConversation();
+                            })
+                        }
+                    }
+                }).open();
+            })
+        }
+        let deleteConversation = function () {
+            $f7.request({
+                url: window.config.api_methods.delete_conversation + '?guid=' + chat.guid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    data = JSON.parse(responseText);
+                    if (data.status == 200) {
+
+                        $f7.toast.show({
+                            text: data.msg,
+                            //cssClass: 'color-'
+                        });
+                        $f7router.navigate('/screens/conversation-list', {ignoreCache: true, reloadCurrent: true});
+
+                    } else {
+                        $f7.toast.show({
+                            text: data.msg,
+                            cssClass: 'color-red'
+                        });
+                    }
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.hide();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+
+        let initializeMoreOption = function (obj, messageText) {
+            obj.on('click', function () {
+                var button = $(this);
+                var id = button.parents('.message').attr('data-id');
+                var dynamicPopover = app.popover.create({
+                    targetEl: button,
+                    content: '<div class="popover">' +
+                        '<div class="popover-inner">' +
+                        '<div class="list no-chevron no-hairlines-between">\n' +
+                        '                    <ul>\n' +
+                        '                        <li>\n' +
+                        '                            <a href="#" data-id="' + id + '" class="copy_to_clipboard item-link popover-close">\n' +
+                        '                                <div class="item-content">\n' +
+                        '                                    <div class="item-media">\n' +
+                        '                                        <i class="fa fa-copy"></i>\n' +
+                        '                                    </div>\n' +
+                        '                                    <div class="item-inner">\n' +
+                        '                                        <div class="item-title">Copiar al portapapeles</div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </a>\n' +
+                        '                        </li>\n' +
+                        '                        <li>\n' +
+                        '                            <a href="#" class="item-link popover-close">\n' +
+                        '                                <div class="item-content">\n' +
+                        '                                    <div class="item-media">\n' +
+                        '                                        <i class="fa fa-volume-high"></i>\n' +
+                        '                                    </div>\n' +
+                        '                                    <div class="item-inner">\n' +
+                        '                                        <div class="item-title">Leer en voz alta</div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </a>\n' +
+                        '                        </li>\n' +
+                        '                        <li>\n' +
+                        '                            <a href="#" style="color:red" class="item-link popover-close">\n' +
+                        '                                <div class="item-content">\n' +
+                        '                                    <div class="item-media">\n' +
+                        '                                        <i class="fa fa-trash"></i>\n' +
+                        '                                    </div>\n' +
+                        '                                    <div class="item-inner">\n' +
+                        '                                        <div class="item-title">Eliminar</div>\n' +
+                        '                                    </div>\n' +
+                        '                                </div>\n' +
+                        '                            </a>\n' +
+                        '                        </li>\n' +
+                        '                    </ul>\n' +
+                        '                </div>' +
+                        '</div>',
+                    on: {
+                        open: function (popover) {
+                            console.log('Popover opened');
+                            popover.$el.find(".copy_to_clipboard").on('click', function (e) {
+                                var dataId = this.getAttribute('data-id'); // Obtiene el valor del atributo 'data-id'
+                                var targetElement = document.getElementById(dataId); // Selecciona el elemento por ese ID
+                                var text = targetElement.textContent
+
+                                copyDivToClipboardWithStructure(text, true);
+                            })
+                        }
+                    }
+                }).open();
+            })
+        }
+        let handleCommentType = function (data) {
+            if (data.user !== user.guid) {
+                addMessageForOtherUser(data);
+            } else {
+                updatePromptMessage(data);
+            }
+        }
+
+        let addMessageForOtherUser = function (data) {
+            if (data.comment.bot) {
+                messages.removeMessage($('[data-id="assistant"]'));
+            }
+
+            messages.addMessage({
+                attrs: {"id": data.comment.conversation, "data-id": data.comment.conversation},
+                isTitle: false,
+                text: converter.makeHtml(parseFormulas(data.comment.message.answer)),
+                textHeader: "<div id='speech_" + data.comment.conversation + "' class='speech-icon'></div>" + createTextHeader(data.comment.conversation),
+                textFooter: "<div class='extra_content text-align-center'></div>",
+                name: data.comment.idOwner.fullName,
+                cssClass: 'card no-margin-top padding-half',
+                type: 'received'
+            }, 'append', false);
+            if (data.comment.message.title) {
+                chat.title = data.comment.message.title;
+                $update();
+            }
+            isResponding = null;
+            $update();
+            onMessageAdded($('[data-id="' + data.comment.conversation + '"]'));
+            initializeMoreOption($('[data-id="' + data.comment.conversation + '"]').find('.more-options'), $('[data-id="' + data.comment.conversation + '"]').find('.message-text'))
+        }
+
+        let updatePromptMessage = function (data) {
+            var promptElement = $('[data-id="prompt"]');
+            initializeMoreOption(promptElement.find('.more-options'), promptElement.find('.message-text'));
+            promptElement.attr({'id': data.comment.conversation, 'data-id': data.comment.conversation});
+        }
+
+        let handleCommentStreamType = function (data) {
+            var messageId = data.comment.message.id;
+            messages.removeMessage($('[data-id="assistant-thinking"]'));
+
+            if (messageId !== lastCancelStreaming) {
+                if (data.comment.message.finish_reason !== 'stop' && data.comment.message.finish_reason !== 'length') {
+                    updateOrAddStreamingMessage(data);
+                } else {
+                    if (data.comment.message.finish_reason === 'stop') {
+                        lastTextStreaming = '';
+                    }
+                    hljs.highlightAll();
+                }
+            } else {
+                lastTextStreaming = '';
+            }
+
+            scrollToBottomIfNeeded();
+        }
+
+        let updateOrAddStreamingMessage = function (data) {
+            lastTextStreaming += data.comment.message.answer;
+            lastTextStreaming=  parseFormulas(lastTextStreaming);
+            //   console.log(lastTextStreaming);
+            if ($('[data-id="assistant"]').length === 0) {
+                addStreamingMessage(data, lastTextStreaming+"</pre>");
+                if (data.comment.message.title) {
+                    chat.title = data.comment.message.title;
+                    $update();
+                }
+            } else {
+                var messageBox = $('[data-id="assistant"]').find('.message-text');
+                messageBox.html(converter.makeHtml(lastTextStreaming + '<span class="thinking-icon">' + assistant.thinkIcon + '</span>'));
+                onMessageAdded($('[data-id="assistant"]'));
+            }
+
+            response += data.comment.message.answer;
+        }
+
+        let addStreamingMessage = function (data, text) {
+            messages.addMessage({
+                attrs: {"data-id": 'assistant'},
+                isTitle: false,
+                text: " " + text,
+                textHeader: createStreamingTextHeader(data.comment.message.id),
+                name: data.comment.idOwner.fullName,
+                cssClass: 'card swipeout no-margin-top padding-half',
+                textFooter: "",
+                type: 'received'
+            }, 'append', false);
+            isResponding = data.comment.message.id;
+            $update()
+            $('[data-id="assistant"]').find('.message-text').addClass('result-streaming');
+
+        }
+
+        let createTextHeader = function (conversationId) {
+            return "<a href='#' id='more_options_prompt' class='link more-options icon-only color-gray'><i class='icon f7-icons font-size-12 text-color-gray'>ellipsis_vertical</i></a>";
+        }
+
+        let createStreamingTextHeader = function (messageId) {
+            //  return "<a data-tooltip='Stop receiving response' class='tooltip-init link stop_transmition' data-id='" + messageId + "'><i class='fa fa-2x fa-stop-circle'></i></a>";
+        }
+
+        let stopTransmition = function () {
+
+            $f7.request({
+                url: window.config.api_methods.cancel_streaming_conversation + '?provider_id=' + isResponding,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    var data = JSON.parse(responseText);
+                    //  console.log(data)
+                    isResponding = false;
+                    var element = document.querySelector('[data-id="assistant"]');
+                    if (element) {
+                        element.setAttribute('id', data.data.guid);
+                        element.setAttribute('data-id', data.data.guid);
+                    }
+
+                    $update();
+
+                },
+                error: function (xhr, status, error) {
+                    audioManager.stopSound('thinking');
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+            // Funcionalidad para detener la transmisión
+            // ...
+        }
+
+        let scrollToBottomIfNeeded = function () {
+            const threshold = 20; // Píxeles desde el fondo para considerar que está 'casi al final'
+
+            // Calcula la posición actual de desplazamiento más la altura de la ventana
+            const currentScrollPosition = pageContent.scrollTop + pageContent.offsetHeight;
+
+            // Verifica si estamos cerca del final
+            if (currentScrollPosition >= pageContent.scrollHeight - threshold) {
+                scrollToBottom();
+            }
+        }
+
+        let subscribeSSE = function () {
+            eventSource['/chat/' + chat.guid] = null;
+            if (eventSource['/chat/' + chat.guid] === null) {
+                console.log("Subscribing sse")
+                eventSource['/chat/' + chat.guid] = new EventSource(window.config.sse_hub + '?topic=' + '/chat/' + chat.guid);
+                eventSource['/chat/' + chat.guid].onerror = function (e) {
+                    eventSource['/chat/' + chat.guid] = null;
+                }
+
+                eventSource['/chat/' + chat.guid].onmessage = function (e) {
+                    audioManager.stopSound('thinking');
+                    var data = JSON.parse(e.data);
+
+                    if (data.type === 'audio') {
+                        playAudio(data.data);
+                        return;
+                    }
+
+                    if (data.type === 'comment') {
+                        handleCommentType(data);
+                        return;
+                    }
+                    if (data.type === 'opening') {
+                        $('.thinking-icon').html("<i class='margin-right-half fa "+data.data.icon+"'></i>"+data.title)
+                        console.log(data.data.app)
+                        window.location.href = data.data.app.scheme+"://";
+                        //window.open(data.data.app.scheme);
+
+                    }
+                    if (data.type === 'stop-searching') {
+                        audioManager.stopSound('thinking');
+                    }
+
+                    if (data.type === 'searching') {
+                        audioManager.playSound('thinking', true);
+                        $('.thinking-icon').html("<i class='margin-right-half fa "+data.data.icon+"'></i>"+data.title)
+                    }
+                    if (data.type === 'comment_stream') {
+                        handleCommentStreamType(data);
+                    }
+                }
+            }
+        }
+        let initializeMessagebar = function () {
+            messagebar = $f7.messagebar.create({
+                el: $el.value.find('.messagebar-chat'),
+                textareaEl: $el.value.find('.messagebar-chat textarea')
+            });
+        }
+
+        let initializeMessages = function () {
+            var self = this;
+            messages = $f7.messages.create({
+                el: $el.value.find('.messages'),
+                scrollMessages: true,
+                autoLayout: true,
+                scrollMessagesOnEdge: true,
+                firstMessageRule: function (message, previousMessage, nextMessage) {
+
+                    if (message != undefined) {
+
+                        if (message.isTitle) {
+                            return false;
+                        }
+
+                        if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name) {
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+                },
+
+                lastMessageRule: function (message, previousMessage, nextMessage) {
+                    //    console.log(message)
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+
+                tailMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+
+        }
+
+        let createChat = function () {
+            $f7.request({
+                url: window.config.api_methods.create_chat + '?assistant=' + chat.assistant.guid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    var data = JSON.parse(responseText);
+                    eventSource['/chat/' + chat.guid] = null;
+
+                    $f7router.navigate('/screens/cart/' + data.data.guid, {ignoreCache: true});
+
+                },
+                error: function (xhr, status, error) {
+                    audioManager.stopSound('thinking');
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+
+        let sendPrompt = function () {
+
+            if (prompt.length) {
+                if (notFinishedMessage == '') {
+                    response = '';
+                    $update();
+                    messages.addMessage({
+                        attrs: {
+                            "data-id": "prompt",
+                            "id": 'prompt'
+                        },
+                        isTitle: false,
+                        text: '<p>' + prompt + '</p>',
+                        // textFooter: ((curUser != data.user) ? '<i class="fa fa-xs fa-speaker-deck margin-right"></i><a style="margin-left:3px;font-weight: bold" class="color-blue-4 response_btn" href="#">Reply</a> | ' : '') + self.getCurrentTime(),
+                        textHeader: '<a href="#" id="more_options_prompt"  class="link more-options icon-only color-gray"><i class="icon f7-icons font-size-12 text-color-gray">ellipsis_vertical</i></a>',
+                        //textFooter: "<a id='copy_"+data.comment.conversation+"' class='copy_message tooltip-init' data-tooltip='Copy' onclick=\"copyDivToClipboardWithStructure($(this).parents(\'.message\').find(\'.message-text\'),true)\" href='#'><i class='fa fa-copy'></i></a>",
+                        name: 'Alfredo García',
+                        //  avatar: data.comment.idOwner.avatar,
+                        cssClass: 'swipeout card no-margin-top  padding-half',//'bot_' + data.comment.botAnswer + ' ' + data.comment.guid,
+                        type: 'received',//(curUser == data.user ? 'sent' : 'received'),
+                        //  type: 'sent'
+                    }, 'append', true);
+                    onMessageAdded($('[data-id="prompt"]'));
+
+                    scrollToBottom();
+                    if (navigator.onLine) {//en cordova usar un plugin
+                        messages.addMessage({
+                            attrs: {"data-id": "assistant-thinking","id":"assistant-thinking"},
+                            isTitle: false,
+                            text: '<p><span class="thinking-icon">' + assistant.thinkIcon + '</span></p>',
+                            // textFooter: ((curUser != data.user) ? '<i class="fa fa-xs fa-speaker-deck margin-right"></i><a style="margin-left:3px;font-weight: bold" class="color-blue-4 response_btn" href="#">Reply</a> | ' : '') + self.getCurrentTime(),
+                            //textHeader:"<div id='speech_" + data.comment.conversation + "'></div>",
+                            //textFooter: "<a id='copy_"+data.comment.conversation+"' class='copy_message tooltip-init' data-tooltip='Copy' onclick=\"copyDivToClipboardWithStructure($(this).parents(\'.message\').find(\'.message-text\'),true)\" href='#'><i class='fa fa-copy'></i></a>",
+                            name: assistant.name,
+                            //  avatar: data.comment.idOwner.avatar,
+                            cssClass: 'card no-margin-top  padding-half',//'bot_' + data.comment.botAnswer + ' ' + data.comment.guid,
+                            type: 'received',//(curUser == data.user ? 'sent' : 'received'),
+                            //  type: 'sent'
+                        }, 'append', true);
+                        onMessageAdded($('[data-id="assistant-thinking"]'));
+                        scrollToBottom();
+                    } else {
+                        //toastr diciendo que no hay conexion
+                    }
+                }
+                $f7.request({
+                    url: window.config.api_methods.conversation + '?continue='+notFinishedMessage+'&chat=' + chat.guid + '&mute=' + mute + '&prompt=' + prompt,
+                    method: 'GET',
+                    headers: {
+                        'X-AUTH-TOKEN': window.config.token
+                    },
+                    // processData: false, // Prevenir que jQuery procese los datos
+                    // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                    success: function (responseText) {
+                        // messages.hideTyping();
+                        var data = JSON.parse(responseText);
+                        if (data.finish_reason == 'length'){
+                            notFinishedMessage = data.conversation;
+                            sendPrompt();
+
+                        } else {
+
+                            var conversationId = data.conversation;
+
+                            var audioPath = data.media;
+
+                            // Comprueba y procesa webPages y news
+                            ['webPages', 'news'].forEach(function(sourceType) {
+                                if (data.sources && data.sources[sourceType]) {
+                                    data.sources[sourceType].forEach(function(item) {
+                                        var footerElement = document.querySelector('[data-id="' + conversationId + '"] .extra_content');
+                                        if (!footerElement) {
+                                            console.error('Footer element not found for conversationId: ' + conversationId);
+                                            return;
+                                        }
+                                        $(footerElement).find('.message-text-footer').css('visibility', 'visible');
+
+                                        // Crear el enlace
+                                        var link = document.createElement('a');
+                                        link.href = item.source;
+                                        link.target = "_blank";
+                                        link.className = 'external link chip-link';
+
+                                        // Crear el chip
+                                        var chip = document.createElement('div');
+                                        chip.className = 'chip tooltip-init chip-source';
+                                        chip.setAttribute('data-toggle', 'tooltip');
+
+                                        var chipMedia = document.createElement('div');
+                                        chipMedia.className = 'chip-media';
+                                        chipMedia.innerHTML = sourceType === 'webPages' ? '<i class="icon material-icons">public</i>' : '<i class="icon material-icons">announcement</i>';
+
+                                        var chipLabel = document.createElement('div');
+                                        chipLabel.className = 'chip-label';
+                                        chipLabel.textContent = item.name;
+
+                                        // Construir y añadir el chip al enlace
+                                        chip.appendChild(chipMedia);
+                                        chip.appendChild(chipLabel);
+                                        link.appendChild(chip);
+
+                                        // Añadir el enlace al footerElement
+                                        footerElement.appendChild(link);
+                                    });
+                                }
+                            });
+                            $('[data-id="' + conversationId + '"] .message-text-footer').css('visibility', 'visible');
+// Comprueba y procesa images
+                            if (data.sources && data.sources.images && data.sources.images.length > 0) {
+                                var footerElement = document.querySelector('[data-id="' + conversationId + '"] .extra_content');
+                                if (!footerElement) {
+                                    console.error('Footer element not found for conversationId: ' + conversationId);
+                                    return; // Salir si no encontramos el elemento
+                                }
+
+                                // Crear el contenedor Swiper
+                                var swiperContainer = document.createElement('div');
+                                swiperContainer.className = 'swiper margin-top-half swiper-init swiper-horizontal swiper-pointer-events';
+                                swiperContainer.style.height = '320px'; // Ajusta según necesites
+
+                                // Crear el wrapper Swiper
+                                var swiperWrapper = document.createElement('div');
+                                swiperWrapper.className = 'swiper-wrapper';
+                                swiperWrapper.style.cursor = 'grab';
+
+                                // Añadir slides al Swiper
+                                data.sources.images.forEach(function(image) {
+                                    var swiperSlide = document.createElement('div');
+                                    swiperSlide.className = 'swiper-slide';
+                                    swiperSlide.style.width = '669px'; // Ajusta según el diseño
+                                    swiperSlide.style.marginRight = '16px';
+
+                                    var card = document.createElement('div');
+                                    card.className = 'card height-100 no-margin no-shadow';
+
+                                    var cardMedia = document.createElement('div');
+                                    cardMedia.className = 'card-media bg-cover bg-overlay';
+                                    cardMedia.style.backgroundImage = `url('${image.source}')`;
+
+                                    var cardMediaContent = document.createElement('div');
+                                    cardMediaContent.className = 'card-media-content';
+
+                                    var cardTitle = document.createElement('div');
+                                    cardTitle.className = 'card-title';
+                                    cardTitle.textContent = image.name;
+
+                                    // Construir la estructura del slide
+                                    cardMediaContent.appendChild(cardTitle);
+                                    cardMedia.appendChild(cardMediaContent);
+                                    card.appendChild(cardMedia);
+                                    swiperSlide.appendChild(card);
+                                    swiperWrapper.appendChild(swiperSlide);
+                                });
+
+                                swiperContainer.appendChild(swiperWrapper);
+                                footerElement.appendChild(swiperContainer);
+
+                                // Inicializar Swiper
+                                new Swiper(swiperContainer, {
+                                    loop: true,
+                                    centeredSlides: true,
+                                    slidesPerView: 'auto',
+                                    spaceBetween: 10,
+                                    navigation: {
+                                        nextEl: '.swiper-navigation-button-next',
+                                        prevEl: '.swiper-navigation-button-previous',
+                                    },
+                                });
+                            }
+
+                            // Comprueba y procesa videos
+                            if (data.sources && data.sources.videos && data.sources.videos.length > 0) {
+                                var footerElementVideos = document.querySelector('[data-id="' + conversationId + '"] .extra_content');
+                                if (!footerElementVideos) {
+                                    console.error('Footer element not found for conversationId: ' + conversationId);
+                                    return; // Salir si no encontramos el elemento
+                                }
+
+                                var listContainer = document.createElement('div');
+                                listContainer.className = 'list media-list text-align-left inset margin-vertical show-more-less';
+                                var ul = document.createElement('ul');
+
+                                data.sources.videos.forEach(function(video) {
+                                    videos[video.source] = video;
+
+                                    var li = document.createElement('li');
+                                    li.className = ''; // Añade aquí cualquier clase condicional si es necesario
+
+                                    // Asume que video.source es la URL directa al video y video.thumb es la URL de la miniatura
+                                    var videoIdMatch = video.source.match(/(?:youtu\.be\/|youtube\.com(?:\/embed\/|\/v\/|\/watch\?v=|\/watch\?.+&v=))((\w|-){11})/);
+                                    var videoId = videoIdMatch ? videoIdMatch[1] : '';
+
+                                    li.innerHTML = `
+            <div class="item-content">
+                <div class="item-media">
+                    <img class="shape-rounded-square" src="${video.thumb}" width="72" height="48" alt="">
+                </div>
+                <div class="item-inner">
+                    <div class="item-title-row">
+                        <div class="item-title">${video.name}</div>
+                        <div class="item-after">
+                            <div href="${video.source}" class="link video-play" target="_blank">
+                                <i class="icon material-icons">play_circle</i>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="item-text">${video.text || 'Video description'}</div>
+                </div>
+            </div>
+        `;
+
+                                    ul.appendChild(li);
+                                });
+
+                                listContainer.appendChild(ul);
+                                footerElementVideos.appendChild(listContainer);
+                            }
+
+                            $el.value.find(".video-play").on('click', function () {
+                                var src = $(this).attr('href');
+                                popoverMedia = $f7.popover.create({
+                                    el: $el.value.find('#popover-media')
+                                });
+                                popoverMedia.on('open',function(event,handler){
+                                    event.$el.find('#youtube-player').attr('src',getYouTubeEmbedUrl(src))
+                                })
+                                popoverMedia.open($(this));
+
+                                console.log($(this))
+
+                            })
+
+                            new ShowMore('.show-more-less', {
+                                config: {
+                                    more: 'Read More',
+                                    less: 'Read Less',
+                                    element: 'div'
+                                }
+                            });
+                            addAudioToMessageFooter(conversationId, audioPath, 'window-media-audio');
+                            notFinishedMessage = '';
+                            prompt = null;
+                        }
+                        //$update();
+                    },
+                    error: function (xhr, status, error) {
+                        audioManager.stopSound('thinking');
+                        $f7.preloader.show();
+                        $f7.toast.show({
+                            text: 'An error occured: ' + error,
+                            cssClass: 'color-red'
+                        });
+                    }
+                });
+                prompt = null;
+                messagebar.clear();
+                speechToText = null;
+                $update();
+            }
+
+        }
+        let getYouTubeEmbedUrl = function(youtubeUrl) {
+            // Extraer el ID del video de la URL de YouTube
+            var videoIdMatch = youtubeUrl.match(/(?:https?:\/\/)?(?:www\.)?youtube\.com\/watch\?v=([a-zA-Z0-9_-]+)/);
+            if (videoIdMatch && videoIdMatch[1]) {
+                // Construir y retornar la URL de incrustación
+                return `https://www.youtube.com/embed/${videoIdMatch[1]}`;
+            } else {
+                // Retornar null o un mensaje de error si la URL no es válida
+                return null; // o puedes optar por retornar un mensaje de error específico
+            }
+        }
+        let handleKeyDown = function (e) {
+            // Verifica si la tecla presionada es Enter
+            if (e.key === 'Enter') {
+                e.preventDefault(); // Previene el comportamiento por defecto
+                sendPrompt(); // Llama a la función sendPrompt
+            }
+        }
+
+        let handlePromptTextArea = function (e) {
+            var value = e.target.value;
+            // Cambios en el icono según el contenido de 'value'
+            if (value.length > 0) {
+                prompt = value;
+                // Cambia el icono a 'send'
+            } else {
+                prompt = null;
+                // Cambia el icono a 'mic'
+            }
+
+            // Verifica si la tecla presionada es Enter y no se presionó la tecla Shift
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault(); // Previene el comportamiento por defecto del Enter
+                sendPrompt(); // Llama a la función sendPrompt
+            }
+
+            $update();
+        }
+
+        let audioManager = {
+            sounds: {},
+
+            // Cargar un sonido
+            loadSound: function (name, path) {
+                this.sounds[name] = new Audio(path);
+            },
+
+            playSound: function (name, loop = false) {
+                if (this.sounds[name]) {
+                    this.sounds[name].loop = loop;
+                    this.sounds[name].play();
+                }
+            },
+
+            // Detener un sonido
+            stopSound: function (name) {
+                if (this.sounds[name]) {
+                    this.sounds[name].pause();
+                    this.sounds[name].currentTime = 0;
+                }
+            }
+        };
+
+        let initSpeech = function () {
+            $(".mic-mode").show();
+            $(".keyboard-mode").hide();
+            mode = 'speech';
+            mute = false;
+            startRecognition();
+        }
+
+        let initKeyboard = function () {
+            $(".keyboard-mode").show();
+            $(".mic-mode").hide();
+            mode = 'keyboard';
+            mute = true;
+            stopRecognition();
+        }
+
+
+        let startRecognition = function () {
+            mode = recognitionMode
+            if (mode === 'auto') {
+                mode = window.cordova ? 'system' : 'html5';
+            }
+
+            if (mode === 'html5') {
+                if (!isRecognizing) {
+                    setupRecognition();
+                    startRecognitionHtml5();
+                } else {
+                    speechToText = null;
+                    stopRecognitionHtml5();
+                    $update()
+                }
+            } else if (mode === 'system') {
+                if (!isRecognizing) {
+                    setupRecognitionCordova();
+                    startRecognitionCordova();
+                } else {
+                    speechToText = null;
+                    stopRecognitionCordova()
+                    $update();
+                }
+            } else {
+                canNotRecognition();
+            }
+        }
+
+        let stopRecognition = function () {
+            mode = recognitionMode
+            if (mode === 'auto') {
+                mode = window.cordova ? 'system' : 'html5';
+            }
+
+            if (mode === 'html5') {
+                stopRecognitionHtml5();
+            } else if (mode === 'system') {
+                stopRecognitionCordova();
+            } else {
+                canNotRecognition();
+            }
+        }
+
+        let canNotRecognition = function () {
+            console.warn('El reconocimiento de voz no está disponible.');
+        }
+
+        let startRecognitionHtml5 = function () {
+            if (!isRecognizing) {
+                setupRecognition(); // Asegura que recognition se configura cada vez
+                recognition.start();
+                isRecognizing = true;
+                $update();
+            }
+        }
+
+        let stopRecognitionHtml5 = function () {
+            console.log('Parando reconocimiento HTML5');
+            if (recognition && isRecognizing) {
+                recognition.stop();
+                isRecognizing = false; // Actualiza el estado aquí
+                $update();
+            }
+        }
+
+
+        let startRecognitionCordova = function () {
+            if (!isRecognizing) {
+                window.plugins.speechRecognition.startListening(function (result) {
+                    // Aquí manejas los resultados
+                    if (result && result.length > 0) {
+                        console.log('Reconocido: ' + result[0]);
+                        speechToText = result[0]; // Tomar el primer resultado como el mejor
+                        prompt = speechToText;
+
+                    } else {
+                        console.log('No se reconoció ningún texto.');
+                        speechToText = null;
+                        $update();
+                    }
+                    isRecognizing = false;
+                    $update(function () {
+                        stopRecognition()
+                    });
+                }, function (err) {
+                    // Aquí manejas los errores
+                    console.error('Error en el reconocimiento de voz:', err);
+                    isRecognizing = false;
+                    prompt = null;
+                    $update();
+                }, {language: "es-ES", showPartial: false});
+
+                isRecognizing = true;
+                speechToText = 'Escuchando...';
+                $update();
+            } else {
+                stopRecognitionCordova();
+            }
+        }
+
+        let stopRecognitionCordova = function () {
+            console.log('Parando reconocimiento');
+            window.plugins.speechRecognition.stopListening(function () {
+                console.log('Reconocimiento detenido');
+                isRecognizing = false;
+                speechToText = null;
+                $update();
+            }, function (err) {
+                console.error('Error al detener el reconocimiento de voz:', err);
+            });
+        }
+
+        let checkCameraPermissions = async function checkCameraPermissions() {
+            return new Promise((resolve, reject) => {
+                console.log("Checking Camera Permissions");
+                if (app.device.cordova) {
+                    var permissions = cordova.plugins.permissions;
+                    var permissionList = [permissions.CAMERA];
+
+                    permissions.checkPermission(permissionList, function (status) {
+                        if (!status.hasPermission) {
+                            permissions.requestPermissions(
+                                permissionList,
+                                function (status) {
+                                    if (!status.hasPermission) {
+                                        console.error("Camera permissions not granted: " + JSON.stringify(status));
+                                        reject("Camera permissions not granted.");
+                                    } else {
+                                        console.log("Camera permissions granted");
+                                        resolve();
+                                    }
+                                },
+                                function (error) {
+                                    console.error("Error requesting camera permissions: " + JSON.stringify(error));
+                                    reject("Error requesting camera permissions.");
+                                }
+                            );
+                        } else {
+                            console.log("Camera permissions already granted");
+                            resolve();
+                        }
+                    }, function (error) {
+                        console.error("Error checking camera permissions: " + JSON.stringify(error));
+                        reject("Error checking camera permissions.");
+                    });
+                } else {
+                    // No es Cordova, resuelve de inmediato (puede ajustarse según tus necesidades)
+                    resolve();
+                }
+            });
+        }
+
+
+        function checkAudioPermissions() {
+            console.log("Checking Audio Permissions");
+            if (app.device.cordova) {
+                var permissions = cordova.plugins.permissions;
+                var permissionList = [permissions.RECORD_AUDIO]; // Assuming RECORD_AUDIO is the correct permission for audio
+
+                permissions.checkPermission(permissionList, function (status) {
+                    if (!status.hasPermission) {
+                        permissions.requestPermissions(
+                            permissionList,
+                            function (status) {
+                                if (!status.hasPermission) {
+                                    console.error("Audio permissions not granted: " + JSON.stringify(status));
+                                } else {
+                                    console.log("Audio permissions granted");
+                                }
+                            },
+                            function (error) {
+                                console.error("Error requesting audio permissions: " + JSON.stringify(error));
+                            }
+                        );
+                    } else {
+                        console.log("Audio permissions already granted");
+                    }
+                }, function (error) {
+                    console.error("Error checking audio permissions: " + JSON.stringify(error));
+                });
+            }
+        }
+
+
+        let setupRecognition = function () {
+            checkAudioPermissions();
+            if ('webkitSpeechRecognition' in window) {
+                console.log('seteando el reconocimiento de voz');
+                // Reinicia recognition cada vez
+
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.continuous = false; // Se cambia a false para una sola ronda de reconocimiento
+                recognition.interimResults = false;
+
+                recognition.onstart = function () {
+                    console.log("empieza el reconocimiento")
+                    speechToText = 'Escuchando...';
+                    mute = true;
+                    $update();
+                };
+
+                recognition.onresult = function (event) {
+                    lastRecognizedText = event.results[0][0].transcript.trim();
+                    console.log('Reconocido: ' + lastRecognizedText);
+                    speechToText = lastRecognizedText;
+                    prompt = lastRecognizedText;
+                    $update();
+
+                    setTimeout(function () {
+                        mute = false;
+                        sendPrompt();
+                    }, 1000);
+                    stopRecognition(); // Detiene el reconocimiento después de obtener el resultado
+                };
+
+                recognition.onerror = function (event) {
+                    console.error('Error en el reconocimiento de voz:', event.error);
+                    prompt = null;
+                    isRecognizing = false; // Asegúrate de actualizar el estado aquí también
+                    $update();
+                };
+
+                recognition.onend = function () {
+                    console.log("finaliza el reconocimiento")
+                    //  prompt = null;
+                    isRecognizing = false;
+                    $update();
+                };
+            } else {
+                console.log('webkitSpeechRecognition no es soportado en esta WebView');
+            }
+
+        };
+
+
+        let setupRecognitionCordova = function () {
+            checkAudioPermissions();
+            window.plugins.speechRecognition.isRecognitionAvailable(function (available) {
+                if (!available) {
+                    console.warn('La API de reconocimiento de voz no está disponible en este dispositivo.');
+                    return;
+                }
+
+                window.plugins.speechRecognition.hasPermission(function (isGranted) {
+                    if (!isGranted) {
+                        window.plugins.speechRecognition.requestPermission(function () {
+                            console.log('Permiso concedido');
+                        }, function (err) {
+                            console.warn('Permiso denegado', err);
+                        });
+                    }
+                }, function (err) {
+                    console.error('Error al verificar permisos:', err);
+                });
+            }, function (err) {
+                console.error('Error al verificar disponibilidad:', err);
+            });
+        };
+
+
+        let base64ToBlob = function (base64Image, mime) {
+            mime = mime || 'image/jpeg';
+            var sliceSize = 1024;
+            var base64 = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+
+            var byteChars = window.atob(base64);
+            var byteArrays = [];
+
+            for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+                var slice = byteChars.slice(offset, offset + sliceSize);
+
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                var byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            return new Blob(byteArrays, {type: mime});
+        }
+
+        let fileURLToBlob = function (fileURL, callback) {
+            window.resolveLocalFileSystemURL(fileURL, function (fileEntry) {
+                fileEntry.file(function (file) {
+                    let reader = new FileReader();
+                    reader.onloadend = function () {
+                        let blob = new Blob([this.result], {type: "image/jpeg"});
+                        callback(blob);
+                    };
+                    reader.readAsArrayBuffer(file);
+                }, function (error) {
+                    $f7.toast.show({
+                        text: 'File reading error: ' + error.code,
+                        cssClass: 'color-red'
+                    });
+                });
+            }, function (error) {
+                $f7.toast.show({
+                    text: 'File resolving error: ' + error.code,
+                    cssClass: 'color-red'
+                });
+            });
+        }
+        let addAudioToMessageFooter = function (messageId, audioFilePath, notificationElementId) {
+            if (audioFilePath) {
+                var mensaje = document.querySelector('[data-id="' + messageId + '"]');
+
+                if (mensaje) {
+                    var speechElement = document.getElementById("speech_" + messageId);
+
+                    if (notificationElementId) {
+                        historyAudio[messageId] = audioFilePath;
+
+                        var playLink = document.createElement('a');
+                        playLink.href = '#';
+                        playLink.classList.add('fa', 'color-gray', 'fa-play');
+                        playLink.addEventListener('click', function (event) {
+                            event.preventDefault();
+                            var notificationElement = document.getElementById(notificationElementId);
+                            if (notificationElement) {
+
+                                playAudio2(audioFilePath, messageId);
+                                //  audio.play();
+                                openWindowMediaAudio();
+
+
+                            } else {
+                                console.error('Contenedor con ID ' + notificationElementId + ' no encontrado.');
+                            }
+                        });
+
+                        speechElement.appendChild(playLink);
+                    } else {
+                        // Si no se proporciona un ID de contenedor, crea un nuevo CircleAudioPlayer
+                        var cap = new CircleAudioPlayer({
+                            audio: audioFilePath,
+                            size: 20,
+                            borderWidth: 2,
+                            borderColor: "#ffffff",
+                            backgroundColor: "#1877f2",
+                            playedColor: "#1877f2"
+                        });
+                        cap.appendTo(speechElement);
+                    }
+                } else {
+                    console.log('Mensaje con data-id ' + messageId + ' no encontrado.');
+                }
+            }
+        }
+
+
+        let playMyAudio = function (base64Audio) {
+            // Asume que base64Audio es una cadena base64 correctamente formateada del audio
+            const audioSrc = "data:audio/mp3;base64," + base64Audio;
+
+            // Obtén el elemento de audio y su fuente
+            const audioElement = document.getElementById('my-audio');
+            const sourceElement = audioElement.querySelector('source');
+
+            // Actualiza el src del elemento source
+            sourceElement.src = audioSrc;
+
+            // Importante: llama a load en el elemento de audio para que la actualización surta efecto
+            audioElement.load();
+
+            // Opcionalmente, reproduce el audio
+            audioElement.play();
+        };
+
+        // Función general para reproducir un audio
+        let playAudio2 = function (audioFilePath, messageId) {
+            if (audio && !audio.paused) {
+                audio.pause();
+            }
+
+
+            audio = new Audio(audioFilePath);
+            audio.onplay = function () {
+                console.log("play_" + currentMessageId);
+                $(".message").removeClass('bg-color-deeppurple')
+                $('[data-id="' + currentMessageId + '"]').addClass('bg-color-deeppurple');
+                isPlaying = true;
+                $update();
+                // Cualquier otra lógica que necesites cuando el audio empiece a reproducirse
+            };
+
+            // Evento pause
+            audio.onpause = function () {
+                isPlaying = false;
+                console.log("pause_" + currentMessageId);
+                $('[data-id="' + currentMessageId + '"]').removeClass('bg-color-deeppurple');
+                $update();
+                // Cualquier otra lógica que necesites cuando el audio se pause
+            };
+
+            // Evento ended
+            audio.onended = function () {
+                isPlaying = false;
+                console.log("end_" + currentMessageId);
+                $('[data-id="' + currentMessageId + '"]').removeClass('bg-color-deeppurple');
+                $update();
+                // Cualquier otra lógica que necesites cuando el audio termine
+                // Por ejemplo, podrías querer llamar a playNextAudio() aquí si deseas que se reproduzca el siguiente audio automáticamente
+            };
+            updateAudioTimer(audio);
+            // Añade el mensaje actual al historial si aún no está
+            if (!historyAudio[messageId]) {
+                historyAudio[messageId] = audioFilePath;
+            }
+
+            currentMessageId = messageId;
+
+            // Configuración y eventos del audio (play, pause, ended, etc.)
+            audio.play();
+
+            // ... Resto de la configuración del audio ...
+        };
+
+        let playAudio = function (base64Audio) {
+            // Convertir el audio base64 a Blob y añadirlo a la cola
+            const audioBlob = base64ToBlob(base64Audio, 'audio/mpeg');
+            audioQueue.push(audioBlob);
+            //  console.log(audioQueue);
+            // Intentar reproducir el audio si no se está reproduciendo nada
+            if (!isPlaying) {
+                playNextAudio();
+            }
+        }
+
+        function stopAllAudios() {
+            // Recorre todas las referencias de elementos de audio y detén cada uno
+            audio.pause();
+            audioQueue = [];
+            mute = true;
+            // audio.currentTime = 0; // Reinicia la reproducción al inicio
+
+        }
+
+        let setupVisualization = function () {
+            var canvas = document.getElementById('canvas-speaker'),
+                cwidth = canvas.width,
+                cheight = canvas.height - 2,
+                meterWidth = 10, //width of the meters in the spectrum
+                gap = 2, //gap between meters
+                capHeight = 2,
+                capStyle = '#fff',
+                meterNum = 800 / (10 + 2), //count of the meters
+                capYPositionArray = [];
+            var ctx = canvas.getContext('2d'),
+                gradient = ctx.createLinearGradient(0, 0, 0, 300);
+            gradient.addColorStop(1, '#1877f2');
+            gradient.addColorStop(0.5, '#1877f2');
+            gradient.addColorStop(0, '#1877f2');
+
+            function renderFrame() {
+                analyser.getByteFrequencyData(frequencyData);
+                ctx.clearRect(0, 0, cwidth, cheight);
+                var step = Math.round(frequencyData.length / meterNum);
+                const centerY = cheight / 2;
+                const radius = meterWidth / 2;
+                const maxBarHeight = cheight * 0.8;
+                const minHeight = 2 * radius;
+
+                for (var i = 1; i < meterNum; i++) { // Comenzar desde i = 1 para omitir la primera columna
+                    var value = frequencyData[i * step];
+                    value = (value / 256) * maxBarHeight;
+
+                    if (value > minHeight) {
+                        var x = (i - 1) * (meterWidth + gap); // Ajustar la posición x
+
+                        ctx.fillStyle = gradient;
+                        ctx.fillRect(x, centerY - value / 2 + radius, meterWidth, value - minHeight);
+
+                        ctx.beginPath();
+                        ctx.arc(x + radius, centerY - value / 2 + radius, radius, Math.PI, 0, false);
+                        ctx.arc(x + radius, centerY + value / 2 - radius, radius, 0, Math.PI, false);
+                        ctx.fill();
+                    }
+                }
+                requestAnimationFrame(renderFrame);
+            }
+
+            renderFrame();
+        };
+
+        function togglePlayPause() {
+            if (audio) {
+                if (audio.paused || audio.ended) {
+                    audio.play();
+                } else {
+                    audio.pause();
+                }
+            }
+        }
+
+        let playNextAudio = function () {
+            if (audioQueue.length > 0 && mute == false) {
+                isPlaying = true;
+                $("#canvas-speaker").show();
+                $("#btn-recognition").hide();
+                $update();
+                const audioBlob = audioQueue.shift();
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audio = new Audio(audioUrl);
+
+                // Conectar el audio con el analizador
+                var audioSrc = ctx.createMediaElementSource(audio);
+                audioSrc.connect(analyser);
+                analyser.connect(ctx.destination);
+                audio.onplay = function () {
+                    $("#canvas-speaker").show();
+                    $("#btn-recognition").hide();
+                }
+                audio.onpause = function () {
+                    isPlaying = false;
+                    $("#canvas-speaker").hide();
+                    $("#btn-recognition").show();
+                }
+                audio.onended = function () {
+                    isPlaying = false;
+                    $("#canvas-speaker").hide();
+                    $("#btn-recognition").show();
+                    $update();
+                    playNextAudio();
+                };
+
+                audio.play();
+            }
+        };
+
+        let sendImage = function () {
+            var image = base64ToBlob(base64Image);
+            let formData = new FormData();
+            formData.append('image0', image);
+            audioManager.playSound('thinking', true);
+            $f7.preloader.show();
+
+            $f7.request({
+                url: window.config.api_methods.what_is_this,
+                method: 'POST',
+                headers: {
+                    'X-Auth-Token': window.config.token
+                },
+                data: formData,
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // Manejar la respuesta exitosa aquí
+                    //     console.log(responseText);
+                    if (responseText) {
+                        var response = JSON.parse(responseText);
+                        $f7.preloader.hide();
+                        audioManager.stopSound('thinking');
+                        if (response.data && response.data.audio) {
+                            sessionStorage.setItem('lastAudioBase64', response.data.audio);
+                            photo_description = response.data.text
+                            audio = 'data:audio/mp3;base64,' + response.data.audio
+                            $update(function () {
+                                playMyAudio(response.data.audio)
+                            });
+
+                        }
+                    }
+
+                    //$update();
+                },
+                error: function (xhr, status, error) {
+                    audioManager.stopSound('thinking');
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+
+        function toggleCamera() {
+            faceMode = faceMode === 'user' ? 'environment' : 'user';
+            takePhotoHtml5();
+        }
+
+        function toggleCameraView() {
+            var videoElement = document.getElementById('camera-preview');
+            var imgElement = document.getElementById('captured-image');
+
+            // Verificar si el video está visible o no
+            var isVideoVisible = videoElement.style.display === 'block';
+
+            // Si el video está visible, ocultar el video y mostrar la imagen
+            // Si la imagen está visible, ocultar la imagen y mostrar el video
+            if (isVideoVisible) {
+                videoElement.style.display = 'none';
+                imgElement.style.display = 'block';
+            } else {
+                videoElement.style.display = 'block';
+                imgElement.style.display = 'none';
+                initVideo();
+            }
+        }
+
+
+        let toggleCameraTorch = async function () {
+            if (window.cordova) {
+                if (window.plugins.flashlight) {
+                    window.plugins.flashlight.toggle(
+                        function () {
+                            isTorchOn = window.plugins.flashlight.isSwitchedOn()
+                            $update();
+
+                        }, // optional success callback
+                        function () {
+                        }, // optional error callback
+                        {intensity: 0.3} // optional as well, used on iOS when switching on
+                    );
+                }
+            }
+        }
+
+        let checkMultipleCamerasAvailable = function () {
+            return navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const videoInputs = devices.filter(device => device.kind === 'videoinput');
+                    return videoInputs.length > 1; // Devuelve true si hay más de una cámara
+                })
+                .catch(error => {
+                    console.error("Error al enumerar los dispositivos:", error);
+                    return false; // Devuelve false si hay un error
+                });
+        }
+        let initVideo = function () {
+            imageTaken = null;
+            $update()
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            var constraints = {
+                video: {
+                    width: {ideal: 1920},
+                    height: {ideal: 1080},
+                    facingMode: faceMode
+                },
+                audio: false
+            };
+
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function (stream) {
+                    videoStream = stream;
+                    var video = document.getElementById('camera-preview');
+                    video.srcObject = stream;
+
+                    // Intenta aplicar el mínimo zoom después de que el stream haya comenzado
+                    const videoTrack = stream.getVideoTracks()[0];
+                    const capabilities = videoTrack.getCapabilities && videoTrack.getCapabilities();
+
+                    if (capabilities && capabilities.zoom) {
+                        const settings = videoTrack.getSettings();
+                        const constraints = {
+                            advanced: [{zoom: Math.max(capabilities.zoom.min, settings.zoom || 0)}]
+                        };
+                        videoTrack.applyConstraints(constraints).then(() => {
+                            console.log('Aplicado el mínimo zoom disponible');
+                        }).catch(error => {
+                            console.error('Error al aplicar el mínimo zoom:', error);
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    console.error("Error al acceder a la cámara:", err);
+                });
+        }
+
+
+        let takePhotoHtml5 = async function () {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Tu navegador no soporta la API de getUserMedia.");
+                return;
+            }
+            await checkCameraPermissions();
+            multipleCamera = checkMultipleCamerasAvailable();
+            $update();
+            initializePopupCamera();
+            initVideo();
+            popupCamera.open();
+        };
+
+        let captureAndSendImage = function () {
+            if (!videoStream) {
+                console.error("No hay transmisión de video activa.");
+                return;
+            }
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            // Obtener el ancho y alto del elemento .page-content dentro de #popup-camera
+            var pageContentWidth = pageContent.clientWidth;
+            var pageContentHeight = pageContent.clientHeight;
+
+            var video = document.querySelector('#camera-preview');
+            var aspectRatio = video.videoWidth / video.videoHeight;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = pageContentWidth;  // o cualquier ancho deseado
+            canvas.height = canvas.width / aspectRatio;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var dataURL = canvas.toDataURL('image/jpeg');
+            // Asignar la imagen capturada como la fuente del elemento img
+            var imgElement = document.querySelector('#captured-image');
+
+            imgElement.src = dataURL;
+            imgElement.style.display = 'block';
+            video.style.display = 'none';
+
+            audioManager.playSound('camera', false);
+            imageTaken = true;
+            $update();
+            console.log("send image");
+            base64Image = dataURL;
+            //sendImage(dataURL);
+
+            // Opcional: Detener la transmisión de video después de tomar la foto
+            videoStream.getTracks().forEach(function (track) {
+                track.stop();
+            });
+
+            // Opcional: Eliminar el video del DOM
+            //video.remove();
+        };
+
+        let processImageAndSend = function (base64Image) {
+            // La imagen ya está en formato base64, pero debes redimensionarla
+            // Crea un elemento de imagen para cargar la foto
+            var img = new Image();
+            img.onload = function () {
+                this.style.transform = 'rotate(' + 90 + 'deg)';
+                // Crea un canvas
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                canvas.width = 512;
+                canvas.height = 512;
+
+                // Dibuja la imagen en el canvas, redimensionándola
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Obtén la imagen redimensionada como base64
+                base64Image = canvas.toDataURL('image/jpeg');
+                sendImage();
+
+            };
+
+            // Establece la fuente de la imagen como la cadena base64
+            img.src = 'data:image/jpeg;base64,' + base64Image;
+        };
+
+        let takePhoto = function () {
+            checkCameraPermissions();
+            navigator.camera.getPicture(
+                function (base64Image) {
+                    processImageAndSend(base64Image)
+                },
+                function (error) {
+                    $f7.toast.show({
+                        text: 'Error: ' + error,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    sourceType: Camera.PictureSourceType.CAMERA,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    quality: 100,
+                    saveToPhotoAlbum: true
+                }
+            );
+        };
+
+        let loadConversation = function () {
+            $f7.request({
+                url: window.config.api_methods.load_conversation + '?withConversations=1&guid=' + chat.guid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    chat = data.data.chat;
+                    $update();
+                    if (data.data.conversations) {
+                        data.data.conversations.forEach(function (conversation) {
+                            // handleCommentType(conversation);
+                            messages.addMessage({
+                                attrs: {"id": conversation.guid, "data-id": conversation.guid},
+                                isTitle: false,
+                                text: converter.makeHtml(parseFormulas(conversation.message)),
+                                textHeader: "<div id='speech_" + conversation.guid + "' class='speech-icon'></div>" + createTextHeader(conversation.guid),
+                                name: conversation.user.fullName,
+                                cssClass: 'swipeout card no-margin-top padding-half',
+                                type: 'received'
+                            }, 'append', false);
+                            document.documentElement.style.setProperty('--think-icon', '-')
+                            onMessageAdded($('[data-id="' + conversation.guid + '"]'));
+                            addAudioToMessageFooter(conversation.guid, conversation.media, 'window-media-audio');
+                            initializeMoreOption($('[data-id="' + conversation.guid + '"]').find('.more-options'), $('[data-id="' + conversation.guid + '"]').find('.message-text'))
+                        });
+                        scrollToBottom();
+                        // setupHapticFeedback();
+                    }
+                    if (data.data.chat) {
+                        assistant = data.data.chat.assistant;
+                        $update();
+                    }
+                    initializeSetupChat($('#chat_setup'))
+                    scrollToBottomIfNeeded();
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+
+        }
+        let initializePopupCamera = function () {
+            console.log('initialize Popup');
+            popupCamera = $f7.popup.create({
+                el: '#popup-camera',
+                push: false,
+                on: {
+                    closed: function (popup) {
+                        console.log('Popup closed');
+                        // Detener el video cuando el popup se cierra
+                        if (videoStream) {
+                            var tracks = videoStream.getTracks();
+                            tracks.forEach(function (track) {
+                                track.stop();
+                            });
+                        }
+                        // Opcional: limpiar srcObject del elemento de video
+                        var video = document.getElementById('camera-preview');
+                        if (video) {
+                            video.srcObject = null;
+                        }
+                    }
+                }
+            });
+
+            popupCamera.open();
+        };
+
+        let setupHapticFeedback = function () {
+            const cards = document.querySelectorAll('.card'); // El selector de tus tarjetas
+            const centerIndicator = document.querySelector('#center-indicator'); // El elemento del centro
+
+            // Opciones para el observador de intersección
+            const options = {
+                root: null, // null significa que el viewport es el área de referencia
+                threshold: 0 // Se llamará al callback cuando cualquier parte intersecte
+            };
+
+            // Crear el observador
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        //$(".card").removeClass('bg-color-amber');
+                        // entry.target.classList.add('bg-color-amber'); // Añade la clase
+                        if ('vibrate' in navigator) {
+                            navigator.vibrate(200); // Vibra por 200 milisegundos
+                        }
+                    } else {
+                        //entry.target.classList.remove('bg-color-amber'); // Quita la clase
+                        if ('vibrate' in navigator) {
+                            navigator.vibrate(0); // Detiene la vibración
+                        }
+                    }
+                });
+            }, options);
+
+            // Observar cada tarjeta en relación con el indicador central
+            cards.forEach(card => {
+                observer.observe(card);
+            });
+        }
+
+
+        let setVibrationStatus = function (status) {
+            isVibrating = status;
+            //$update();
+        }
+
+        let singleVibration = function () {
+            navigator.vibrate(1000);
+            setVibrationStatus(true);
+            setTimeout(function () {
+                setVibrationStatus(false);
+            }, 1000);
+        }
+
+
+        audioManager.loadSound('thinking', 'assets/custom/audio/thinking.mp3');
+        audioManager.loadSound('camera', 'assets/custom/audio/camera.mp3');
+        if (mode == 'keyboard') {
+            initKeyboard();
+        }
+
+
+        subscribeSSE();
+        console.log("me voy aqui");
+        /* window.addEventListener('scroll', function () {
+             isScrolling = true;
+             clearTimeout(window.scrollTimeout);
+             window.scrollTimeout = setTimeout(function () {
+                 isScrolling = false;
+             }, 100); // Tiempo en milisegundos para considerar que el scroll ha terminado
+         }, false);*/
+        $on('pageBeforeIn', function () {
+            initializeWindowMediaAudio();
+        });
+        $on('pageAfterIn', function () {
+            initializeMessagebar();
+            initializeMessages();
+            setupVisualization();
+            scrollToBottomBtn = document.getElementById('scrollToBottom');
+            pageContent = document.getElementById('conversationPage');
+
+
+// Evento para manejar el desplazamiento dentro de .page-content
+            pageContent.addEventListener('scroll', checkScrollPosition);
+
+            loadConversation();
+            checkScrollPosition();
+            initializeWindowMediaAudio();
+
+        })
+        return $render;
+    }
+</script>

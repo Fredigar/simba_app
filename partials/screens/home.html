@@ -1,0 +1,980 @@
+<template>
+    <div class="page no-tabbar" data-name="home">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    ${$f7.config.layout[$f7.config.layout.default].sidebar.enabled && $h`
+                    <a href="#" class="link ripple-color-gray" @click="${() => $f7.sidebar.toggle()}">
+                        <span class="shape-container shape-auto size-32 bg-color-mono">
+                            <i class="icon material-icons font-size-20 color-mono-invert">menu</i>
+                        </span>
+                    </a>
+                    `}
+                </div>
+                <div class="title">
+                    <img class="if-not-dark" src="${$f7.config.app.logos.logotypeLight}" alt=""/>
+                    <img class="if-dark" src="${$f7.config.app.logos.logotypeDark}" alt=""/>
+                </div>
+                <div class="right">
+                    ${$f7.config.i18n.enabled && $h`
+                    <a href="/select-language/" class="link ripple-color-gray tooltip-init" data-open-in="popup"
+                       data-tooltip="Language">
+                        <span class="shape-container shape-auto size-32 bg-color-chrome">
+                            <i class="icon material-icons font-size-20 color-mono">language</i>
+                        </span>
+                    </a>
+                    `}
+                    ${$f7.config.theming.enabled && $h`
+                    <a href="/select-appearance/" class="link ripple-color-gray tooltip-init" data-open-in="popup"
+                       data-tooltip="Appearance">
+                        <span class="shape-container shape-auto size-32 bg-color-chrome">
+                            <i class="icon material-icons font-size-20 color-mono">palette</i>
+                        </span>
+                    </a>
+                    `}
+                </div>
+            </div>
+            t
+        </div>
+
+        <div class="toolbar messagebar">
+
+            <div id="voiceStatus" ${speechToText ? $h`` : $h`style="display:none" `}
+                 class="${speechToText ? $h`block` : $h``} mic-mode text-align-center">${speechToText}
+            </div>
+
+            <div class="toolbar-inner" style="height: 70px;"><a href="#" @click="${takePhotoHtml5}"
+                                                                class="link margin-left-half ripple-color-gray"><i
+                    class="icon f7-icons">camera</i></a>
+                <div class="messagebar-area" style="overflow:visible">
+                    <div class="fab fab-center-center mic-mode margin-bottom" style="display:none">
+                        <a id="btn-recognition" @click="${startRecognition}" href="#"
+                           class="${isRecognizing ? $h`listening-button` : $h` `}">
+                            <i class="fa fa-icon fa-${isRecognizing ? $h`close` : $h`microphone`}"> </i>
+                        </a>
+                    </div>
+                    <textarea id="prompt" @input="${handlePromptTextArea}" placeholder="Message"
+                              class="input-with-value keyboard-mode"></textarea></div>
+                <a href="#" @click="${initKeyboard}" style="display:none"
+                   class="mic-mode link margin-left-half margin-right-half ripple-color-gray">
+                    <i class="icon f7-icons">keyboard</i></a>
+                ${!prompt ? $h`
+                <a href="#" @click="${initSpeech}" class="link margin-right-half keyboard-mode ripple-color-gray">
+                    <i class="icon f7-icons">mic</i>
+                </a>
+                ` : $h`
+                <a href="#" @click="${sendPrompt}" class="link margin-right-half keyboard-mode ripple-color-gray">
+                    <i class="icon material-icons">send</i>
+                </a>
+                `}
+            </div>
+        </div>
+        <div class="page-content messages-content">
+            <div class="messages" id="messages-space">
+                <div class="messages-title"><b>Sunday, Feb 9</b> 12:58</div>
+                <div id="message-1" class="card message message-sent padding-half">
+                    <div class="card-content message-content">
+                        <div class="message-bubble">
+                            <div class="message-text">How are you?</div>
+                        </div>
+                    </div>
+                </div>
+                <div id="message-2" class="card message message-received padding-half">
+                    <div class="card-content message-content">
+                        <div class="card-header message-name">Blue Ninja</div>
+                        <div class="message-bubble">
+                            <div class="message-text">Hi there, I am also fine, thanks! And how are you?</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+        <div id="popup-camera" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="left">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                        <div class="title">
+                            <div>Capture the moment</div>
+                            <div class="subtitle">Make a picture</div>
+                        </div>
+                        <div class="right">
+                            ${$f7.device.cordova ? $h`
+                            ${!imageTaken ? $h`
+                            <!--<a class="link icon-only" @click="${toggleCameraTorch}">
+                                <i class="icon material-icons color-white">${isTorchOn ? $h`flash_on` : $h`flash_off`}</i>
+                            </a-->
+
+                            <a href="#" class="link icon-only" @click="${takePhoto}">
+                                <i class="icon material-icons">camera_enhance</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                            ${multipleCamera ? $h`
+                            ${!imageTaken ? $h`
+                            <a class="link icon-only" @click="${toggleCamera}">
+                                <i class="icon material-icons color-white">flip_camera_ios</i>
+                            </a>
+                            `:$h``}
+                            ` : $h` `}
+                        </div>
+                    </div>
+                </div>
+
+                <div class="toolbar messagebar">
+
+                    <div id="voiceStatusa" ${speechToText ? $h`` : $h`style="display:none" `}
+                         class="${speechToText ? $h`block` : $h``} mic-mode text-align-center">${speechToText}
+                    </div>
+
+                    <div class="toolbar-inner" style="height: 70px;">
+                        ${imageTaken ? $h`
+                        <a href="#" @click="${toggleCameraView}"
+                           class="link margin-left ripple-color-gray"><i
+                                class="icon material-icons">close</i></a>
+                        ` : $h` `}
+                        <div class="messagebar-area" style="overflow:visible">
+                            <div class="fab fab-center-center margin-bottom">
+                                <a id="btn-capture" @click="${captureAndSendImage}" href="#" class="">
+                                    <i class="icon material-icons">camera</i>
+                                </a>
+                            </div>
+                        </div>
+                        ${imageTaken ? $h`<a @click="${sendImage}" href="#"
+                                             class="link margin-right ripple-color-gray"><i
+                            class="icon material-icons">check</i></a>
+                        ` : $h` `}
+
+
+                    </div>
+                </div>
+                <div class="page-content">
+                    <video id="camera-preview" autoplay></video>
+                    <img id="captured-image" src="" style="display:none" alt="Imagen Capturada"/>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+<style>
+
+    #camera-preview, #captured-image {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+        position: fixed;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        margin: auto;
+    }
+
+    .message {
+        max-width: 100% !important;
+        /* text-align: right; */
+        flex-direction: row !important;
+        align-self: normal !important;
+    }
+
+    .message-bubble {
+
+        color: inherit !important;
+        background: inherit !important;
+    }
+
+    @keyframes pulse-animation {
+        0% {
+            transform: scale(1);
+            opacity: 1;
+        }
+        50% {
+            transform: scale(1.1);
+            opacity: 0.7;
+        }
+        100% {
+            transform: scale(1);
+            opacity: 1;
+        }
+    }
+
+    .listening-button {
+        animation: pulse-animation 2s infinite;
+    }
+</style>
+<script>
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let photo = null;
+        let photo_description = '';
+        let audio = null;
+        let mode = 'keyboard';
+        let recognition = null;
+        let lastRecognizedText = null;
+        let isRecognizing = false;
+        let speechToText = null;
+        let recognitionMode = "html5"//'html5'//'system' | 'auto'
+        let popupCamera = null;
+        let faceMode = 'environment' //user
+        let videoStream = null;
+        let isTorchOn = false;
+        let track;
+        let multipleCamera = false;
+        let imageTaken = null;
+        let base64Image = null;
+        let prompt = null;
+        let messages = null;
+        //  let canTurn````````````
+        //  Flash = photoCapabilities.fillLightMode.includes('flash');
+
+
+        let initializeMessages = function () {
+            var self = this;
+            messages = $f7.messages.create({
+                el: $el.value.find('.messages'),
+                scrollMessages: true,
+                autoLayout: true,
+                scrollMessagesOnEdge: true,
+                firstMessageRule: function (message, previousMessage, nextMessage) {
+
+                    if (message != undefined) {
+
+                        if (message.isTitle) {
+                            return false;
+                        }
+
+                        if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name) {
+                            return true;
+                        }
+
+                    }
+
+                    return false;
+                },
+
+                lastMessageRule: function (message, previousMessage, nextMessage) {
+
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+
+                    return false;
+                },
+
+                tailMessageRule: function (message, previousMessage, nextMessage) {
+                    if (message != undefined) {
+                        if (message.isTitle) {
+                            return false;
+                        }
+                        if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                            return true;
+                        }
+                    }
+                    return false;
+                }
+            });
+
+
+        }
+
+        let sendPrompt = function () {
+
+            $f7.toast.show({
+                text: prompt,
+                cssClass: 'color-red'
+            });
+            messages.addMessage({
+                id: 'message_3',
+                isTitle: false,
+                text: prompt,
+            //    textFooter: ((curUser != data.user) ? '<i class="fa fa-xs fa-speaker-deck margin-right"></i><a style="margin-left:3px;font-weight: bold" class="color-blue-4 response_btn" href="#">Reply</a> | ' : '') + self.getCurrentTime(),
+                textHeader: 'Tú',
+                name: 'Tú',
+                //  avatar: data.comment.idOwner.avatar,
+               // cssClass: 'bot_' + data.comment.botAnswer + ' ' + data.comment.guid,
+                type: 'sent'//(curUser == data.user ? 'sent' : 'received'),
+                //  type: 'sent'
+            }, 'append', false);
+        }
+
+
+        let handlePromptTextArea = function (e) {
+            var value = e.target.value;
+            console.log(value)
+            // Aquí puedes cambiar el icono según el contenido de 'value'
+            if (value.length > 0) {
+                prompt = value;
+                // Cambia el icono a 'send'
+            } else {
+                prompt = null;
+                // Cambia el icono a 'mic'
+            }
+            $update();
+        }
+        let audioManager = {
+            sounds: {},
+
+            // Cargar un sonido
+            loadSound: function (name, path) {
+                this.sounds[name] = new Audio(path);
+            },
+
+            playSound: function (name, loop = false) {
+                if (this.sounds[name]) {
+                    this.sounds[name].loop = loop;
+                    this.sounds[name].play();
+                }
+            },
+
+            // Detener un sonido
+            stopSound: function (name) {
+                if (this.sounds[name]) {
+                    this.sounds[name].pause();
+                    this.sounds[name].currentTime = 0;
+                }
+            }
+        };
+
+        let initSpeech = function () {
+            $(".mic-mode").show();
+            $(".keyboard-mode").hide();
+            mode = 'speech';
+            startRecognition();
+        }
+
+        let initKeyboard = function () {
+            $(".keyboard-mode").show();
+            $(".mic-mode").hide();
+            mode = 'keyboard';
+            stopRecognition();
+        }
+
+
+        let startRecognition = function () {
+            mode = recognitionMode
+            if (mode === 'auto') {
+                mode = window.cordova ? 'system' : 'html5';
+            }
+
+            if (mode === 'html5') {
+                if (!isRecognizing) {
+                    setupRecognition();
+                    startRecognitionHtml5();
+                } else {
+                    stopRecognitionHtml5();
+                }
+            } else if (mode === 'system') {
+                if (!isRecognizing) {
+                    setupRecognitionCordova();
+                    startRecognitionCordova();
+                } else {
+                    stopRecognitionCordova()
+                }
+            } else {
+                canNotRecognition();
+            }
+        }
+
+        let stopRecognition = function () {
+            mode = recognitionMode
+            if (mode === 'auto') {
+                mode = window.cordova ? 'system' : 'html5';
+            }
+
+            if (mode === 'html5') {
+                stopRecognitionHtml5();
+            } else if (mode === 'system') {
+                stopRecognitionCordova();
+            } else {
+                canNotRecognition();
+            }
+        }
+
+        let canNotRecognition = function () {
+            console.warn('El reconocimiento de voz no está disponible.');
+        }
+
+        let startRecognitionHtml5 = function () {
+            if (!isRecognizing) {
+                setupRecognition(); // Asegura que recognition se configura cada vez
+                recognition.start();
+                isRecognizing = true;
+                $update();
+            }
+        }
+
+        let stopRecognitionHtml5 = function () {
+            console.log('Parando reconocimiento HTML5');
+            if (recognition && isRecognizing) {
+                recognition.stop();
+                isRecognizing = false; // Actualiza el estado aquí
+                $update();
+            }
+        }
+
+
+        let startRecognitionCordova = function () {
+            if (!isRecognizing) {
+                window.plugins.speechRecognition.startListening(function (result) {
+                    // Aquí manejas los resultados
+                    if (result && result.length > 0) {
+                        console.log('Reconocido: ' + result[0]);
+                        speechToText = result[0]; // Tomar el primer resultado como el mejor
+                        prompt = speechToText;
+                        sendPrompt();
+                    } else {
+                        console.log('No se reconoció ningún texto.');
+                        speechToText = 'Escuchando...';
+                    }
+                    isRecognizing = false;
+                    $update(function () {
+                        stopRecognition()
+                    });
+                }, function (err) {
+                    // Aquí manejas los errores
+                    console.error('Error en el reconocimiento de voz:', err);
+                    isRecognizing = false;
+                    prompt = null;
+                    $update();
+                }, {language: "es-ES", showPartial: false});
+
+                isRecognizing = true;
+                speechToText = 'Escuchando...';
+                $update();
+            } else {
+                stopRecognitionCordova();
+            }
+        }
+
+        let stopRecognitionCordova = function () {
+            console.log('Parando reconocimiento');
+            window.plugins.speechRecognition.stopListening(function () {
+                console.log('Reconocimiento detenido');
+                isRecognizing = false;
+                $update();
+            }, function (err) {
+                console.error('Error al detener el reconocimiento de voz:', err);
+            });
+        }
+
+        let checkCameraPermissions = async function checkCameraPermissions() {
+            return new Promise((resolve, reject) => {
+                console.log("Checking Camera Permissions");
+                if (app.device.cordova) {
+                    var permissions = cordova.plugins.permissions;
+                    var permissionList = [permissions.CAMERA];
+
+                    permissions.checkPermission(permissionList, function (status) {
+                        if (!status.hasPermission) {
+                            permissions.requestPermissions(
+                                permissionList,
+                                function (status) {
+                                    if (!status.hasPermission) {
+                                        console.error("Camera permissions not granted: " + JSON.stringify(status));
+                                        reject("Camera permissions not granted.");
+                                    } else {
+                                        console.log("Camera permissions granted");
+                                        resolve();
+                                    }
+                                },
+                                function (error) {
+                                    console.error("Error requesting camera permissions: " + JSON.stringify(error));
+                                    reject("Error requesting camera permissions.");
+                                }
+                            );
+                        } else {
+                            console.log("Camera permissions already granted");
+                            resolve();
+                        }
+                    }, function (error) {
+                        console.error("Error checking camera permissions: " + JSON.stringify(error));
+                        reject("Error checking camera permissions.");
+                    });
+                } else {
+                    // No es Cordova, resuelve de inmediato (puede ajustarse según tus necesidades)
+                    resolve();
+                }
+            });
+        }
+
+
+        function checkAudioPermissions() {
+            console.log("Checking Audio Permissions");
+            if (app.device.cordova) {
+                var permissions = cordova.plugins.permissions;
+                var permissionList = [permissions.RECORD_AUDIO]; // Assuming RECORD_AUDIO is the correct permission for audio
+
+                permissions.checkPermission(permissionList, function (status) {
+                    if (!status.hasPermission) {
+                        permissions.requestPermissions(
+                            permissionList,
+                            function (status) {
+                                if (!status.hasPermission) {
+                                    console.error("Audio permissions not granted: " + JSON.stringify(status));
+                                } else {
+                                    console.log("Audio permissions granted");
+                                }
+                            },
+                            function (error) {
+                                console.error("Error requesting audio permissions: " + JSON.stringify(error));
+                            }
+                        );
+                    } else {
+                        console.log("Audio permissions already granted");
+                    }
+                }, function (error) {
+                    console.error("Error checking audio permissions: " + JSON.stringify(error));
+                });
+            }
+        }
+
+
+        let setupRecognition = function () {
+            checkAudioPermissions();
+            if ('webkitSpeechRecognition' in window) {
+                console.log('seteando el reconocimiento de voz');
+                // Reinicia recognition cada vez
+
+                recognition = new webkitSpeechRecognition();
+                recognition.lang = 'es-ES';
+                recognition.continuous = false; // Se cambia a false para una sola ronda de reconocimiento
+                recognition.interimResults = false;
+
+                recognition.onstart = function () {
+                    console.log("empieza el reconocimiento")
+                    speechToText = 'Escuchando...';
+                    $update();
+                };
+
+                recognition.onresult = function (event) {
+                    lastRecognizedText = event.results[0][0].transcript.trim();
+                    console.log('Reconocido: ' + lastRecognizedText);
+                    speechToText = lastRecognizedText;
+                    prompt = lastRecognizedText;
+                    $update();
+                    sendPrompt();
+                    stopRecognition(); // Detiene el reconocimiento después de obtener el resultado
+                };
+
+                recognition.onerror = function (event) {
+                    console.error('Error en el reconocimiento de voz:', event.error);
+                    prompt = null;
+                    isRecognizing = false; // Asegúrate de actualizar el estado aquí también
+                    $update();
+                };
+
+                recognition.onend = function () {
+                    console.log("finaliza el reconocimiento")
+                    prompt = null;
+                    isRecognizing = false;
+                    $update();
+                };
+            } else {
+                console.log('webkitSpeechRecognition no es soportado en esta WebView');
+            }
+
+        };
+
+
+        let setupRecognitionCordova = function () {
+            checkAudioPermissions();
+            window.plugins.speechRecognition.isRecognitionAvailable(function (available) {
+                if (!available) {
+                    console.warn('La API de reconocimiento de voz no está disponible en este dispositivo.');
+                    return;
+                }
+
+                window.plugins.speechRecognition.hasPermission(function (isGranted) {
+                    if (!isGranted) {
+                        window.plugins.speechRecognition.requestPermission(function () {
+                            console.log('Permiso concedido');
+                        }, function (err) {
+                            console.warn('Permiso denegado', err);
+                        });
+                    }
+                }, function (err) {
+                    console.error('Error al verificar permisos:', err);
+                });
+            }, function (err) {
+                console.error('Error al verificar disponibilidad:', err);
+            });
+        };
+
+
+        let base64ToBlob = function (base64Image, mime) {
+            mime = mime || 'image/jpeg';
+            var sliceSize = 1024;
+            var base64 = base64Image.replace(/^data:image\/(png|jpeg|jpg);base64,/, "");
+
+            var byteChars = window.atob(base64);
+            var byteArrays = [];
+
+            for (var offset = 0, len = byteChars.length; offset < len; offset += sliceSize) {
+                var slice = byteChars.slice(offset, offset + sliceSize);
+
+                var byteNumbers = new Array(slice.length);
+                for (var i = 0; i < slice.length; i++) {
+                    byteNumbers[i] = slice.charCodeAt(i);
+                }
+
+                var byteArray = new Uint8Array(byteNumbers);
+                byteArrays.push(byteArray);
+            }
+
+            return new Blob(byteArrays, {type: mime});
+        }
+
+        let fileURLToBlob = function (fileURL, callback) {
+            window.resolveLocalFileSystemURL(fileURL, function (fileEntry) {
+                fileEntry.file(function (file) {
+                    let reader = new FileReader();
+                    reader.onloadend = function () {
+                        let blob = new Blob([this.result], {type: "image/jpeg"});
+                        callback(blob);
+                    };
+                    reader.readAsArrayBuffer(file);
+                }, function (error) {
+                    $f7.toast.show({
+                        text: 'File reading error: ' + error.code,
+                        cssClass: 'color-red'
+                    });
+                });
+            }, function (error) {
+                $f7.toast.show({
+                    text: 'File resolving error: ' + error.code,
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        let playMyAudio = function (base64Audio) {
+            // Asume que base64Audio es una cadena base64 correctamente formateada del audio
+            const audioSrc = "data:audio/mp3;base64," + base64Audio;
+
+            // Obtén el elemento de audio y su fuente
+            const audioElement = document.getElementById('my-audio');
+            const sourceElement = audioElement.querySelector('source');
+
+            // Actualiza el src del elemento source
+            sourceElement.src = audioSrc;
+
+            // Importante: llama a load en el elemento de audio para que la actualización surta efecto
+            audioElement.load();
+
+            // Opcionalmente, reproduce el audio
+            audioElement.play();
+        };
+
+        let playAudio = function (base64Audio) {
+            console.log('Intentando reproducir')
+            const audioBlob = base64ToBlob(base64Audio, 'audio/mpeg');
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+        }
+
+        let sendImage = function () {
+            var image = base64ToBlob(base64Image);
+            let formData = new FormData();
+            formData.append('image0', image);
+            audioManager.playSound('thinking', true);
+            $f7.preloader.show();
+
+            $f7.request({
+                url: window.config.api_methods.what_is_this,
+                method: 'POST',
+                headers: {
+                    'X-Auth-Token': window.config.token
+                },
+                data: formData,
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // Manejar la respuesta exitosa aquí
+                    var response = JSON.parse(responseText);
+                    $f7.preloader.hide();
+                    audioManager.stopSound('thinking');
+                    if (response.data && response.data.audio) {
+                        sessionStorage.setItem('lastAudioBase64', response.data.audio);
+                        photo_description = response.data.text
+                        audio = 'data:audio/mp3;base64,' + response.data.audio
+                        $update(function () {
+                            playMyAudio(response.data.audio)
+                        });
+
+                    }
+
+                    //$update();
+                },
+                error: function (xhr, status, error) {
+                    audioManager.stopSound('thinking');
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+
+        function toggleCamera() {
+            faceMode = faceMode === 'user' ? 'environment' : 'user';
+            takePhotoHtml5();
+        }
+
+        function toggleCameraView() {
+            var videoElement = document.getElementById('camera-preview');
+            var imgElement = document.getElementById('captured-image');
+
+            // Verificar si el video está visible o no
+            var isVideoVisible = videoElement.style.display === 'block';
+
+            // Si el video está visible, ocultar el video y mostrar la imagen
+            // Si la imagen está visible, ocultar la imagen y mostrar el video
+            if (isVideoVisible) {
+                videoElement.style.display = 'none';
+                imgElement.style.display = 'block';
+            } else {
+                videoElement.style.display = 'block';
+                imgElement.style.display = 'none';
+                initVideo();
+            }
+        }
+
+
+        let toggleCameraTorch = async function () {
+            if (window.cordova) {
+                if (window.plugins.flashlight) {
+                    window.plugins.flashlight.toggle(
+                        function () {
+                            isTorchOn = window.plugins.flashlight.isSwitchedOn()
+                            $update();
+
+                        }, // optional success callback
+                        function () {
+                        }, // optional error callback
+                        {intensity: 0.3} // optional as well, used on iOS when switching on
+                    );
+                }
+            }
+        }
+
+        let checkMultipleCamerasAvailable = function () {
+            return navigator.mediaDevices.enumerateDevices()
+                .then(devices => {
+                    const videoInputs = devices.filter(device => device.kind === 'videoinput');
+                    return videoInputs.length > 1; // Devuelve true si hay más de una cámara
+                })
+                .catch(error => {
+                    console.error("Error al enumerar los dispositivos:", error);
+                    return false; // Devuelve false si hay un error
+                });
+        }
+        let initVideo = function () {
+            imageTaken = null;
+            $update()
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            var constraints = {
+                video: {
+                    width: {ideal: 1920},
+                    height: {ideal: 1080},
+                    facingMode: faceMode
+                },
+                audio: false
+            };
+
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            navigator.mediaDevices.getUserMedia(constraints)
+                .then(function (stream) {
+                    videoStream = stream;
+                    var video = document.getElementById('camera-preview');
+                    video.srcObject = stream;
+
+                    // Intenta aplicar el mínimo zoom después de que el stream haya comenzado
+                    const videoTrack = stream.getVideoTracks()[0];
+                    const capabilities = videoTrack.getCapabilities && videoTrack.getCapabilities();
+
+                    if (capabilities && capabilities.zoom) {
+                        const settings = videoTrack.getSettings();
+                        const constraints = {
+                            advanced: [{zoom: Math.max(capabilities.zoom.min, settings.zoom || 0)}]
+                        };
+                        videoTrack.applyConstraints(constraints).then(() => {
+                            console.log('Aplicado el mínimo zoom disponible');
+                        }).catch(error => {
+                            console.error('Error al aplicar el mínimo zoom:', error);
+                        });
+                    }
+                })
+                .catch(function (err) {
+                    console.error("Error al acceder a la cámara:", err);
+                });
+        }
+
+
+        let takePhotoHtml5 = async function () {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                alert("Tu navegador no soporta la API de getUserMedia.");
+                return;
+            }
+            await checkCameraPermissions();
+            multipleCamera = checkMultipleCamerasAvailable();
+            $update();
+            initializePopupCamera();
+            initVideo();
+            popupCamera.open();
+        };
+
+        let captureAndSendImage = function () {
+            if (!videoStream) {
+                console.error("No hay transmisión de video activa.");
+                return;
+            }
+            var pageContent = document.querySelector('#popup-camera').querySelector('.page-content');
+
+            // Obtener el ancho y alto del elemento .page-content dentro de #popup-camera
+            var pageContentWidth = pageContent.clientWidth;
+            var pageContentHeight = pageContent.clientHeight;
+
+            var video = document.querySelector('#camera-preview');
+            var aspectRatio = video.videoWidth / video.videoHeight;
+
+            var canvas = document.createElement('canvas');
+            canvas.width = pageContentWidth;  // o cualquier ancho deseado
+            canvas.height = canvas.width / aspectRatio;
+
+            var ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            var dataURL = canvas.toDataURL('image/jpeg');
+            // Asignar la imagen capturada como la fuente del elemento img
+            var imgElement = document.querySelector('#captured-image');
+
+            imgElement.src = dataURL;
+            imgElement.style.display = 'block';
+            video.style.display = 'none';
+
+            audioManager.playSound('camera', false);
+            imageTaken = true;
+            $update();
+            console.log("send image");
+            base64Image = dataURL;
+            //sendImage(dataURL);
+
+            // Opcional: Detener la transmisión de video después de tomar la foto
+            videoStream.getTracks().forEach(function (track) {
+                track.stop();
+            });
+
+            // Opcional: Eliminar el video del DOM
+            //video.remove();
+        };
+
+        let processImageAndSend = function (base64Image) {
+
+            // La imagen ya está en formato base64, pero debes redimensionarla
+            // Crea un elemento de imagen para cargar la foto
+            var img = new Image();
+            img.onload = function () {
+                this.style.transform = 'rotate(' + 90 + 'deg)';
+                // Crea un canvas
+                var canvas = document.createElement('canvas');
+                var ctx = canvas.getContext('2d');
+                canvas.width = 512;
+                canvas.height = 512;
+
+                // Dibuja la imagen en el canvas, redimensionándola
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                // Obtén la imagen redimensionada como base64
+                base64Image = canvas.toDataURL('image/jpeg');
+                sendImage();
+
+            };
+
+            // Establece la fuente de la imagen como la cadena base64
+            img.src = 'data:image/jpeg;base64,' + base64Image;
+        };
+
+        let takePhoto = function () {
+            checkCameraPermissions();
+            navigator.camera.getPicture(
+                function (base64Image) {
+                    processImageAndSend(base64Image)
+                },
+                function (error) {
+                    $f7.toast.show({
+                        text: 'Error: ' + error,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    sourceType: Camera.PictureSourceType.CAMERA,
+                    destinationType: Camera.DestinationType.DATA_URL,
+                    encodingType: Camera.EncodingType.JPEG,
+                    quality: 100,
+                    saveToPhotoAlbum: true
+                }
+            );
+        };
+
+
+        let initializePopupCamera = function () {
+            console.log('initialize Popup');
+            popupCamera = $f7.popup.create({
+                el: '#popup-camera',
+                push: false,
+                on: {
+                    closed: function (popup) {
+                        console.log('Popup closed');
+                        // Detener el video cuando el popup se cierra
+                        if (videoStream) {
+                            var tracks = videoStream.getTracks();
+                            tracks.forEach(function (track) {
+                                track.stop();
+                            });
+                        }
+                        // Opcional: limpiar srcObject del elemento de video
+                        var video = document.getElementById('camera-preview');
+                        if (video) {
+                            video.srcObject = null;
+                        }
+                    }
+                }
+            });
+
+            popupCamera.open();
+        };
+
+
+        audioManager.loadSound('thinking', 'assets/custom/audio/thinking.mp3');
+        audioManager.loadSound('camera', 'assets/custom/audio/camera.mp3');
+        if (mode == 'keyboard') {
+            initKeyboard();
+        }
+        initializeMessages();
+
+
+        console.log("me voy aqui");
+        $on('pageAfterIn',function(){
+            alert("Hola")
+        })
+
+        return $render;
+    }
+</script>

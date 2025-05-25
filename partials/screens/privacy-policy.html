@@ -1,0 +1,68 @@
+<template>
+    <div class="page" data-name="privacy-policy">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Privacy Policy</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="note note-fade inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Notice</div>
+                            <div class="note-message">This Privacy Policy was last updated on ${moment().format('dddd, MMMM DD, YYYY')}</div>
+                        </div>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <h3>What kind of personal information do we collect?</h3>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <h3>Why do we collect and use your personal data?</h3>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <h3>How do we share your data with third parties?</h3>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <h3>How do we make use of mobile devices and social media?</h3>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+                        <p>${faker.lorem.sentences(5)}</p>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

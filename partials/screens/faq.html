@@ -1,0 +1,534 @@
+<template>
+    <div class="page" data-name="faq">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">FAQ</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong medium-inset medium-margin-top no-hairlines no-margin-vertical">
+                <lottie-player src="${$f7.config.lottie.assetUrl + 'faq.json'}" autoplay loop background="transparent" speed="1" style="height: 144px;"></lottie-player>
+                <div class="margin-top text-align-center">
+                    <div class="font-size-24 font-weight-bold">Frequently Asked Questions</div>
+                </div>
+            </div>
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 large-30 large-show sticky sticky-top">
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content">
+                            <div class="list media-list menu-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="#tab-general-inquiries" class="item-link tab-link tab-link-active color-deeporange">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons font-size-40 color-deeporange">info_circle</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title font-size-16">General Inquiries</div>
+                                                    </div>
+                                                    <div class="item-text">New around here? Start with the basics.</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-app-features" class="item-link tab-link color-teal">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons font-size-40 color-teal">star_circle</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title font-size-16">App Features</div>
+                                                    </div>
+                                                    <div class="item-text">Dive deeper into app's robust features.</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-permissions-privacy" class="item-link tab-link color-bluegray">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons font-size-40 color-bluegray">lock_circle</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title font-size-16">Permissions & Privacy</div>
+                                                    </div>
+                                                    <div class="item-text">We take security and privacy seriously.</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-pricing-plans" class="item-link tab-link color-green">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons font-size-40 color-green">money_dollar_circle</i>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title font-size-16">Pricing & Plans</div>
+                                                    </div>
+                                                    <div class="item-text">Learn about plans, payments, and more.</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-100 large-70">
+                    <div class="tabs">
+
+                        <div id="tab-general-inquiries" class="tab tab-active">
+                            <div class="card no-shadow">
+                                <div class="card-content">
+                                    <div class="list media-list no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons font-size-40 color-deeporange">info_circle</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title-row">
+                                                            <div class="item-title font-size-20 font-weight-bold text-color-deeporange">General Inquiries</div>
+                                                        </div>
+                                                        <div class="item-text">New around here? Start with the basics.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    ${faq && faq.general_inquiries && faq.general_inquiries.length ? $h`
+                                    <div class="list no-safe-areas">
+                                        <ul>
+                                            ${faq.general_inquiries.map((item, index) => $h`
+                                            <li class="accordion-item custom-toggle-icon">
+                                                <a href="#" class="item-link">
+                                                    <div class="item-content">
+                                                        <div class="item-media text-align-center" style="width: 40px;">
+                                                            <span class="font-size-18 font-weight-bold" style="color: var(--color-deeporange-200);">${String(item.id).padStart(2, '0')}</span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">${item.question}</div>
+                                                            <div class="item-after">
+                                                                <i class="icon f7-icons toggle-icon-open color-deeporange">plus_circle_fill</i>
+                                                                <i class="icon f7-icons toggle-icon-close color-gray">minus_circle_fill</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="accordion-item-content">
+                                                    <div class="block margin-vertical">${item.answer}</div>
+                                                </div>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                    ` : $h`
+                                    <div class="card-content-padding text-align-center">
+                                        <div class="preloader"></div>
+                                    </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-app-features" class="tab">
+                            <div class="card no-shadow">
+                                <div class="card-content">
+                                    <div class="list media-list no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons font-size-40 color-teal">star_circle</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title-row">
+                                                            <div class="item-title font-size-20 font-weight-bold text-color-teal">App Features</div>
+                                                        </div>
+                                                        <div class="item-text">Dive deeper into app's robust features.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    ${faq && faq.app_features && faq.app_features.length ? $h`
+                                    <div class="list no-safe-areas">
+                                        <ul>
+                                            ${faq.app_features.map((item, index) => $h`
+                                            <li class="accordion-item custom-toggle-icon">
+                                                <a href="#" class="item-link">
+                                                    <div class="item-content">
+                                                        <div class="item-media text-align-center" style="width: 40px;">
+                                                            <span class="font-size-18 font-weight-bold" style="color: var(--color-teal-200);">${String(item.id).padStart(2, '0')}</span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">${item.question}</div>
+                                                            <div class="item-after">
+                                                                <i class="icon f7-icons toggle-icon-open color-teal">plus_circle_fill</i>
+                                                                <i class="icon f7-icons toggle-icon-close color-gray">minus_circle_fill</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="accordion-item-content">
+                                                    <div class="block margin-vertical">${item.answer}</div>
+                                                </div>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                    ` : $h`
+                                    <div class="card-content-padding text-align-center">
+                                        <div class="preloader"></div>
+                                    </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-permissions-privacy" class="tab">
+                            <div class="card no-shadow">
+                                <div class="card-content">
+                                    <div class="list media-list no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons font-size-40 color-bluegray">lock_circle</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title-row">
+                                                            <div class="item-title font-size-20 font-weight-bold text-color-bluegray">Permissions & Privacy</div>
+                                                        </div>
+                                                        <div class="item-text">We take security and privacy seriously.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    ${faq && faq.permissions_privacy && faq.permissions_privacy.length ? $h`
+                                    <div class="list no-safe-areas">
+                                        <ul>
+                                            ${faq.permissions_privacy.map((item, index) => $h`
+                                            <li class="accordion-item custom-toggle-icon">
+                                                <a href="#" class="item-link">
+                                                    <div class="item-content">
+                                                        <div class="item-media text-align-center" style="width: 40px;">
+                                                            <span class="font-size-18 font-weight-bold" style="color: var(--color-bluegray-200);">${String(item.id).padStart(2, '0')}</span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">${item.question}</div>
+                                                            <div class="item-after">
+                                                                <i class="icon f7-icons toggle-icon-open color-bluegray">plus_circle_fill</i>
+                                                                <i class="icon f7-icons toggle-icon-close color-gray">minus_circle_fill</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="accordion-item-content">
+                                                    <div class="block margin-vertical">${item.answer}</div>
+                                                </div>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                    ` : $h`
+                                    <div class="card-content-padding text-align-center">
+                                        <div class="preloader"></div>
+                                    </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="tab-pricing-plans" class="tab">
+                            <div class="card no-shadow">
+                                <div class="card-content">
+                                    <div class="list media-list no-safe-areas">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon f7-icons font-size-40 color-green">money_dollar_circle</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title-row">
+                                                            <div class="item-title font-size-20 font-weight-bold text-color-green">Pricing & Plans</div>
+                                                        </div>
+                                                        <div class="item-text">Learn about plans, payments, and more.</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    ${faq && faq.pricing_plans && faq.pricing_plans.length ? $h`
+                                    <div class="list no-safe-areas">
+                                        <ul>
+                                            ${faq.pricing_plans.map((item, index) => $h`
+                                            <li class="accordion-item custom-toggle-icon">
+                                                <a href="#" class="item-link">
+                                                    <div class="item-content">
+                                                        <div class="item-media text-align-center" style="width: 40px;">
+                                                            <span class="font-size-18 font-weight-bold" style="color: var(--color-green-200);">${String(item.id).padStart(2, '0')}</span>
+                                                        </div>
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">${item.question}</div>
+                                                            <div class="item-after">
+                                                                <i class="icon f7-icons toggle-icon-open color-green">plus_circle_fill</i>
+                                                                <i class="icon f7-icons toggle-icon-close color-gray">minus_circle_fill</i>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </a>
+                                                <div class="accordion-item-content">
+                                                    <div class="block margin-vertical">${item.answer}</div>
+                                                </div>
+                                            </li>
+                                            `)}
+                                        </ul>
+                                    </div>
+                                    ` : $h`
+                                    <div class="card-content-padding text-align-center">
+                                        <div class="preloader"></div>
+                                    </div>
+                                    `}
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="fab ${$f7.rtl ? 'fab-left-bottom' : 'fab-right-bottom'}">
+            <a href="#" @click="${openPopupAsk}">
+                <i class="icon material-icons">question_mark</i>
+            </a>
+        </div>
+
+        <div id="popup-ask" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Ask Us</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupAsk}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'faq.json'}" autoplay loop background="transparent" speed="1" style="height: 144px;"></lottie-player>
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">Ask Your Question</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">Got a specific question for us? We are here to help.</div>
+                        </div>
+                    </div>
+
+                    <form name="ask" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list inset margin-vertical">
+                            <ul class="padding-vertical-half">
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">person_outline</i>
+                                                </div>
+                                                <input type="text" name="name" placeholder="Name" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">mail_outline</i>
+                                                </div>
+                                                <input type="email" name="email" inputmode="email" placeholder="Email" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media align-self-flex-start">
+                                                    <i class="icon material-icons">help_outline</i>
+                                                </div>
+                                                <textarea name="question" class="resizable" placeholder="Question" required style="min-height: 128px;"></textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <button type="submit" class="button button-fill button-large">Submit</button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<style>
+    @media (max-width: 1023.98px) {
+        .page[data-name=faq] .tabs .tab {
+            display: block;
+        }
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let faq = null;
+        let popupAsk = null;
+        let formValidator = null;
+
+        let loadData = function() {
+            let data = {
+                general_inquiries: [],
+                app_features: [],
+                permissions_privacy: [],
+                pricing_plans: []
+            };
+            for (i=1; i<=25; i++) {
+                data.general_inquiries.push({
+                    id: i,
+                    question: (faker.lorem.sentence(5)).slice(0, -1) + '?',
+                    answer: faker.lorem.sentences(3)
+                });
+            }
+            for (i=1; i<=25; i++) {
+                data.app_features.push({
+                    id: i,
+                    question: (faker.lorem.sentence(7)).slice(0, -1) + '?',
+                    answer: faker.lorem.sentences(5)
+                });
+            }
+            for (i=1; i<=25; i++) {
+                data.permissions_privacy.push({
+                    id: i,
+                    question: (faker.lorem.sentence(7)).slice(0, -1) + '?',
+                    answer: faker.lorem.sentences(7)
+                });
+            }
+            for (i=1; i<=25; i++) {
+                data.pricing_plans.push({
+                    id: i,
+                    question: (faker.lorem.sentence(5)).slice(0, -1) + '?',
+                    answer: faker.lorem.sentences(9)
+                });
+            }
+            faq = data;
+            $update();
+        }
+
+        let initializePopupAsk = function() {
+            popupAsk = $f7.popup.create({
+                el: $el.value.find('#popup-ask')
+            });
+        }
+
+        let openPopupAsk = function() {
+            popupAsk.open();
+        }
+
+        let closePopupAsk = function() {
+            formValidator.resetForm();
+            popupAsk.close();
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=ask]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    question: {
+                        required: true
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    question: {
+                        required: 'Please enter question.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for asking us. We will get back to you soon.',
+                        cssClass: 'color-green'
+                    });
+                    closePopupAsk();
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+            initializePopupAsk();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

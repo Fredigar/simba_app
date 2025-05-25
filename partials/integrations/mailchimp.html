@@ -1,0 +1,154 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Mailchimp</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-yellow-100);">
+                            <img src="https://icon.horse/icon/mailchimp.com" height="40" alt="" />
+                        </span>
+                        <p>Let your users subscribe to your mailing lists.</p>
+                    </div>
+
+                    <div class="block margin-vertical">
+                        <button type="button" class="button button-fill button-large" @click="${() => popupSubscribe.open()}">Open Subscribe Form</button>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-subscribe" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Subscribe</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => popupSubscribe.close()}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'envelope.json'}" autoplay loop background="transparent" speed="1" style="height: 96px;"></lottie-player>
+                        <p>Subscribe for weekly newsletters and get more of Nectar delivered to your inbox.</p>
+                    </div>
+                    <form name="subscribe" action="#" method="GET" enctype="application/x-www-form-urlencoded">
+                        <input type="hidden" name="u" value="${$f7.config.mailchimp.userId}" />
+                        <input type="hidden" name="id" value="${$f7.config.mailchimp.audienceId}" />
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <input type="email" name="EMAIL" inputmode="email" required />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Your Email Address</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical text-align-center">
+                            <button type="submit" class="button button-fill button-large">Subscribe</button>
+                            <div class="margin-top-half text-color-gray">We won't spam you. It's a promise.</div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let popupSubscribe = null;
+        let formValidator = null;
+
+        let initializePopupSubscribe = function() {
+            popupSubscribe = $f7.popup.create({
+                el: $el.value.find('#popup-subscribe')
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=subscribe]')).validate({
+                rules: {
+                    EMAIL: {
+                        required: true,
+                        email:true
+                    }
+                },
+                messages: {
+                    EMAIL: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.preloader.show();
+                    $f7.request({
+                        url: $f7.config.cors.proxy + '?url=' + $f7.config.mailchimp.subscribeUrl,
+                        method: 'GET',
+                        data: $f7.form.convertToData(form),
+                        dataType: 'json'
+                    })
+                    .then(function(response) {
+                        $f7.preloader.hide();
+                        if (response.data.result == 'success') {
+                            $f7.toast.show({
+                                text: response.data.msg,
+                                cssClass: 'color-green'
+                            });
+                            popupSubscribe.close(false);
+                        }
+                        else {
+                            $f7.toast.show({
+                                text: response.data.msg,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    })
+                    .catch(function(response) {
+                        $f7.preloader.hide();
+                        $f7.toast.show({
+                            text: 'An error occured while subscribing. Please try again later.',
+                            cssClass: 'color-red'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePopupSubscribe();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

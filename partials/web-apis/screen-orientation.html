@@ -1,0 +1,158 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Screen Orientation API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Screen Orientation API allows web apps to get information about the current orientation of the screen.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${orientationInfo ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <i class="icon material-icons font-size-80 color-mono ${'deg-' + orientationInfo.angle}">${$f7.device.desktop ? 'desktop_windows' : 'phone_iphone'}</i>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Orientation Type</div>
+                                        <div class="item-after">${orientationInfo.type}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Orientation Angle</div>
+                                        <div class="item-after">${orientationInfo.angle} deg</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="note note-outline inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Rotate your device to change the screen orientation.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.screenOrientation ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Screen Orientation API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Screen Orientation API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Screen_Orientation_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .deg-0 {
+        transform: rotate(0deg);
+    }
+
+    .deg-90 {
+        transform: rotate(-90deg);
+    }
+
+    .deg-180 {
+        transform: rotate(180deg);
+    }
+
+    .deg-270 {
+        transform: rotate(-270deg);
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let orientationInfo = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            updateInfo({
+                type: screen.orientation.type,
+                angle: screen.orientation.angle
+            });
+            addEventListeners();
+        }
+
+        let addEventListeners = function() {
+            screen.orientation.addEventListener('change', onChange);
+        }
+
+        let removeEventListeners = function() {
+            screen.orientation.removeEventListener('change', onChange);
+        }
+
+        let updateInfo = function(orientation) {
+            let orientationData = {};
+            orientationData.type = orientation.type;
+            orientationData.angle = orientation.angle;
+            orientationInfo = orientationData;
+            $update();
+        }
+
+        let onChange = function(event) {
+            updateInfo(event.target);
+        }
+
+        $on('pageBeforeRemove', function() {
+            removeEventListeners();
+        });
+
+        return $render;
+    }
+</script>

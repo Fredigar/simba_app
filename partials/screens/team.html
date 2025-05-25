@@ -1,0 +1,137 @@
+<template>
+    <div class="page" data-name="team">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Team</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 large-90 xlarge-80">
+
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'team.json'}" autoplay loop background="transparent" speed="1" style="height: 256px;"></lottie-player>
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">Meet Our Team</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">To be the company our customers want us to be, it takes an eclectic group of passionate operators. Get to know the people leading the way at our company.</div>
+                        </div>
+                    </div>
+
+                    ${team && team.length ? $h`
+                    <div class="list cards-list inset margin-vertical-half no-hairlines-between">
+                        <ul class="row align-items-stretch">
+                            ${team.map((item, index) => $h`
+                            <li class="col-50 medium-33 xlarge-25">
+                                <div class="item-content height-100">
+                                    <div class="item-inner item-cell align-self-flex-start height-100 padding-vertical text-align-center">
+                                        <div class="item-row flex-direction-column height-100">
+                                            <div class="item-row">
+                                                <div class="item-cell">
+                                                    ${item.avatar ? $h`
+                                                    <img class="shape-auto" src="${item.avatar}" loading="lazy" height="64" width="64" alt="" />
+                                                    ` : $h`
+                                                    <span class="shape-container shape-auto size-64 bg-color-random text-color-white">
+                                                        <span class="font-size-32 font-weight-600">${item.name.trim().charAt(0)}</span>
+                                                    </span>
+                                                    `}
+                                                </div>
+                                            </div>
+                                            <div class="item-row margin-top-half">
+                                                <div class="item-cell">
+                                                    <div class="font-size-16 font-weight-bold single-line-text">${item.name}</div>
+                                                </div>
+                                            </div>
+                                            <div class="item-row margin-bottom">
+                                                <div class="item-cell">
+                                                    <div class="font-size-14 multi-line-text lines-2 text-color-gray">${item.role}</div>
+                                                </div>
+                                            </div>
+                                            <div class="item-row justify-content-center margin-top-auto">
+                                                <div class="item-cell">
+                                                    ${item.github && $h`
+                                                    <a href="${item.github}" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 margin-horizontal-half margin-top-half tooltip-init" data-tooltip="GitHub" style="background-color: rgba(var(--brand-color-github), 1); --f7-touch-ripple-color: rgba(var(--brand-color-github), 0.125);">
+                                                        <i class="icon fa-brands fa-github color-white"></i>
+                                                    </a>
+                                                    `}
+                                                    ${item.linkedin && $h`
+                                                    <a href="${item.linkedin}" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 margin-horizontal-half margin-top-half tooltip-init" data-tooltip="LinkedIn" style="background-color: rgba(var(--brand-color-linkedin), 1); --f7-touch-ripple-color: rgba(var(--brand-color-linkedin), 0.125);">
+                                                        <i class="icon fa-brands fa-linkedin-in color-white"></i>
+                                                    </a>
+                                                    `}
+                                                    ${item.twitter && $h`
+                                                    <a href="${item.twitter}" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 margin-horizontal-half margin-top-half tooltip-init" data-tooltip="Twitter" style="background-color: rgba(var(--brand-color-twitter), 1); --f7-touch-ripple-color: rgba(var(--brand-color-twitter), 0.125);">
+                                                        <i class="icon fa-brands fa-twitter color-white"></i>
+                                                    </a>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="block margin-vertical text-align-center">
+                        <div key="preloader" class="preloader"></div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div class="fab fab-extended fab-center-bottom color-mono">
+            <a href="/careers/">
+                <span class="fab-text text-uppercase text-color-mono-invert">Join Our Team</span>
+            </a>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let team = null;
+
+        let loadData = function() {
+            $f7.request({
+                url: 'assets/custom/dataset/team.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                team = response.data;
+                $update(function() {
+                    $f7.randomColorClassGenerator.initialize($el.value);
+                });
+            })
+            .catch(function(response) {
+                $f7.toast.show({
+                    text: 'An error occured while loading data.',
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

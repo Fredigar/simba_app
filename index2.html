@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Camera PWA</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            overflow: hidden; /* Evita desplazamientos innecesarios */
+        }
+
+        #cameraStream {
+            width: 100vw;   /* 100% del ancho de la ventana */
+            height: 100vh;  /* 100% del alto de la ventana */
+            object-fit: cover; /* Asegura que el video cubra toda la pantalla */
+            position: fixed; /* Posicionamiento fijo */
+            top: 0;
+            left: 0;
+        }
+        .darken {
+            filter: brightness(50%);
+        }
+        .captureCanvas {
+             position: fixed;
+             top: 1em; /* Espacio desde la parte superior */
+             right: 1em; /* Espacio desde la derecha */
+             border: 1px solid #ccc; /* Borde para mejor visualización */
+             max-width: 6em; /* Ancho máximo basado en el tamaño de la fuente */
+             max-height: 6em; /* Altura máxima basada en el tamaño de la fuente */
+         }
+
+        @media (max-width: 768px) {
+            /* Para pantallas más pequeñas como móviles */
+            .captureCanvas {
+                max-width:10em; /* Ancho reducido */
+                max-height: 10em; /* Altura reducida */
+            }
+        }
+
+        #switchCameraButton {
+            position: fixed; /* Posición fija en la pantalla */
+            z-index: 1000; /* Asegura que esté sobre otros elementos */
+            bottom: 10px; /* Distancia desde el fondo de la pantalla */
+            right: 10px; /* Distancia desde el lado derecho de la pantalla */
+            padding: 10px 20px; /* Espaciado interno para hacerlo más grande */
+            background-color: #4CAF50; /* Color de fondo */
+            color: white; /* Color del texto */
+            border: none; /* Sin borde */
+            border-radius: 5px; /* Bordes redondeados */
+            font-size: 16px; /* Tamaño del texto */
+            cursor: pointer; /* Cursor en forma de mano al pasar sobre el botón */
+        }
+
+        #switchCameraButton:hover {
+            background-color: #45a049; /* Color de fondo al pasar el ratón por encima */
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 40px;
+            height: 40px;
+            top: 50%;
+
+            border-radius: 50%;
+            border-left-color: #09f;
+
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/compressorjs@1.0.0/dist/compressor.min.js"></script>
+
+</head>
+<body>
+<video id="cameraStream" autoplay></video>
+<!--button id="switchCameraButton">Cambiar Cámara</button-->
+<canvas id="photoCanvas" style="display:none;"></canvas>
+<audio id="captureSound" src="assets/custom/audio/camera.mp3" preload="auto"></audio>
+<audio id="thinkingSound" src="thinking.mp3" preload="auto" loop></audio>
+<audio id="listenSound" src="listen.mp3" preload="auto"></audio>
+<audio id="goodSound" src="good.mp3" preload="auto"></audio>
+<img id="capturedImage" style="position: fixed; top: 0; left: 0; width: 100px; height: 100px; display: none;" />
+<div id="upperHalf" style=" position: fixed; top: 0; left: 0; width: 100%; height: 50%; z-index: 999;"></div>
+<div id="lowerHalf" style="position: fixed; bottom: 0; left: 0; width: 100%; height: 50%; z-index: 999;"></div>
+<div id="sliderContainer" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0,0,0,0.5);">
+    <div id="slider" style="width: 100%; height: 100%;">
+        <!-- Las imágenes capturadas se añadirán aquí -->
+    </div>
+</div>
+<div id="voiceStatus" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); color: white; text-shadow: 2px 2px 4px #000000; font-size: 2em; z-index: 1000;">Escuchando...</div>
+<div id="loadingSpinner" style="display:none;">
+    <!-- Aquí puedes añadir una imagen de un spinner o usar CSS para crear uno -->
+    <div class="spinner"></div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let video = document.getElementById('cameraStream');
+        let canvas = document.getElementById('photoCanvas');
+        let context = canvas.getContext('2d');
+        let captureSound = document.getElementById('captureSound');
+        let thinkingSound = document.getElementById('thinkingSound');
+        let goodSound = document.getElementById('goodSound');
+
+        let listenSound = document.getElementById('listenSound');
+        let currentFacingMode = 'user'; // Comienza con la cámara frontal
+        let videoStream = null;
+        let isSending = false; // Variable para controlar si se está enviando una imagen
+
+        let capturedImages = []; // Almacena las imágenes capturadas
+
+        let isTouching = false;
+        let intervalId = null;
+        const captureInterval = 2000; // Intervalo en milisegundos para la captura automática
+        let lastTap = 0;
+        const capturedImagesContainer = document.createElement('div');
+        capturedImagesContainer.classList.add('captureCanvas');
+        capturedImagesContainer.style.position = 'fixed';
+        capturedImagesContainer.style.top = '0';
+        capturedImagesContainer.style.left = '0';
+        capturedImagesContainer.style.display = 'flex';
+        document.body.appendChild(capturedImagesContainer);
+
+        function showSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'block';
+        }
+
+        function hideSpinner() {
+            document.getElementById('loadingSpinner').style.display = 'none';
+        }
+
+        // Solicita acceso a la cámara
+
+        let currentCamera = 'environment'; // Comienza con la cámara frontal ('user') o trasera ('environment')
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({video: {facingMode: currentCamera}})
+                .then(function (stream) {
+                    video.srcObject = stream;
+                    video.play();
+                }).catch(function (error) {
+                console.log("Error al acceder a la cámara: ", error);
+            });
+        }
+
+        function showCapturedImagesSlider() {
+            const sliderContainer = document.getElementById('sliderContainer');
+            const slider = document.getElementById('slider');
+
+            // Limpia el contenedor del slider
+            slider.innerHTML = '';
+
+            // Muestra cada imagen capturada en el slider
+            capturedImages.forEach(blob => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(blob);
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                slider.appendChild(img);
+            });
+
+            // Muestra el contenedor del slider
+            sliderContainer.style.display = 'block';
+        }
+
+// Función para ocultar el slider
+        function hideCapturedImagesSlider() {
+            const sliderContainer = document.getElementById('sliderContainer');
+            sliderContainer.style.display = 'none';
+        }
+       /* document.getElementById('switchCameraButton').addEventListener('click', function () {
+            alert(currentCamera)
+            if (currentCamera === 'user') {
+                currentCamera = 'environment';
+            } else {
+                currentCamera = 'user';
+            }
+
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({video: {facingMode: currentCamera}})
+                    .then(function (stream) {
+                        video.srcObject = stream;
+                        video.play();
+                    }).catch(function (error) {
+                    console.log("Error al cambiar la cámara: ", error);
+                });
+            }
+        });*/
+
+        function clearCapturedImages() {
+            if (isSending) {
+                return; // Si se está enviando, no hacer nada
+            }
+
+            capturedImages = []
+            while (capturedImagesContainer.firstChild) {
+                capturedImagesContainer.removeChild(capturedImagesContainer.firstChild);
+            }
+        }
+
+        // Función para capturar la imagen y enviarla
+// Función para capturar la imagen, ajustar su tamaño manteniendo la proporción y enviarla
+// ... (resto del código JavaScript)
+
+// Función para capturar la imagen y mostrarla en el slider
+        function captureAndSendImage() {
+            if (isSending) {
+                return; // Si se está enviando, no hacer nada
+            }
+            // Tamaño objetivo
+            const targetWidth = 512;
+            const targetHeight = 512;
+
+            // Calcular la relación de aspecto de la imagen original
+            const originalWidth = video.videoWidth;
+            const originalHeight = video.videoHeight;
+            const aspectRatio = originalWidth / originalHeight;
+
+            // Calcular las dimensiones ajustadas
+            let adjustedWidth, adjustedHeight;
+            if (originalWidth > originalHeight) {
+                // La imagen es más ancha que alta
+                adjustedWidth = targetWidth;
+                adjustedHeight = targetWidth / aspectRatio;
+            } else {
+                // La imagen es más alta que ancha
+                adjustedHeight = targetHeight;
+                adjustedWidth = targetHeight * aspectRatio;
+            }
+
+            // Ajustar el tamaño del canvas
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Calcular el punto de inicio para dibujar la imagen en el canvas
+            const startX = (targetWidth - adjustedWidth) / 2;
+            const startY = (targetHeight - adjustedHeight) / 2;
+
+            // Limpiar el canvas y dibujar la imagen ajustada
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(video, startX, startY, adjustedWidth, adjustedHeight);
+            captureSound.play();
+
+            // Convertir la imagen del canvas a Blob y almacenarla
+            canvas.toBlob(function (blob) {
+                capturedImages.push(blob);
+                // Actualizar el slider con la nueva imagen
+                updateCapturedImagesSlider();
+            }, 'image/jpeg');
+        }
+
+// Función para actualizar el slider con las imágenes capturadas
+        function updateCapturedImagesSlider() {
+            const sliderContainer = document.getElementById('sliderContainer');
+            const slider = document.getElementById('slider');
+
+            // Limpia el contenedor del slider
+            slider.innerHTML = '';
+
+            // Muestra cada imagen capturada en el slider, empezando por la última
+            capturedImages.slice().reverse().forEach(blob => {
+                const img = document.createElement('img');
+                img.src = URL.createObjectURL(blob);
+                img.style.width = '100%';
+                img.style.height = '100%';
+                img.style.objectFit = 'cover';
+                slider.appendChild(img);
+            });
+
+            // Muestra el contenedor del slider
+            sliderContainer.style.display = 'block';
+        }
+
+
+// ... (resto del código JavaScript)
+
+
+        function playBase64Audio(base64String) {
+            // Decodifica la cadena base64 y conviértela en datos binarios
+            const audioBlob = new Blob([Uint8Array.from(atob(base64String), c => c.charCodeAt(0))], {type: 'audio/mpeg'});
+
+            // Crea un URL de objeto y reproduce el audio
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+        }
+
+        // Función para iniciar la captura automática
+        function startCapture() {
+            if (!intervalId) {
+                captureAndSendImage(); // Captura inmediata al iniciar
+                intervalId = setInterval(captureAndSendImage, captureInterval);
+            }
+        }
+
+        // Función para detener la captura automática
+        function stopCapture() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        function playAudio(base64Audio){
+            const audioBlob = base64ToBlob(base64Audio, 'audio/mpeg');
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            audio.play();
+        }
+
+        function sendAllCapturedImagesToAPI(recognizedText='') {
+           // alert(recognizedText)
+
+            if (isSending) {
+                return; // Si se está enviando, no hacer nada
+            }
+            video.classList.add('darken'); // Oscurecer el video
+            const formData = new FormData();
+            thinkingSound.play()
+            capturedImages.forEach((imageBlob, index) => {
+                formData.append('image' + index, imageBlob);
+            });
+            if (recognizedText) {
+                formData.append('message', recognizedText);
+            }
+            isSending = true; // Establecer que se está enviando
+            // Llamada a la API
+           showSpinner(); // Mostrar el spinner
+           fetch('https://survey.simeng.es/api/v1/myeyes/what-is-this', {
+                method: 'POST',
+                headers: {
+                    'X-AUTH-TOKEN': '31556cc7b59e9a81304d48a6263b9af85bb800c0'
+                },
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    thinkingSound.pause();
+                    if (data.data && data.data.audio) {
+                      sessionStorage.setItem('lastAudioBase64', data.data.audio);
+
+                      playAudio(data.data.audio)
+                    }
+                    isSending = false; // Establecer que se está enviando
+                    video.classList.add('remove'); // Oscurecer el video
+                    hideSpinner()
+                })
+                .catch(error => {
+                    thinkingSound.pause()
+                    hideSpinner();
+                    isSending = false; // Establecer que se está enviando
+                    video.classList.remove('darken'); // Oscurecer el video
+                    console.error('Error al enviar la imagen:', error);
+                });
+        }
+
+
+        function base64ToBlob(base64, mimeType) {
+            const byteCharacters = atob(base64);
+            const byteNumbers = new Array(byteCharacters.length);
+            for (let i = 0; i < byteCharacters.length; i++) {
+                byteNumbers[i] = byteCharacters.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            return new Blob([byteArray], {type: mimeType});
+        }
+
+        // Inicialización de la API de reconocimiento de voz
+        let recognition;
+        let isRecognizing = false;
+        let lastRecognizedText = ''; // Variable para almacenar el último texto reconocido
+        let voiceStatusDiv = document.getElementById('voiceStatus'); // Obtener el elemento para el estado del reconocimiento de voz
+
+        if ('webkitSpeechRecognition' in window) {
+            recognition = new webkitSpeechRecognition();
+            recognition.lang = 'es-ES'; // Configura el idioma español
+            recognition.continuous = true; // Cambiado a false para un solo resultado
+            recognition.interimResults = false; // Cambiado a false para resultados finales
+            recognition.onstart = function() {
+                voiceStatusDiv.innerHTML = 'Escuchando...';
+                voiceStatusDiv.style.display = 'block';
+            };
+            recognition.onresult = function(event) {
+                lastRecognizedText = event.results[0][0].transcript.trim();
+                console.log('Reconocido: ' + lastRecognizedText);
+                voiceStatusDiv.innerHTML = lastRecognizedText;
+                if (lastRecognizedText === 'repetir') {
+                    const lastAudioBase64 = sessionStorage.getItem('lastAudioBase64');
+                    if (lastAudioBase64) {
+                        playBase64Audio(lastAudioBase64);
+                    }
+                } else if (lastRecognizedText === 'otra') {
+                    // Ocultar el slider y mostrar el video
+                    goodSound.play()
+                    hideCapturedImagesSlider(); // Asegúrate de que sliderContainer se refiere al contenedor del slider
+                    video.style.display = 'block';
+                } else {
+                    sendAllCapturedImagesToAPI(lastRecognizedText)
+                }
+
+                // Aquí puedes hacer algo con el texto reconocido
+            };
+
+            recognition.onerror = function(event) {
+                console.error('Error en el reconocimiento de voz:', event.error);
+            };
+
+            recognition.onend = function() {
+                isRecognizing = false;
+                isRecognizing = false;
+                setTimeout(function() {
+                    voiceStatusDiv.style.display = 'none'; // Retrasa la llamada a stopRecognition
+                }, 1000)
+
+            };
+        } else {
+            console.warn('La API de reconocimiento de voz no es compatible con este navegador.');
+        }
+
+        // Función para iniciar el reconocimiento de voz
+        function startRecognition() {
+            if (recognition && !isRecognizing) {
+                triggerVibration();
+                listenSound.play()
+                recognition.start();
+                isRecognizing = true;
+            }
+        }
+
+        function triggerVibration() {
+            // Comprobar si la API de vibración es soportada
+            if ("vibrate" in navigator) {
+                // Vibrar durante 200 milisegundos
+                navigator.vibrate(200);
+            } else {
+                console.log("La API de vibración no está soportada en este dispositivo.");
+            }
+        }
+        // Función para detener el reconocimiento de voz
+        function stopRecognition() {
+            if (recognition && isRecognizing) {
+                recognition.stop();
+            }
+        }
+
+
+        const screenHeightHalf = window.innerHeight / 2;
+
+        function isTopHalf(event) {
+            // Devuelve true si el evento ocurrió en la mitad superior de la pantalla
+            return (event.clientY < screenHeightHalf);
+        }
+
+        function handleTouch(event) {
+            if (isTopHalf(event)) {
+                // Si el toque es en la mitad superior, captura y envía imágenes
+                clearCapturedImages();
+                startCapture();
+            } else {
+                setTimeout(function() {
+                    stopRecognition(); // Retrasa la llamada a stopRecognition
+                }, 500)
+                // Si el toque es en la mitad inferior, inicia el reconocimiento de voz
+                // [Aquí va el código para iniciar el reconocimiento de voz]
+            }
+        }
+
+
+        // Función para manejar el doble clic o doble toque
+        function handleDoubleInteraction() {
+            if (recognition) {
+                recognition.start(); // Inicia el reconocimiento de voz
+            }
+        }
+        function handleUpperHalfEvent() {
+            console.log('Evento en la mitad superior');
+            clearCapturedImages();
+            startCapture();
+        }
+
+        function handleLowerHalfEvent() {
+            console.log('Evento en la mitad inferior');
+            startRecognition();
+        }
+
+        // Función para manejar el final de los toques o clics
+        function handleEndInteraction(up) {
+                if (up) {
+                    stopCapture();
+                    sendAllCapturedImagesToAPI();
+                } else {
+
+                    stopRecognition();
+
+                }
+
+        }
+
+        // Eventos para la mitad superior de la pantalla
+        var upperHalf = document.getElementById('upperHalf');
+        upperHalf.addEventListener('mousedown', handleUpperHalfEvent);
+        upperHalf.addEventListener('touchstart', function(event){event.preventDefault();handleUpperHalfEvent()});
+        upperHalf.addEventListener('touchend', function(event){event.preventDefault();handleEndInteraction(true)});
+        upperHalf.addEventListener('mouseup', function(){handleEndInteraction(true)});
+
+        // Eventos para la mitad inferior de la pantalla
+        var lowerHalf = document.getElementById('lowerHalf');
+        lowerHalf.addEventListener('mousedown', handleLowerHalfEvent);
+        lowerHalf.addEventListener('touchstart', function(event){event.preventDefault();handleLowerHalfEvent()});
+        lowerHalf.addEventListener('touchend', function(event){handleEndInteraction(false)});
+        lowerHalf.addEventListener('mouseup', function(){handleEndInteraction(false)});
+    });
+
+
+</script>
+</body>
+</html>
+

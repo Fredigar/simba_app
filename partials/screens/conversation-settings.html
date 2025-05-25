@@ -1,0 +1,225 @@
+<template>
+    <div class="page" data-name="conversation-settings">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Configuración de chat</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="list media-list inset chevron-center margin-vertical no-hairlines-between">
+                        <ul>
+                            <li>
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <img class="shape-auto elevation-12" src="${chat.assistant.avatar}" height="56" width="56" alt="" />
+                                        </div>
+                                        <div class="item-inner align-self-center">
+                                            <div class="item-title-row">
+                                                <div class="item-title">${chat.assistant.name}</div>
+                                            </div>
+                                            <div class="item-text">${chat.assistant.description}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Audio and Voice Configuration</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li id="theme-color-selector">
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons color-white">record_voice_over</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Voz</div>
+                                            <div class="item-after text-uppercase">Noelia</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons color-white">graphic_eq</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Respuestas dictadas</div>
+                                        <div class="item-after">
+                                            <div class="segmented segmented-strong color-gray">
+                                                <button class="button button-small color-amber ${chat.spokenResponse == 'Always' ? 'button-active' : ''}" @click="${() => changeSpokenResponse('Always')}">Siempre</button>
+                                                <button class="button button-small color-black ${chat.spokenResponse == 'Auto' ? 'button-active' : ''}" @click="${() => changeSpokenResponse('Auto')}">Automático</button>
+                                                <button class="button button-small color-bluegray ${chat.spokenResponse == 'Never' ? 'button-active' : ''}" @click="${() => changeSpokenResponse('Never')}">Nunca</button>
+                                                <span class="segmented-highlight"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="#" class="item-link smart-select smart-select-init" data-open-in="popover" data-close-on-select="true" data-searchbar="false">
+                                    <div class="item-content">
+                                        <select name="language" @change="${(event) => changeLanguage(event.target.value)}">
+                                            ${Object.keys(langs).map((code) => $h`
+                                            <option value="${langs[code].value}" data-i18n="${langs[code].text}" selected="${langs[code].value == chat.lang}">${langs[code].text}</option>
+                                            `)}
+                                        </select>
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-blue">
+                                                <i class="icon material-icons color-white">language</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Language</div>
+                                            <div class="item-after" data-i18n="${chat.lang}"></div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="block-title margin-vertical">Chat Settings</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-40 bg-color-mono">
+                                            <i class="icon fa-brands fa-apple font-size-18 color-mono-invert"></i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Respuestas en tiempo real</div>
+                                        <div class="item-after">
+                                            ${chat.stream}
+                                            <label class="toggle toggle-init">
+                                                <input type="checkbox" ${chat.stream ? $h`checked` : $h``} />
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+
+
+        </div>
+
+    </div>
+        </div>
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let themeColorPicker = null;
+        let chat = {
+            guid: $f7route.params.guid,
+            stream:false,
+            spokenResponses:'Auto',
+            assistant:{
+                name:'',
+                description:'',
+                avatar:''
+            }
+        }
+
+        let changeSpokenResponse = function(value) {
+
+        }
+
+        let changeLanguage = function(value){
+
+        }
+
+        let loadConversation = function () {
+            $f7.request({
+                url: window.config.api_methods.load_conversation + '?withConversations=0&guid=' + chat.guid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                   chat = data.data.chat;
+                   chat.stream = data.data.chat.stream == 1;
+                   console.log(chat);
+                   $update();
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let initializeThemeColorPicker = function() {
+            themeColorPicker = $f7.colorPicker.create({
+                targetEl: $el.value.find('#theme-color-selector'),
+                modules: ['rgb-sliders', 'hex', 'initial-current-colors'],
+                openIn: 'popover',
+                sliderLabel: true,
+                sliderValue: true,
+                sliderValueEditable: true,
+                hexValueEditable: true,
+                value: {
+                    hex: $f7.theming.currentColor()
+                },
+                on: {
+                    change: function(colorPicker, value) {
+                        $f7.theming.changeColor(value.hex);
+                    }
+                }
+            });
+        }
+
+        $on('languageChanged', function(language) {
+            $f7.i18n.localize();
+        });
+
+        $on('pageBeforeIn', function() {
+            initializeThemeColorPicker();
+            loadConversation();
+        });
+
+        $on('tabInit', function() {
+            initializeThemeColorPicker();
+        });
+
+        return $render;
+    }
+</script>

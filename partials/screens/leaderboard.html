@@ -1,0 +1,370 @@
+<template>
+    <div class="page" data-name="leaderboard">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="title">Tabla de resultados</div>
+
+                <div class="right margin-right">
+                    ${isAdmin ? $h`
+                    <a href="#" class="link icon-only tooltip-init" data-tooltip="Cierra el juego" @click="${closeGame}">
+                        <i class="icon f7-icons">power</i>
+                    </a>
+                    `:$h`
+
+                    `}
+
+                    <a href="#" class="" @click="${() => $store.dispatch('logoutUser')}">
+                        <i class="icon material-icons font-size-20">logout</i>
+                    </a>
+                </div>
+                <div class="subnavbar">
+                    <div class="subnavbar-inner">
+                        <div class="segmented segmented-strong segmented-round color-pink">
+                            <a href="#tab-today" class="button button-round button-small tab-link tab-link-active">Ranking</a>
+                            <a href="#tab-today" @click="${() => photoBrowser.open()}" class="button button-round button-small tab-link">Solución</a>
+                            <span class="segmented-highlight"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tabs-swipeable-wrap">
+            <div class="tabs">
+
+                <div id="tab-today" class="page-content tab tab-active ptr-content">
+                    <div class="ptr-preloader">
+                        <div class="preloader"></div>
+                        <div class="ptr-arrow"></div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-100 medium-75 large-60 xlarge-50">
+                            ${leaderboardToday && $h`
+                            <div class="list inset margin-vertical">
+                                <ul>
+                                    ${leaderboardToday.map((item, index) => $h`
+                                    <li class="${(index+1) == leaderboardTodayMyRank && $h`my-rank`}">
+                                        <div class="item-content">
+                                            <div class="item-inner item-cell">
+                                                <div class="item-row">
+                                                    <div class="item-cell flex-shrink-0" style="width: 36px;">
+                                                        <div class="font-size-24 font-weight-bold" style="color: var(--color-gray-300);">${item.position}</div>
+                                                    </div>
+                                                    <div class="item-cell width-auto">
+                                                        <img src="https://api.dicebear.com/9.x/fun-emoji/svg?seed=${item.username}" width="80" alt="" />
+                                                    </div>
+                                                    <div class="item-cell">
+                                                        ${(index+1) == leaderboardTodayMyRank ? $h`
+                                                        <div class="font-size-20 font-weight-bold text-color-primary">Tu</div>
+                                                        <div class="font-size-14 text-color-gray">Aciertos: ${item.hits}  Fallos: ${item.misses}</div>
+                                                        ` : $h`
+                                                        <div class="font-size-16 font-weight-600 text-color-primary">${item.username}</div>
+                                                        <div class="font-size-14 text-color-gray">Aciertos: ${item.hits}  Fallos: ${item.misses}</div>
+                                                        `}
+                                                    </div>
+                                                    <div class="item-cell flex-shrink-0 width-auto">
+                                                        <div class="font-size-18 font-weight-bold text-color-bluegray">${item.time}</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    `)}
+                                </ul>
+                            </div>
+                            `}
+                        </div>
+                    </div>
+                </div>
+
+
+
+
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .page[data-name=leaderboard] .my-rank {
+        background-color: var(--f7-theme-color);
+        border-radius: var(--f7-list-inset-border-radius);
+        box-shadow: var(--f7-elevation-12);
+        margin: 0 -8px;
+        width: calc(100% + 16px);
+    }
+
+    .page[data-name=leaderboard] .my-rank * {
+        color: #FFFFFF !important;
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let leaderboardToday = null;
+        let leaderboardTodayMyRank = faker.datatype.number({min: 1, max: 50});
+        let isAdmin = false;
+        let pullToRefresh = null;
+        let photoBrowser = null;
+        let summary = null;
+        let collection = [
+            {
+                url: 'https://survey.simeng.es/img/juego/Ricardo.png',
+                caption: 'Ricardo AA',
+                type: 'image'
+            },
+            {
+                url: 'https://survey.simeng.es/img/juego/Alfredo_García.png',
+                caption: 'Alfredo García',
+                type: 'image'
+            }
+        ]
+        let subscribeSSE = function () {
+            eventSource['/christmas/'] = null;
+            if (eventSource['/christmas/'] === null) {
+                console.log("Subscribing sse")
+                eventSource['/christmas/'] = new EventSource(window.config.sse_hub + '?topic=' + '/christmas/');
+                eventSource['/christmas/'].onerror = function (e) {
+                    eventSource['/christmas/'] = null;
+                }
+
+                eventSource['/christmas/' ].onmessage = function (e) {
+                    loadLeaderboardToday()
+                }
+            }
+        }
+
+        let closeGame = function() {
+            let dialog = $f7.dialog.create({
+                content: `
+                    <div class="block no-margin no-padding text-align-center">
+                        <span class="shape-container shape-circle bg-color-blue">
+                            <i class="icon material-icons font-size-40 color-white">power</i>
+                        </span>
+                        <p>Vas a cerrar el juego. Si aún quedan participantes sin enviar sus respuestas ya no podrán hacerlo.</p>
+                    </div>
+                `,
+                buttons: [
+                    {
+                        text: 'Cancelar',
+                        color: 'gray'
+                    },
+                    {
+                        text: 'Cerrar juego',
+                        color: 'green',
+                        onClick: function() {
+                            $f7.request({
+                                url: 'https://survey.simeng.es/api/v1/myeyes/close-game',//window.config.api_methods.load_conversations+'?assistant='+assistantGuid,
+                                method: 'GET',
+                                headers: {
+                                    'X-AUTH-TOKEN': app.store.state.currentUser.token
+                                },
+                                contentType: 'application/json', // Indicamos que el contenido es JSON
+                                // processData: false, // Prevenir que jQuery procese los datos
+                                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                                success: function (responseText) {
+                                    // messages.hideTyping();
+                                    var data = JSON.parse(responseText);
+                                    console.log(data);
+                                    // initializeSearchbar();
+                                    $f7.toast.show({
+                                        text: 'Juego cerrado',
+                                        cssClass: 'color-green'
+                                    });
+
+
+                                },
+                                error: function (xhr, status, error) {
+
+                                    $f7.preloader.hide();
+                                    $f7.toast.show({
+                                        text: 'An error occured: ' + error,
+                                        cssClass: 'color-red'
+                                    });
+                                }
+                            });
+                            /* $f7router.navigate('/login/', {
+                                 reloadCurrent: true
+                             });*/
+                        }
+                    }
+                ]
+            });
+            dialog.open();
+        }
+        let initializePullToRefresh = function() {
+            pullToRefresh = $f7.ptr.create($el.value.find('.ptr-content'));
+            pullToRefresh.on('refresh', function() {
+                setTimeout(function() {
+                    pullToRefresh.done();
+                    loadLeaderboardToday()
+                }, 1000);
+            });
+        }
+        let initializePhotoBrowser = function(summary) {
+            let orderBy = "t.fullName";
+            let responseArray = [];
+            if (summary && summary.answers) {
+                if (typeof summary.answers === 'string') {
+                    responseArray = (summary.answers+", ").split(', ')
+                    console.log(summary.answers)
+                    console.log(responseArray);
+                } else if (typeof summary.answers === 'object' && !Array.isArray(summary.answers)) {
+                    responseArray = Object.values(summary.answers);
+                }
+            }
+            $f7.request({
+                url: 'https://survey.simeng.es/api/v1/myeyes/get?extraQuery='+btoa('t.isGame=1')+'&withMedia=1&entity=christmasGame&orderBy='+btoa(orderBy)+'&orderType=ASC&fields=_myMedias;fullName;isGame;guid;id',//window.config.api_methods.load_conversations+'?assistant='+assistantGuid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': app.store.state.currentUser.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    let people = data.data.data;
+                    let collection = people
+                        .map(item => {
+                            if (item._myMedias.picture && item._myMedias.picture.length > 0) {
+                                const media = item._myMedias.picture[0];
+                                console.log(item.fullName)
+                                const index = responseArray.indexOf(item.fullName); // Encuentra el índice del elemento en el array
+                                console.log(index);
+                                const isChecked = index !== -1;
+                                delete responseArray[index];
+                              //  responseArray.splice(index, 1)
+                                return {
+                                    url: media.thumbnailPath.replace('_thumb',''),  // o media.path si quieres la imagen completa
+                                    caption: item.fullName,
+                                    isChecked:'<br>'+(isChecked ? '<span class="text-color-green">¡Lo has identificado!</span>' : '<span class="text-color-red">¡Se te escapó!</span>') ,
+                                    type: 'image'
+                                };
+                            } else {
+                                return null;  // O puedes omitir estos elementos sin imágenes
+                            }
+                        })
+                        .filter(item => item !== null);
+
+                    if (responseArray.length > 0) {
+                        collection.push({
+                            caption: responseArray.join('<br>'),
+                            type: 'text'
+                        });
+                    }
+                    console.log(responseArray)
+                    // initializeSearchbar();
+
+                    let photos = collection.map(function(item, index) {
+                        let photo = {};
+                        if (item.type == 'image') {
+                            photo = {
+                                html: `
+                    <div style="width: 300px; margin: auto;">
+                        <img src="${item.url}" alt="${item.caption}" style="width: 100%;">
+                    </div>
+                `,
+                                caption: item.caption+ item.isChecked
+                            }
+                        }
+                        else if (item.type == 'video') {
+                            photo = {
+                                html: `
+                            <video controls playsinline preload="metadata" poster="${item.poster}">
+                                <source src="${item.url}" type="${item.mime}" />
+                            </video>
+                        `,
+                                caption: item.caption
+                            }
+                        }
+                        else if (item.type == 'text' && item.caption) {
+                            photo = {
+                                html:`
+                    <div style="width: 300px; margin: auto;">
+                      ${item.caption}
+                    </div>
+                `,
+                                caption: "Compañeros identificados que no estaban en el cartel"
+                            }
+                        }
+                        return photo;
+                    });
+                    photoBrowser = $f7.photoBrowser.create({
+                        photos: photos,
+                        exposition: true,
+                        theme: $f7.theming.currentMode() == 'dark' ? 'dark' : 'light'
+                    });
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let loadLeaderboardToday = function() {
+            $f7.request({
+                url: 'https://survey.simeng.es/api/v1/myeyes/get-ranking',
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN':  app.store.state.currentUser.token
+
+                },
+                success: function(responseText) {
+                    let response = JSON.parse(responseText);
+
+                    if (response.status === 200 && Array.isArray(response.data.ranking)) {
+                        let data = response.data.ranking;
+                        let summary = response.data.summary
+
+                        // Ordenamos los datos recibidos por posición, en caso de que no estén ordenados
+                        data.sort((a, b) => a.position - b.position);
+                        leaderboardToday = data;
+
+                        // Encuentra la posición del usuario actual si tiene un indicador claro en los datos
+                        leaderboardTodayMyRank = data.findIndex(item => item.username === app.store.state.currentUser.username) + 1;
+
+                        $update(function(){
+                            console.log(summary)
+                            initializePhotoBrowser(summary);
+                        });
+
+                    } else {
+                        leaderboardToday = null;
+                        $update();
+                        console.error("Error en el formato de respuesta o código de estado incorrecto");
+                    }
+                },
+                error: function(xhr, status, error) {
+                    $f7.preloader.hide();
+                    $f7.toast.show({
+                        text: 'An error occurred: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        };
+
+        $on('pageAfterIn', function() {
+            loadLeaderboardToday();
+            subscribeSSE()
+            initializePullToRefresh();
+            isAdmin = ($f7route.params.mode=="admin");
+            console.log($f7route.params.mode);
+
+            //   subscribeSSE();
+
+        });
+
+        return $render;
+    }
+</script>

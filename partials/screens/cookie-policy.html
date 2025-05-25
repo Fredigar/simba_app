@@ -1,0 +1,95 @@
+<template>
+    <div class="page" data-name="cookie-policy">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Coookie Policy</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="note note-fade inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Notice</div>
+                            <div class="note-message">This Cookie Policy was last updated on ${moment().format('dddd, MMMM DD, YYYY')}</div>
+                        </div>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+
+                        <p>When you visit a website that uses cookies, these cookies will get placed on your device. Cookies can contain information about actions you take on the page. The information is specific to you and the website you visited.</p>
+                        <p>When you visit the website again, the site automatically looks for the cookie on your device and reads its contents to tailor your browsing experience based on how you interacted with the website in the past.</p>
+                        <p>The benefit of cookies is a more personalized and often faster browsing experience. However, some consumers may not want you to track their browsing behaviors. Therefore, some privacy laws require you to disclose and explain your cookie policy to your site visitors. The strictest laws require you to get informed consent from users before using cookies.</p>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+        ${!cookiesAccepted && $h`
+        <div class="fab fab-extended fab-center-bottom" style="width: 128px;">
+            <a href="#" @click="${acceptCookies}">
+                <span class="fab-text">Accept</span>
+            </a>
+            <a href="#" class="margin-top-half color-gray" @click="${rejectCookies}">
+                <span class="fab-text">Reject</span>
+            </a>
+        </div>
+        `}
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let cookiesAccepted = 0;
+
+        let getCookiesStatus = function() {
+            cookiesAccepted = localStorage.getItem('Nectar_Cookies_Accepted') == 1 ? 1 : 0;
+            $update();
+        }
+
+        let acceptCookies = function() {
+            localStorage.setItem('Nectar_Cookies_Accepted', 1);
+            getCookiesStatus();
+            $f7.toast.show({
+                text: 'Cookies Accepted!',
+                cssClass: 'color-green'
+            });
+            $f7router.back();
+        }
+
+        let rejectCookies = function() {
+            localStorage.setItem('Nectar_Cookies_Accepted', 0);
+            getCookiesStatus();
+            $f7.toast.show({
+                text: 'Cookies Rejected!',
+                cssClass: 'color-red'
+            });
+            $f7router.back();
+        }
+
+        $on('pageBeforeIn', function() {
+            getCookiesStatus();
+        });
+
+        return $render;
+    }
+</script>

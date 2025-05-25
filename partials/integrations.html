@@ -1,0 +1,443 @@
+<template>
+    <div class="page">
+
+        <div class="navbar navbar-transparent bg-color-pink color-white">
+            <div class="navbar-bg bg-color-pink"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title text-color-white">Integrations</div>
+                <div class="right">
+                    <a href="#" class="link icon-only" @click="${enableSearchbar}">
+                        <i class="icon material-icons">search</i>
+                    </a>
+                </div>
+                <form class="searchbar searchbar-expandable">
+                    <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search" />
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong elevation-12 flexbox-centered height-auto no-hairlines no-margin bg-color-pink color-pink text-color-white" style="min-height: 256px;">
+                <span class="shape-container shape-circle" style="background-color: var(--color-pink-700);">
+                    <i class="icon f7-icons font-size-40 color-white">flame_fill</i>
+                </span>
+                <div class="font-size-24 font-weight-bold margin-top-half">Integrations</div>
+                <div class="font-size-16 margin-top-half">Nectar provides integrations for popular third-party services right out-of-the-box.</div>
+            </div>
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="searchbar-found">
+                        <div class="list media-list inset margin-vertical no-chevron">
+                            <ul>
+                                <li>
+                                    <a href="/integrations/alasql/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-yellow-100);">
+                                                    <img src="https://cloud.githubusercontent.com/assets/1063454/19309516/94f8007e-9085-11e6-810f-62fd60b42185.png" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">AlaSQL</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Manage relational SQL data and nested JSON data using client-side in-memory database.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/disqus/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-blue-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/disqus.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Disqus</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Increase engagement on your site by allowing visitors to leave comments and express their opinions.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/embedly/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-cyan-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/embedly.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Embedly</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Embed articles, images, videos, and rich media content from third-party websites.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/facebook-comments/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-blue-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/facebook.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Facebook Comments</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Let visitors comment on the content on your site using their Facebook account.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/google-admob/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-red-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/google-admob.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Google AdMob</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Monetize your app by showing ads to the users.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/google-maps/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-green-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/google-maps.svg" height="26" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Google Maps</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Show any location or different routes on the map, or build address autocomplete feature using Google Maps.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/google-sheets/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-green-50);">
+                                                    <img src="https://upload.wikimedia.org/wikipedia/commons/a/ae/Google_Sheets_2020_Logo.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Google Sheets</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Write data to Google Sheets using Google Apps Script.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/gravatar/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-blue-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/gravatar-icon.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Gravatar</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Fetch your users' global avatar and basic profile from Gravatar using their registered email address.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/lottie/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-teal-50);">
+                                                    <img src="https://logo.clearbit.com/lottiefiles.com" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Lottie</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Add high-quality interactive animations to your app.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/mailchimp/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-yellow-100);">
+                                                    <img src="https://icon.horse/icon/mailchimp.com" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Mailchimp</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Let your users subscribe to your mailing lists.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/qr-code/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-bluegray-50);">
+                                                    <i class="icon material-icons font-size-24 text-color-black">qr_code_2</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">QR Code</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Create and read QR codes in your app.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/rss/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-orange-50);">
+                                                    <i class="icon material-icons font-size-26 color-orange">rss_feed</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">RSS</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Show the RSS feed made available by any website in your app.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/telegram-comments/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-blue-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/telegram.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">Telegram Comments</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Let visitors comment on the content on your site using their Telegram account.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/wordpress/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-bluegray-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/wordpress-icon.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">WordPress</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Show the contents of any publicly accessible WordPress.org or WordPress.com website using their available REST APIs.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li>
+                                    <a href="/integrations/youtube/" class="item-link">
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-48" style="background-color: var(--color-red-50);">
+                                                    <img src="https://cdn.svgporn.com/logos/youtube-icon.svg" alt="" />
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title-row">
+                                                    <div class="item-title">YouTube</div>
+                                                    <div class="item-after">
+                                                        <span class="badge color-blue">Web</span>
+                                                        <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                                    </div>
+                                                </div>
+                                                <div class="item-text">Embed YouTube videos using iFrame element or YouTube iFrame Player API and control it programatically.</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="searchbar-not-found">
+                        <div class="empty-state empty-state-strong inset margin-vertical">
+                            <div class="empty-state-media">
+                                <span class="shape-container shape-auto bg-color-chrome">
+                                    <i class="icon material-icons font-size-32">search_off</i>
+                                </span>
+                            </div>
+                            <div class="empty-state-subtitle">No Search Results</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let searchbar = null;
+
+        let initializeSearchbar = function() {
+            let navbarEl = $f7.navbar.getElByPage($el.value);
+            searchbar = $f7.searchbar.create({
+                el: $(navbarEl).find('.searchbar'),
+                searchContainer: $el.value.find('.list'),
+                searchItem: 'li',
+                searchIn: 'a',
+                backdrop: false,
+                removeDiacritics: true,
+                on: {
+                    enable: function(searchbar) {
+                        searchbar.$el.find('input').focus();
+                    }
+                }
+            });
+            if ($f7route.query.search) {
+                searchSearchbar($f7route.query.search);
+            }
+        }
+
+        let enableSearchbar = function() {
+            if (searchbar) {
+                searchbar.enable();
+            }
+        }
+
+        let disableSearchbar = function() {
+            if (searchbar) {
+                searchbar.disable();
+            }
+        }
+
+        let searchSearchbar = function(query) {
+            if (searchbar) {
+                searchbar.search(query);
+            }
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeSearchbar();
+        });
+
+        $on('pageBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        $on('tabInit', function() {
+            initializeSearchbar();
+        });
+
+        $on('tabBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+        return $render;
+    }
+</script>

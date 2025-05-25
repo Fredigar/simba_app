@@ -1,0 +1,298 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Gravatar</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-blue-50);">
+                            <img src="https://cdn.svgporn.com/logos/gravatar-icon.svg" height="48" alt="" />
+                        </span>
+                        <p>Fetch your users' global avatar and basic profile from Gravatar using their registered email address.</p>
+                    </div>
+
+                    <form name="gravatar" action="#" method="GET" enctype="application/x-www-form-urlencoded">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <input type="email" name="email" inputmode="email" value="praveen.mujawdiya@gmail.com" required />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Your Gravatar Email Address</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical text-align-center">
+                            <button type="submit" class="button button-fill button-large">Load Gravatar Profile</button>
+                            <p>Don't have a Gravatar account? <a href="https://gravatar.com" target="${$f7.getExternalUrlTarget()}" class="external">Create</a></p>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+        ${profile && $h`
+        <div id="popup-profile" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Profile</div>
+                        <div class="right">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="list media-list inset chevron-center margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="${profile.profileUrl}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <img class="shape-auto" src="${profile.thumbnailUrl}" height="64" width="64" alt="" />
+                                        </div>
+                                        <div class="item-inner align-self-center">
+                                            <div class="item-title-row">
+                                                <div class="item-title font-size-18 font-weight-bold">${profile.displayName}</div>
+                                            </div>
+                                            <div class="item-text font-size-16">${profile.preferredUsername}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                    ${profile.name && $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">First Name</div>
+                                        <div class="item-after">${profile.name.givenName}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Last Name</div>
+                                        <div class="item-after">${profile.name.familyName}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Full Name</div>
+                                        <div class="item-after">${profile.name.formatted}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    `}
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Location</div>
+                                        <div class="item-after">${profile.currentLocation}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ${profile.aboutMe && $h`
+                    <div class="block-title margin-vertical">About Me</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <p innerHTML="${profile.aboutMe}"></p>
+                    </div>
+                    `}
+                    ${profile.phoneNumbers && $h`
+                    <div class="block-title margin-vertical">Phone Numbers</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${profile.phoneNumbers.map((item, index) => $h`
+                            <li>
+                                <a href="tel:${item.value}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title text-capitalize">${item.type}</div>
+                                            <div class="item-after">${item.value}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    `}
+                    ${profile.emails && $h`
+                    <div class="block-title margin-vertical">Email Addresses</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${profile.emails.map((item, index) => $h`
+                            <li>
+                                <a href="mailto:${item.value}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">${item.primary ? 'Primary' : 'Other'}</div>
+                                            <div class="item-after">${item.value}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    `}
+                    ${profile.urls.length ? $h`
+                    <div class="block-title margin-vertical">Websites</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${profile.urls.map((item, index) => $h`
+                            <li>
+                                <a href="${item.value}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">${item.title}</div>
+                                            <div class="item-after">${item.value}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ${profile.currency && $h`
+                    <div class="block-title margin-vertical">Crypto Wallets</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${profile.currency.map((item, index) => $h`
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title text-capitalize">${item.type}</div>
+                                        <div class="item-after">${item.value}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    `}
+                </div>
+            </div>
+        </div>
+        `}
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+        let profile = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=gravatar]')).validate({
+                rules: {
+                    email: {
+                        required: true,
+                        email:true
+                    }
+                },
+                messages: {
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.preloader.show();
+                    generateEmailHash(form.elements.namedItem('email').value)
+                        .then(function(response) {
+                            fetchProfile(response.data.Digest);
+                        })
+                        .catch(function(response) {
+                            $f7.preloader.hide();
+                            $f7.toast.show({
+                                text: 'An error occured while generating hash.',
+                                cssClass: 'color-red'
+                            });
+                        });
+                }
+            });
+        }
+
+        let generateEmailHash = function(email) {
+            return $f7.request({
+                url: 'https://api.hashify.net/hash/md5/hex',
+                method: 'GET',
+                data: {
+                    value: email
+                },
+                dataType: 'json'
+            });
+        }
+
+        let fetchProfile = function(emailHash) {
+            let url = 'https://gravatar.com/' + emailHash + '.json' + '?callback=1';
+            $f7.request({
+                url: url,
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                profile = response.data.entry[0];
+                $update(function() {
+                    $f7.preloader.hide();
+                    $f7.popup.open($el.value.find('#popup-profile'));
+                });
+            })
+            .catch(function(response) {
+                $f7.preloader.hide();
+                $f7.toast.show({
+                    text: 'Could not fetch profile. Please make sure you have an account on Gravatar and your email address is correct.',
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

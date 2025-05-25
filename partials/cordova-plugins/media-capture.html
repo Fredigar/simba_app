@@ -1,0 +1,182 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Media Capture</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to capture images, audio, and video.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        ${image ? $h`
+                        <img class="margin-bottom shape-rounded-square" src="${image.url}" alt="" />
+                        ` : $h` `}
+                        <button type="button" class="button button-fill" @click="${captureImage}">Capture Image</button>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        ${audio ? $h`
+                        <audio class="margin-bottom" controls>
+                            <source src="${audio.url}" type="${audio.type}" />
+                        </audio>
+                        ` : $h` `}
+                        <button type="button" class="button button-fill" @click="${captureAudio}">Capture Audio</button>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        ${video ? $h`
+                        <div class="responsive-container margin-bottom">
+                            <video class="responsive-content shape-rounded-square" controls playsinline>
+                                <source src="${video.url}" type="${video.type}" />
+                            </video>
+                        </div>
+                        ` : $h` `}
+                        <button type="button" class="button button-fill" @click="${captureVideo}">Capture Video</button>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let image = null;
+        let audio = null;
+        let video = null;
+
+        let captureImage = function() {
+            image = null;
+            $update();
+            navigator.device.capture.captureImage(
+                function(files) {
+                    window.resolveLocalFileSystemURL(
+                        files[0].fullPath,
+                        function(fileEntry) {
+                            let file = {};
+                            file.url = fileEntry.toInternalURL();
+                            file.type = files[0].type;
+                            image = file;
+                            $update();
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: 'Error Code: ' + error.code,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: 'Error Code: ' + error.code,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    limit: 1
+                }
+            );
+        }
+
+        let captureAudio = function() {
+            audio = null;
+            $update();
+            navigator.device.capture.captureAudio(
+                function(files) {
+                    window.resolveLocalFileSystemURL(
+                        files[0].fullPath,
+                        function(fileEntry) {
+                            let file = {};
+                            file.url = fileEntry.toInternalURL();
+                            file.type = files[0].type;
+                            audio = file;
+                            $update();
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: 'Error Code: ' + error.code,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: 'Error Code: ' + error.code,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    limit: 1
+                }
+            );
+        }
+
+        let captureVideo = function() {
+            video = null;
+            $update();
+            navigator.device.capture.captureVideo(
+                function(files) {
+                    window.resolveLocalFileSystemURL(
+                        files[0].fullPath,
+                        function(fileEntry) {
+                            let file = {};
+                            file.url = fileEntry.toInternalURL();
+                            file.type = files[0].type;
+                            video = file;
+                            $update();
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: 'Error Code: ' + error.code,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: 'Error Code: ' + error.code,
+                        cssClass: 'color-red'
+                    });
+                },
+                {
+                    limit: 1
+                }
+            );
+        }
+
+        return $render;
+    }
+</script>

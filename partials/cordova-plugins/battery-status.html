@@ -1,0 +1,138 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Battery Status</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to get information about the device battery.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    ${batteryInfo ? $h`
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Battery Status</div>
+                                        <div class="item-after">${batteryInfo.status}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Battery Level</div>
+                                        <div class="item-after">${batteryInfo.level}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Try plugging and unplugging the charger.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let batteryInfo = null;
+
+        let initialize = function() {
+            window.addEventListener("batterystatus", emptyFunction);
+            window.removeEventListener("batterystatus", emptyFunction);
+            addEventListeners();
+        }
+
+        let emptyFunction = function() {
+
+        }
+
+        let addEventListeners = function() {
+            window.addEventListener('batterystatus', onBatteryStatus);
+            window.addEventListener('batterylow', onBatteryLow);
+            window.addEventListener('batterycritical', onBatteryCritical);
+        }
+
+        let removeEventListeners = function() {
+            window.removeEventListener('batterystatus', onBatteryStatus);
+            window.removeEventListener('batterylow', onBatteryLow);
+            window.removeEventListener('batterycritical', onBatteryCritical);
+        }
+
+        let onBatteryStatus = function(battery) {
+            updateBatteryInfo(battery);
+        }
+
+        let onBatteryLow = function(battery) {
+            updateBatteryInfo(battery);
+            $f7.toast.show({
+                text: 'Battery Level Low!',
+                cssClass: 'color-orange'
+            });
+        }
+
+        let onBatteryCritical = function(battery) {
+            updateBatteryInfo(battery);
+            $f7.toast.show({
+                text: 'Battery Level Critical!',
+                cssClass: 'color-red'
+            });
+        }
+
+        let updateBatteryInfo = function(battery) {
+            let batteryData = {};
+            batteryData.level = battery.level ? battery.level + '%' : 'Unknown';
+            batteryData.status = battery.isPlugged ? 'Charging' : 'Not Charging';
+            batteryInfo = batteryData;
+            $update();
+        }
+
+        $on('pageBeforeIn', function() {
+            initialize();
+        });
+
+        $on('pageBeforeRemove', function() {
+            removeEventListeners();
+        });
+
+        return $render;
+    }
+</script>

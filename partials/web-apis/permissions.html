@@ -1,0 +1,387 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Permissions API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Permissions API allows web apps to query for the permission status or request the permission for the features that might require user consent such as camera, geolocation, microphone, or notifications.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Once granted or denied, the permissions cannot be revoked using the Permissions API. They must be explicitly revoked by the user from browser's settings.</div>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${Object.keys(permissions).map((key, index) => $h`
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">${permissions[key].label}</div>
+                                        <div class="item-after">
+                                            ${permissions[key].isAvailable ? $h`
+                                            ${permissions[key].state == 'granted' ? $h`
+                                            <span class="badge no-margin color-green">Granted</span>
+                                            ` : $h` `}
+                                            ${permissions[key].state == 'denied' ? $h`
+                                            <span class="badge no-margin color-red">Denied</span>
+                                            ` : $h` `}
+                                            ${permissions[key].state == 'prompt' ? $h`
+                                            <button type="button" class="button button-fill button-small" @click="${() => requestPermission(key)}">Request</button>
+                                            ` : $h` `}
+                                            ` : $h`
+                                            <span class="badge no-margin color-amber">Not Available</span>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.permissions ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Permissions API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Permissions API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Permissions_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let permissions = {
+            'accelerometer': {
+                label: 'Accelerometer',
+                name: 'accelerometer',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'accessibility-events': {
+                label: 'Accessibility Events',
+                name: 'accessibility-events',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'ambient-light-sensor': {
+                label: 'Ambient Light Sensor',
+                name: 'ambient-light-sensor',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'background-sync': {
+                label: 'Background Sync',
+                name: 'background-sync',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'camera': {
+                label: 'Camera',
+                name: 'camera',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'clipboard-read': {
+                label: 'Clipboard Read',
+                name: 'clipboard-read',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'clipboard-write': {
+                label: 'Clipboard Write',
+                name: 'clipboard-write',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'geolocation': {
+                label: 'Geolocation',
+                name: 'geolocation',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'gyroscope': {
+                label: 'Gyroscope',
+                name: 'gyroscope',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'magnetometer': {
+                label: 'Magnetometer',
+                name: 'magnetometer',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'microphone': {
+                label: 'Microphone',
+                name: 'microphone',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'midi': {
+                label: 'MIDI',
+                name: 'midi',
+                descriptor: {
+                    sysex: true
+                },
+                state: null,
+                isAvailable: null
+            },
+            'notifications': {
+                label: 'Notifications',
+                name: 'notifications',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'payment-handler': {
+                label: 'Payment Handler',
+                name: 'payment-handler',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'persistent-storage': {
+                label: 'Persistent Storage',
+                name: 'persistent-storage',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            },
+            'push': {
+                label: 'Push',
+                name: 'push',
+                descriptor: {
+                    userVisibleOnly: true
+                },
+                state: null,
+                isAvailable: null
+            },
+            'speaker-selection': {
+                label: 'Speaker Selection',
+                name: 'speaker-selection',
+                descriptor: {},
+                state: null,
+                isAvailable: null
+            }
+        }
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            Object.keys(permissions).forEach(function(permissionName) {
+                checkPermission(permissionName);
+            });
+        }
+
+        let checkPermission = function(permissionName) {
+            navigator.permissions.query(Object.assign({name: permissionName}, permissions[permissionName].descriptor))
+                .then(function(permission) {
+                    updatePermission(permissionName, permission.state);
+                    permission.addEventListener('change', function(event) {
+                        updatePermission(permissionName, permission.state);
+                    });
+                })
+                .catch(function() {
+                    permissions[permissionName].isAvailable = false;
+                    $update();
+                });
+        }
+
+        let requestPermission = function(permissionName) {
+            switch (permissionName) {
+                case 'camera':
+                    navigator.mediaDevices.getUserMedia({
+                        video: true
+                    })
+                    .then(function() {
+                        $f7.toast.show({
+                            text: 'Permission Granted!',
+                            cssClass: 'color-green'
+                        });
+                    })
+                    .catch(function(error) {
+                        $f7.toast.show({
+                            text: error.message,
+                            cssClass: 'color-red'
+                        });
+                    });
+                break;
+                case 'clipboard-read':
+                    navigator.clipboard.readText()
+                        .then(function() {
+                            $f7.toast.show({
+                                text: 'Permission Granted!',
+                                cssClass: 'color-green'
+                            });
+                        })
+                        .catch(function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        });
+                break;
+                case 'geolocation':
+                    navigator.geolocation.getCurrentPosition(
+                        function() {
+                            $f7.toast.show({
+                                text: 'Permission Granted!',
+                                cssClass: 'color-green'
+                            });
+                        },
+                        function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    );
+                break;
+                case 'microphone':
+                    navigator.mediaDevices.getUserMedia({
+                        audio: true
+                    })
+                    .then(function() {
+                        $f7.toast.show({
+                            text: 'Permission Granted!',
+                            cssClass: 'color-green'
+                        });
+                    })
+                    .catch(function(error) {
+                        $f7.toast.show({
+                            text: error.message,
+                            cssClass: 'color-red'
+                        });
+                    });
+                break;
+                case 'midi':
+                    navigator.requestMIDIAccess({
+                        sysex: true
+                    })
+                    .then(function() {
+                        $f7.toast.show({
+                            text: 'Permission Granted!',
+                            cssClass: 'color-green'
+                        });
+                    })
+                    .catch(function(error) {
+                        $f7.toast.show({
+                            text: error.message,
+                            cssClass: 'color-red'
+                        });
+                    });
+                break;
+                case 'notifications':
+                case 'push':
+                    Notification.requestPermission()
+                        .then(function(permission) {
+                            if (permission == 'granted') {
+                                $f7.toast.show({
+                                    text: 'Permission Granted!',
+                                    cssClass: 'color-green'
+                                });
+                            }
+                            else if (permission == 'denied') {
+                                $f7.toast.show({
+                                    text: 'Permission Denied!',
+                                    cssClass: 'color-red'
+                                });
+                            }
+                        })
+                        .catch(function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        });
+                break;
+                case 'persistent-storage':
+                    navigator.storage.persist()
+                        .then(function() {
+                            $f7.toast.show({
+                                text: 'Permission Granted!',
+                                cssClass: 'color-green'
+                            });
+                        })
+                        .catch(function(error) {
+                            $f7.toast.show({
+                                text: error.message,
+                                cssClass: 'color-red'
+                            });
+                        });
+                break;
+            }
+        }
+
+        let updatePermission = function(permissionName, permissionState) {
+            permissions[permissionName].state = permissionState;
+            permissions[permissionName].isAvailable = permissionState;
+            $update();
+        }
+
+        return $render;
+    }
+</script>

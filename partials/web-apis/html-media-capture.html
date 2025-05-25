@@ -1,0 +1,166 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">HTML Media Capture API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>HTML Media Capture API allows access to the device's media capture mechanism, such as a camera, or microphone, from within a file upload control.</p>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        ${image ? $h`
+                        <img class="margin-bottom shape-rounded-square" src="${image.url}" alt="" />
+                        ` : $h` `}
+                        <label class="button button-fill button-file">
+                            <input type="file" name="image" capture="user" accept="image/*" @change="${onImageCapture}" />
+                            <span>Capture Image</span>
+                        </label>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        ${audio ? $h`
+                        <audio class="margin-bottom" controls>
+                            <source src="${audio.url}" type="${audio.type}" />
+                        </audio>
+                        ` : $h` `}
+                        <label class="button button-fill button-file">
+                            <input type="file" name="audio" capture="user" accept="audio/*" @change="${onAudioCapture}" />
+                            <span>Capture Audio</span>
+                        </label>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        ${video ? $h`
+                        <div class="responsive-container margin-bottom">
+                            <video class="responsive-content shape-rounded-square" controls playsinline>
+                                <source src="${video.url}" type="${video.type}" />
+                            </video>
+                        </div>
+                        ` : $h` `}
+                        <label class="button button-fill button-file">
+                            <input type="file" name="video" capture="environment" accept="video/*" @change="${onVideoCapture}" />
+                            <span>Capture Video</span>
+                        </label>
+                    </div>
+
+                    ${$f7.device.desktop ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">HTML Media Capture works better on mobile devices. On desktops, you will likely get a typical file picker.</div>
+                    </div>
+                    ` : $h` `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let image = null;
+        let audio = null;
+        let video = null;
+
+        let onImageCapture = function(event) {
+            let file = event.target.files[0];
+            let fileData = {};
+            fileData.type = file.type;
+            if ($f7.device.os == 'ios') {
+                let reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    fileData.url = reader.result;
+                    image = fileData;
+                    $update();
+                });
+                reader.addEventListener('error', function() {
+                    $f7.toast.show({
+                        text: reader.error,
+                        cssClass: 'color-red'
+                    });
+                });
+                reader.readAsDataURL(file);
+            }
+            else {
+                fileData.url = URL.createObjectURL(file);
+                image = fileData;
+                $update();
+            }
+        }
+
+        let onAudioCapture = function(event) {
+            let file = event.target.files[0];
+            let fileData = {};
+            fileData.type = file.type;
+            if ($f7.device.os == 'ios') {
+                let reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    fileData.url = reader.result;
+                    audio = fileData;
+                    $update();
+                });
+                reader.addEventListener('error', function() {
+                    $f7.toast.show({
+                        text: reader.error,
+                        cssClass: 'color-red'
+                    });
+                });
+                reader.readAsDataURL(file);
+            }
+            else {
+                fileData.url = URL.createObjectURL(file);
+                audio = fileData;
+                $update();
+            }
+        }
+
+        let onVideoCapture = function(event) {
+            let file = event.target.files[0];
+            let fileData = {};
+            fileData.type = file.type;
+            if ($f7.device.os == 'ios') {
+                let reader = new FileReader();
+                reader.addEventListener('load', function() {
+                    fileData.url = reader.result;
+                    video = fileData;
+                    $update();
+                });
+                reader.addEventListener('error', function() {
+                    $f7.toast.show({
+                        text: reader.error,
+                        cssClass: 'color-red'
+                    });
+                });
+                reader.readAsDataURL(file);
+            }
+            else {
+                fileData.url = URL.createObjectURL(file);
+                video = fileData;
+                $update();
+            }
+        }
+
+        return $render;
+    }
+</script>

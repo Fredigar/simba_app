@@ -1,0 +1,551 @@
+<template>
+    <div class="page" data-name="dashboard">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Dashboard</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block margin-bottom-half margin-top">
+                <div class="font-size-32 font-weight-bold">
+                    <span class="text-color-gray">Hello,</span>
+                    ${`\u0020`}
+                    <span>Praveen</span>
+                    ${`\u0020`}
+                    ${$f7.renderUnicode('1F44B')}
+                </div>
+                <div class="text-color-gray">Welcome to Nectar!</div>
+            </div>
+
+            <div class="block margin-vertical-half">
+                <div class="row">
+                    <div class="col-100 small-50 medium-33 large-25">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow text-color-black" style="background-color: var(--color-blue-200);">
+                            <div class="card-content card-content-padding">
+                                <button class="button button-fill button-icon button-round margin position-absolute ${$f7.rtl ? 'position-left-top' : 'position-right-top'}" style="background-color: var(--color-blue-300);">
+                                    <i class="icon material-icons color-black">more_vert</i>
+                                </button>
+                                <i class="icon f7-icons font-size-32">person</i>
+                                <div class="font-size-22 font-weight-bold margin-top-half">Customers</div>
+                                <div class="font-size-32 font-weight-bold margin-top-half">100K</div>
+                            </div>
+                            <div class="card-footer no-padding">
+                                <a href="#" class="link display-flex align-items-center justify-content-space-between padding width-100 ripple-color-blue text-color-black">
+                                    <span class="font-size-16 font-weight-600">View</span>
+                                    <i class="icon f7-icons font-size-20">${$f7.rtl ? 'arrow_left' : 'arrow_right'}</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-100 small-50 medium-33 large-25">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow text-color-black" style="background-color: var(--color-red-200);">
+                            <div class="card-content card-content-padding">
+                                <button class="button button-fill button-icon button-round margin position-absolute ${$f7.rtl ? 'position-left-top' : 'position-right-top'}" style="background-color: var(--color-red-300);">
+                                    <i class="icon material-icons color-black">more_vert</i>
+                                </button>
+                                <i class="icon f7-icons font-size-32">ellipses_bubble</i>
+                                <div class="font-size-22 font-weight-bold margin-top-half">Messages</div>
+                                <div class="font-size-32 font-weight-bold margin-top-half">75</div>
+                            </div>
+                            <div class="card-footer no-padding">
+                                <a href="#" class="link display-flex align-items-center justify-content-space-between padding width-100 ripple-color-red text-color-black">
+                                    <span class="font-size-16 font-weight-600">View</span>
+                                    <i class="icon f7-icons font-size-20">${$f7.rtl ? 'arrow_left' : 'arrow_right'}</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-100 small-50 medium-33 large-25">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow text-color-black" style="background-color: var(--color-amber-200);">
+                            <div class="card-content card-content-padding">
+                                <button class="button button-fill button-icon button-round margin position-absolute ${$f7.rtl ? 'position-left-top' : 'position-right-top'}" style="background-color: var(--color-amber-300);">
+                                    <i class="icon material-icons color-black">more_vert</i>
+                                </button>
+                                <i class="icon f7-icons font-size-32">square_list</i>
+                                <div class="font-size-22 font-weight-bold margin-top-half">Tasks</div>
+                                <div class="font-size-32 font-weight-bold margin-top-half">5</div>
+                            </div>
+                            <div class="card-footer no-padding">
+                                <a href="#" class="link display-flex align-items-center justify-content-space-between padding width-100 ripple-color-amber text-color-black">
+                                    <span class="font-size-16 font-weight-600">View</span>
+                                    <i class="icon f7-icons font-size-20">${$f7.rtl ? 'arrow_left' : 'arrow_right'}</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-100 small-50 medium-33 large-25">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow text-color-black" style="background-color: var(--color-green-200);">
+                            <div class="card-content card-content-padding">
+                                <button class="button button-fill button-icon button-round margin position-absolute ${$f7.rtl ? 'position-left-top' : 'position-right-top'}" style="background-color: var(--color-green-300);">
+                                    <i class="icon material-icons color-black">more_vert</i>
+                                </button>
+                                <i class="icon f7-icons font-size-32">wallet</i>
+                                <div class="font-size-22 font-weight-bold margin-top-half">Earnings</div>
+                                <div class="font-size-32 font-weight-bold margin-top-half">$500K</div>
+                            </div>
+                            <div class="card-footer no-padding">
+                                <a href="#" class="link display-flex align-items-center justify-content-space-between padding width-100 ripple-color-green text-color-black">
+                                    <span class="font-size-16 font-weight-600">View</span>
+                                    <i class="icon f7-icons font-size-20">${$f7.rtl ? 'arrow_left' : 'arrow_right'}</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="note inset margin-vertical-half" style="background-color: var(--color-gray-300);">
+                <div class="note-content">
+                    <div class="note-media">
+                        <i class="icon f7-icons font-size-48 color-black">rocket_fill</i>
+                    </div>
+                    <div class="note-title font-size-22 font-weight-bold margin-top-half text-color-black">Upgrade your account to <span class="text-gradient-red">PRO</span></div>
+                    <div class="note-message font-size-16 margin-top-half text-color-black">With a <span class="font-weight-bold text-gradient-red">PRO</span> account you get many additional and convenient features to increase your productivity.</div>
+                </div>
+                <div class="note-actions">
+                    <a href="#" class="note-action link shape-container shape-circle bg-color-black color-black">
+                        <i class="icon f7-icons color-white">${$f7.rtl ? 'arrow_left' : 'arrow_right'}</i>
+                    </a>
+                </div>
+                <a href="#" class="note-close link color-black"></a>
+            </div>
+
+            <div class="block margin-vertical-half">
+                <div class="row">
+                    <div class="col-100 large-50">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow">
+                            <div class="card-header">
+                                <div class="font-size-22">
+                                    <i class="icon f7-icons font-size-32">globe</i>
+                                    <span class="margin-horizontal-half vertical-align-middle">Visitors</span>
+                                </div>
+                                <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div class="list no-safe-areas">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img src="https://flagcdn.com/40x30/us.png" loading="lazy" height="20" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">United States</div>
+                                                    <div class="item-after font-weight-600">10,250</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img src="https://flagcdn.com/40x30/in.png" loading="lazy" height="20" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">India</div>
+                                                    <div class="item-after font-weight-600">7,825</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img src="https://flagcdn.com/40x30/br.png" loading="lazy" height="20" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">Brazil</div>
+                                                    <div class="item-after font-weight-600">6,790</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img src="https://flagcdn.com/40x30/fr.png" loading="lazy" height="20" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">France</div>
+                                                    <div class="item-after font-weight-600">5,545</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <img src="https://flagcdn.com/40x30/cn.png" loading="lazy" height="20" alt="" />
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title">China</div>
+                                                    <div class="item-after font-weight-600">4,675</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-100 large-50">
+                        <div class="card margin-vertical-half no-margin-horizontal no-safe-areas no-shadow">
+                            <div class="card-header">
+                                <div class="font-size-22">
+                                    <i class="icon f7-icons font-size-32">money_dollar_circle</i>
+                                    <span class="margin-horizontal-half vertical-align-middle">Earnings</span>
+                                </div>
+                                <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div class="list no-safe-areas">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">December</div>
+                                                    <div class="item-after font-weight-600">$23,475</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">November</div>
+                                                    <div class="item-after font-weight-600">$17,895</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">October</div>
+                                                    <div class="item-after font-weight-600">$19,730</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">September</div>
+                                                    <div class="item-after font-weight-600">$21,295</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">August</div>
+                                                    <div class="item-after font-weight-600">$16,625</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block margin-vertical-half">
+                <div class="row align-items-stretch">
+                    <div class="col-100 medium-40 large-35 padding-vertical-half">
+                        <div class="card height-100 no-margin no-safe-areas no-shadow">
+                            <div class="card-header">
+                                <div class="font-size-22">
+                                    <i class="icon f7-icons font-size-32">globe</i>
+                                    <span class="margin-horizontal-half vertical-align-middle">Browsers</span>
+                                </div>
+                            </div>
+                            <div class="card-content card-content-padding">
+                                <div id="chart-browsers" class="pie-chart margin-horizontal-auto" style="max-height: 320px; max-width: 320px;"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-100 medium-60 large-65 padding-vertical-half">
+                        <div class="card height-100 no-margin no-safe-areas no-shadow">
+                            <div class="card-header">
+                                <div class="font-size-22">
+                                    <i class="icon f7-icons font-size-32">square_list</i>
+                                    <span class="margin-horizontal-half vertical-align-middle">Projects</span>
+                                </div>
+                                <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div class="card-content-padding">
+                                    <div class="font-size-16 font-weight-600">3 projects completed out of 5</div>
+                                    <div class="progressbar progressbar-round color-green margin-top" data-progress="60"></div>
+                                </div>
+                                <div class="list no-safe-areas">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">
+                                                                <span class="vertical-align-middle">Android App</span>
+                                                                ${`\u0020`}
+                                                                <span class="badge badge-round no-margin-horizontal color-red">Urgent</span>
+                                                            </div>
+                                                            <div class="font-size-12 text-color-gray">
+                                                                <span>25 Issues</span>
+                                                                ${`\u0020`}
+                                                                ${`\u2022`}
+                                                                ${`\u0020`}
+                                                                <span>15 Fixes</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">
+                                                                <span class="vertical-align-middle">iOS App</span>
+                                                                ${`\u0020`}
+                                                                <span class="badge badge-round no-margin-horizontal color-green">High</span>
+                                                            </div>
+                                                            <div class="font-size-12 text-color-gray">
+                                                                <span>12 Issues</span>
+                                                                ${`\u0020`}
+                                                                ${`\u2022`}
+                                                                ${`\u0020`}
+                                                                <span>7 Fixes</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell">
+                                                            <div class="font-size-18 font-weight-bold">
+                                                                <span class="vertical-align-middle">Web App</span>
+                                                                ${`\u0020`}
+                                                                <span class="badge badge-round no-margin-horizontal color-amber">Low</span>
+                                                            </div>
+                                                            <div class="font-size-12 text-color-gray">
+                                                                <span>13 Issues</span>
+                                                                ${`\u0020`}
+                                                                ${`\u2022`}
+                                                                ${`\u0020`}
+                                                                <span>10 Fixes</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-table data-table-init card margin-bottom margin-top-half no-shadow">
+                <div class="card-header">
+                    <div class="data-table-header" style="min-height: auto;">
+                        <div class="data-table-title font-size-22">
+                            <i class="icon f7-icons font-size-32">person_2_fill</i>
+                            <span class="margin-horizontal-half vertical-align-middle">Customers</span>
+                        </div>
+                        <div class="data-table-actions">
+                            <a href="#" class="link link-button font-size-14 ripple-color-gray">View All</a>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-content">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th class="label-cell">Name</th>
+                                <th class="label-cell">Email</th>
+                                <th class="label-cell">Country</th>
+                                <th class="label-cell">Status</th>
+                                <th class="label-cell">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="label-cell white-space-nowrap">
+                                    <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/nKZuhvCGGQU/64x64" loading="lazy" height="32" width="32" alt="" />
+                                    <span class="margin-horizontal-half">Reggie Berge</span>
+                                </td>
+                                <td class="label-cell">reggie.berge@example.com</td>
+                                <td class="label-cell">Norway</td>
+                                <td class="label-cell">
+                                    <span class="badge badge-fade badge-round no-margin color-green">Active</span>
+                                </td>
+                                <td class="label-cell white-space-nowrap">
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-blue ripple-color-blue" data-tooltip="View">
+                                        <i class="icon material-icons font-size-16 color-white">visibility</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-orange ripple-color-orange" data-tooltip="Edit">
+                                        <i class="icon material-icons font-size-16 color-white">edit</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-red ripple-color-red" data-tooltip="Delete">
+                                        <i class="icon material-icons font-size-16 color-white">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell white-space-nowrap">
+                                    <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/iEEBWgY_6lA/64x64" loading="lazy" height="32" width="32" alt="" />
+                                    <span class="margin-horizontal-half">Peter Hoeger</span>
+                                </td>
+                                <td class="label-cell">peter.hoeger@example.com</td>
+                                <td class="label-cell">Chile</td>
+                                <td class="label-cell">
+                                    <span class="badge badge-fade badge-round no-margin color-red">Inactive</span>
+                                </td>
+                                <td class="label-cell white-space-nowrap">
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-blue ripple-color-blue" data-tooltip="View">
+                                        <i class="icon material-icons font-size-16 color-white">visibility</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-orange ripple-color-orange" data-tooltip="Edit">
+                                        <i class="icon material-icons font-size-16 color-white">edit</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-red ripple-color-red" data-tooltip="Delete">
+                                        <i class="icon material-icons font-size-16 color-white">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell white-space-nowrap">
+                                    <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/jzY0KRJopEI/64x64" loading="lazy" height="32" width="32" alt="" />
+                                    <span class="margin-horizontal-half">Xander Cronin</span>
+                                </td>
+                                <td class="label-cell">xander.cronin@example.com</td>
+                                <td class="label-cell">Morocco</td>
+                                <td class="label-cell">
+                                    <span class="badge badge-fade badge-round no-margin color-green">Active</span>
+                                </td>
+                                <td class="label-cell white-space-nowrap">
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-blue ripple-color-blue" data-tooltip="View">
+                                        <i class="icon material-icons font-size-16 color-white">visibility</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-orange ripple-color-orange" data-tooltip="Edit">
+                                        <i class="icon material-icons font-size-16 color-white">edit</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-red ripple-color-red" data-tooltip="Delete">
+                                        <i class="icon material-icons font-size-16 color-white">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell white-space-nowrap">
+                                    <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/ZHvM3XIOHoE/64x64" loading="lazy" height="32" width="32" alt="" />
+                                    <span class="margin-horizontal-half">Reagan Jones</span>
+                                </td>
+                                <td class="label-cell">reagan.jones@example.com</td>
+                                <td class="label-cell">Jamaica</td>
+                                <td class="label-cell">
+                                    <span class="badge badge-fade badge-round no-margin color-red">Inactive</span>
+                                </td>
+                                <td class="label-cell white-space-nowrap">
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-blue ripple-color-blue" data-tooltip="View">
+                                        <i class="icon material-icons font-size-16 color-white">visibility</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-orange ripple-color-orange" data-tooltip="Edit">
+                                        <i class="icon material-icons font-size-16 color-white">edit</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-red ripple-color-red" data-tooltip="Delete">
+                                        <i class="icon material-icons font-size-16 color-white">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="label-cell white-space-nowrap">
+                                    <img class="shape-circle vertical-align-middle" src="https://source.unsplash.com/0wRXAXqIp58/64x64" loading="lazy" height="32" width="32" alt="" />
+                                    <span class="margin-horizontal-half">Stacey Littel</span>
+                                </td>
+                                <td class="label-cell">stacey.littel@example.com</td>
+                                <td class="label-cell">Georgia</td>
+                                <td class="label-cell">
+                                    <span class="badge badge-fade badge-round no-margin color-green">Active</span>
+                                </td>
+                                <td class="label-cell white-space-nowrap">
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-blue ripple-color-blue" data-tooltip="View">
+                                        <i class="icon material-icons font-size-16 color-white">visibility</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-orange ripple-color-orange" data-tooltip="Edit">
+                                        <i class="icon material-icons font-size-16 color-white">edit</i>
+                                    </a>
+                                    ${`\u0020`}
+                                    <a href="#" class="link shape-container shape-circle size-24 tooltip-init bg-color-red ripple-color-red" data-tooltip="Delete">
+                                        <i class="icon material-icons font-size-16 color-white">delete</i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let chartBrowsers = null;
+
+        let initializeChartBrowsers = function() {
+            chartBrowsers = $f7.pieChart.create({
+                el: $el.value.find('#chart-browsers'),
+                datasets: [
+                    {
+                        value: 65.87,
+                        color: $f7.stylesheet.getPropertyValue('--f7-color-blue'),
+                        label: 'Google Chrome'
+                    },
+                    {
+                        value: 18.61,
+                        color: $f7.stylesheet.getPropertyValue('--f7-color-black'),
+                        label: 'Apple Safari'
+                    },
+                    {
+                        value: 15.52,
+                        color: $f7.stylesheet.getPropertyValue('--f7-color-amber'),
+                        label: 'Other'
+                    }
+                ],
+                tooltip: true
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeChartBrowsers();
+        });
+
+        return $render;
+    }
+</script>

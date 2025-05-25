@@ -1,0 +1,30 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="under-maintenance" style="background-color: var(--f7-block-strong-bg-color);">
+
+        <div class="page-content">
+
+            <div class="empty-state empty-state-strong inset">
+                <div class="empty-state-media">
+                    <img src="assets/custom/img/under-maintenance.svg" height="288" alt="" />
+                </div>
+                <div class="empty-state-title font-size-24 font-weight-900 text-uppercase">
+                    <span>Under</span>
+                    ${`\u0020`}
+                    <span class="text-color-primary">Maintenance</span>
+                </div>
+                <div class="empty-state-text">We are busy updating the site for you and will be back shortly. Thank you for your patience.</div>
+                <div class="empty-state-actions">
+                    <a href="#" class="empty-state-action back button button-fill button-large button-round margin-top color-mono text-color-mono-invert" data-reload-current="true" style="min-width: 256px;">Go Back</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

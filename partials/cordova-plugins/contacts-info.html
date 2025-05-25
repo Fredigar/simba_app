@@ -1,0 +1,231 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Contacts Info</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to list all the contacts on the user device.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${listContacts}">List Contacts</button>
+                    </div>
+
+                    ${contacts && contacts.length ? $h`
+                    <div class="block-title margin-vertical">Total Contacts (${contacts.length})</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${contacts.map((item, index) => $h`
+                            <li>
+                                <a herf="#" class="item-link" @click="${() => openPopupContact(item.id)}">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-random text-color-white">
+                                                <span class="font-size-20 font-weight-600">${item.displayName.trim().charAt(0)}</span>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">${item.displayName}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-contact" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Contact Info</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupContact}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    ${currentContact ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-96 bg-color-mono text-color-mono-invert">
+                            <span class="font-size-48 font-weight-bold">${currentContact.displayName.trim().charAt(0)}</span>
+                        </span>
+                        <div class="font-size-20 font-weight-bold margin-top">${currentContact.displayName}</div>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">First Name</div>
+                                        <div class="item-after">${currentContact.firstName}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Last Name</div>
+                                        <div class="item-after">${currentContact.lastName}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Display Name</div>
+                                        <div class="item-after">${currentContact.displayName}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ${currentContact.phoneNumbers.length ? $h`
+                    <div class="block-title margin-vertical">Phone Numbers</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${currentContact.phoneNumbers.map((item, index) => $h`
+                            <li>
+                                <a href="tel:${item.number}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-title">
+                                            <div class="item-header">${item.type}</div>
+                                            <div>${item.number}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ${currentContact.emails.length ? $h`
+                    <div class="block-title margin-vertical">Email Addresses</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${currentContact.emails.map((item, index) => $h`
+                            <li>
+                                <a href="mailto:${item.address}" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                    <div class="item-content">
+                                        <div class="item-title">
+                                            <div class="item-header">${item.type}</div>
+                                            <div>${item.address}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h` `}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let contacts = null;
+        let currentContact = null;
+        let popupContact = null;
+
+        let listContacts = function() {
+            navigator.contactsInfo.list(
+                function(result) {
+                    if (result.length) {
+                        if (window.fastSort) {
+                            sorted = fastSort.sort(result).asc(r => r.displayName);
+                            contacts = sorted;
+                        }
+                        else {
+                            contacts = result;
+                        }
+                        $update(function() {
+                            $f7.randomColorClassGenerator.initialize($el.value);
+                        });
+                    }
+                    else {
+                        $f7.toast.show({
+                            text: 'No Contacts Found',
+                            cssClass: 'color-red'
+                        });
+                    }
+                },
+                function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                }
+            );
+        }
+
+        let initializePopupContact = function() {
+            popupContact = $f7.popup.create({
+                el: $el.value.find('#popup-contact')
+            });
+        }
+
+        let openPopupContact = function(id) {
+            let result = contacts.find(function(contact) {
+                return contact.id == id;
+            });
+            currentContact = result;
+            $update(function() {
+                popupContact.open();
+            });
+        }
+
+        let closePopupContact = function() {
+            currentContact = null;
+            $update(function() {
+                popupContact.close();
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePopupContact();
+        });
+
+        return $render;
+    }
+</script>

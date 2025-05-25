@@ -1,0 +1,147 @@
+<template>
+    <div class="page" data-name="terms">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Disclaimer – SIMBA, DAISEI & mySIM</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="note note-fade inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Notice</div>
+                            <div class="note-message">These Terms were last updated on ${moment().format('dddd, MMMM DD, YYYY')}</div>
+                        </div>
+                    </div>
+
+                    <div id="term" class="block block-strong inset margin-vertical" innerHTML="${disclaimer}">
+
+                    </div>
+                    <div class="block">
+                        <a href="#" class="button button-fill button-large" @click="${acceptTerms}">I Accept</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        let disclaimer = '';
+        let md = window.markdownit({
+            html: true,            // ¡Muy importante para seguridad!
+            linkify: true,         // Convierte URLs automáticamente en enlaces
+            typographer: true,     // Mejores sustituciones tipográficas
+            highlight: function (str, lang) {
+                if (lang && hljs.getLanguage(lang)) {
+                    try {
+                        return '<pre class="no-margin-top hljs" data-lang="' + lang + '"><code class="cod-with-auto">' +
+                            hljs.highlight(str.replace('<span class="thinking-icon">' + assistant.thinkIcon + '</span>','').replace('```',""), {language: lang, ignoreIllegals: true}).value +
+                            '</code></pre>';
+                    } catch (__) {
+                    }
+                }
+
+                // Si no hay lenguaje especificado o se produce un error:
+                return '<pre class="no-margin-top hljs"><code>' + md.utils.escapeHtml(str.replace('<span class="thinking-icon">' + assistant.thinkIcon + '</span>','').replace('```',"")) + '</code></pre>';
+            }
+        }).use(window.texmath, {engine: window.katex, delimiters: 'brackets'});
+        let acceptTerms = function() {
+            localStorage.setItem('terms_accepted', 'true');
+            // Redirigir de vuelta a la página principal
+            $f7.views.main.router.navigate('/', {
+                reloadCurrent: true,
+                clearPreviousHistory: true
+            });
+        }
+        $on('pageAfterIn', function () {
+            disclaimer = "# Disclaimer – SIMBA, DAISEI & mySIM\n" +
+                "\n" +
+                "**SIMBA** is a conversational assistant developed by TASTO5 to support technical staff in discrepancy analysis, troubleshooting, and access to technical information related to simulators.\n" +
+
+                "\nThis disclaimer applies to **SIMBA and any of its agents or components**, including but not limited to **Tasks, Docs**.\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## 📡 Connected Information Sources\n" +
+                "\n" +
+                "SIMBA operates as an intelligent interface connected to several sources:\n" +
+                "\n" +
+                "- **DAISEI Companion (via REST API):** An advanced reasoning AI platform based on large language models trained with publicly available internet data.  \n" +
+                "  **It does not contain or has been trained on Airbus proprietary data.**  \n" +
+                "  It can generate content classified up to **Airbus Amber** within the divisional cloud environment.\n" +
+                "\n" +
+                "- **mySIM:** Airbus internal system that manages discrepancies (DRs), maintenance actions, and historical operational documentation related to simulators.  \n" +
+                "  All information retrieved from mySIM is **classified up to Airbus Amber**.\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## 🔐 Classification Level – Airbus Amber\n" +
+                "\n" +
+                "- **SIMBA is only authorized to process and generate content classified up to Airbus Amber level.**\n" +
+                "- **It is strictly forbidden to input into SIMBA any information classified above Airbus Amber.**\n" +
+                "- This restriction applies to both manual inputs (prompts) and any data shared from connected systems.\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## ⚠️ Important Notice\n" +
+                "\n" +
+                "The answers provided by SIMBA, whether sourced from DAISEI or mySIM, are **for guidance purposes only**  \n" +
+                "and should not be considered final recommendations or validated Airbus content.  \n" +
+                "**The ultimate responsibility for the use, interpretation, and validation of the information lies solely with the user.**\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## ✅ User Responsibilities\n" +
+                "\n" +
+                "By using SIMBA, the user agrees to the following:\n" +
+                "\n" +
+                "- Responses may contain errors, omissions, or be subject to interpretation.\n" +
+                "- All retrieved or generated information must be **reviewed and validated by qualified technical personnel** before being used operationally.\n" +
+                "- No information above Airbus Amber classification shall be shared with SIMBA.\n" +
+                "- Technical, maintenance, or safety decisions **must not rely solely** on SIMBA responses.\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## ❗ Prohibited Use\n" +
+                "\n" +
+                "Users are expressly prohibited from using SIMBA in any way that:\n" +
+                "\n" +
+                "- Attempts to extract, reproduce, reverse engineer or manipulate the internal logic of the system.\n" +
+                "- Inserts misleading, harmful, or classified information above Airbus Amber.\n" +
+                "- Automates interactions through external scripts or bots without prior authorization.\n" +
+                "- Misuses the system to impersonate others or submit prompts that violate Airbus security or data protection policies.\n" +
+                "- Uses the assistant for purposes outside its intended scope within the Airbus operational context.\n" +
+                "\n" +
+                "---\n" +
+                "\n" +
+                "## ❌ Limitation of Liability\n" +
+                "\n" +
+                "Airbus makes no guarantees regarding the accuracy, completeness, or currency of SIMBA’s responses  \n" +
+                "and assumes no responsibility for decisions made based on unverified use of the tool.  \n" +
+                "\n" +
+                "**By using SIMBA, the user expressly accepts these conditions.**\n";
+            disclaimer = md.render(disclaimer);
+            $update();
+        });
+        return $render;
+    }
+</script>

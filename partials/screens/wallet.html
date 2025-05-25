@@ -1,0 +1,187 @@
+<template>
+    <div class="page" data-name="wallet">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Wallet</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical text-color-black" style="background-color: var(--color-green-400);">
+                        <div class="flexbox-centered">
+                            <span class="shape-container shape-circle size-64 margin-vertical-half bg-color-green">
+                                <i class="icon f7-icons font-size-32">wallet</i>
+                            </span>
+                            <div class="font-size-32 font-weight-bold margin-vertical-half">${wallet && wallet.balance ? wallet.balance.toFixed(2) : Number(0).toFixed(2)}</div>
+                            <button type="button" class="button button-fill button-round margin-vertical-half color-green text-color-black" style="width: 144px;">Add Money</button>
+                        </div>
+                    </div>
+
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical sticky sticky-top">
+                        <div class="row">
+                            <div class="col">
+                                <button type="button" class="button button-fill align-items-center flex-direction-column height-auto padding-half color-red">
+                                    <i class="icon material-icons">arrow_upward</i>
+                                    <span class="font-size-12 font-weight-600 letter-spacing-1 line-height-1 margin-top-half text-uppercase">Send</span>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="button button-fill align-items-center flex-direction-column height-auto padding-half color-green">
+                                    <i class="icon material-icons">arrow_downward</i>
+                                    <span class="font-size-12 font-weight-600 letter-spacing-1 line-height-1 margin-top-half text-uppercase">Receive</span>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="button button-fill align-items-center flex-direction-column height-auto padding-half color-blue">
+                                    <i class="icon material-icons">add</i>
+                                    <span class="font-size-12 font-weight-600 letter-spacing-1 line-height-1 margin-top-half text-uppercase">Top Up</span>
+                                </button>
+                            </div>
+                            <div class="col">
+                                <button type="button" class="button button-fill align-items-center flex-direction-column height-auto padding-half color-amber">
+                                    <i class="icon material-icons">bolt</i>
+                                    <span class="font-size-12 font-weight-600 letter-spacing-1 line-height-1 margin-top-half text-uppercase">Payment</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    ${wallet && $h`
+                    ${wallet.transactions && wallet.transactions.length ? $h`
+                    <div class="block-title margin-vertical">
+                        <span>Transaction History</span>
+                        <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                    </div>
+                    <div class="list inset margin-vertical no-chevron">
+                        <ul>
+                            ${wallet.transactions.map((item, index) => $h`
+                            <li>
+                                <a href="#" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-inner item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell flex-shrink-0 width-auto">
+                                                    ${item.type == 'send' && $h`
+                                                    <span class="shape-container shape-auto size-40 bg-color-red">
+                                                        <i class="icon material-icons color-white">arrow_upward</i>
+                                                    </span>
+                                                    `}
+                                                    ${item.type == 'receive' && $h`
+                                                    <span class="shape-container shape-auto size-40 bg-color-green">
+                                                        <i class="icon material-icons color-white">arrow_downward</i>
+                                                    </span>
+                                                    `}
+                                                    ${item.type == 'topup' && $h`
+                                                    <span class="shape-container shape-auto size-40 bg-color-blue">
+                                                        <i class="icon material-icons color-white">add</i>
+                                                    </span>
+                                                    `}
+                                                    ${item.type == 'payment' && $h`
+                                                    <span class="shape-container shape-auto size-40 bg-color-amber">
+                                                        <i class="icon material-icons color-white">bolt</i>
+                                                    </span>
+                                                    `}
+                                                </div>
+                                                <div class="item-cell">
+                                                    <div class="font-size-12 text-color-gray">${moment(item.date).format('MMMM DD, YYYY')} at ${moment(item.date).format('hh:mm A')}</div>
+                                                    <div class="font-size-14">${item.remarks}</div>
+                                                </div>
+                                                <div class="item-cell flex-shrink-0 width-auto text-align-end">
+                                                    ${(item.type == 'send' && item.status == 'success') && $h`
+                                                    <div class="font-size-16 font-weight-600">- ${item.amount}</div>
+                                                    `}
+                                                    ${(item.type == 'receive' && item.status == 'success') && $h`
+                                                    <div class="font-size-16 font-weight-600">+ ${item.amount}</div>
+                                                    `}
+                                                    ${(item.type == 'topup' && item.status == 'success') && $h`
+                                                    <div class="font-size-16 font-weight-600">+ ${item.amount}</div>
+                                                    `}
+                                                    ${(item.type == 'payment' && item.status == 'success') && $h`
+                                                    <div class="font-size-16 font-weight-600">- ${item.amount}</div>
+                                                    `}
+                                                    ${(item.status == 'pending' || item.status == 'fail') && $h`
+                                                    <div class="font-size-16 font-weight-600 text-color-gray">${item.amount}</div>
+                                                    `}
+
+                                                    ${item.status == 'success' && $h`
+                                                    <div class="font-size-10 letter-spacing-1 text-uppercase text-color-green">Success</div>
+                                                    `}
+                                                    ${item.status == 'fail' && $h`
+                                                    <div class="font-size-10 letter-spacing-1 text-uppercase text-color-red">Failed</div>
+                                                    `}
+                                                    ${item.status == 'pending' && $h`
+                                                    <div class="font-size-10 letter-spacing-1 text-uppercase text-color-amber">Pending</div>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <span class="shape-container shape-auto size-72 bg-color-chrome">
+                                <i class="icon material-icons font-size-40">receipt_long</i>
+                            </span>
+                        </div>
+                        <div class="empty-state-title">No Transactions</div>
+                        <div class="empty-state-text">You haven't made any transactions yet.</div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let wallet = null;
+
+        let loadData = function() {
+            $f7.request({
+                url: 'assets/custom/dataset/wallet.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                wallet = response.data;
+                $update();
+            })
+            .catch(function(response) {
+                $f7.toast.show({
+                    text: 'An error occured while loading data.',
+                    cssClass: 'color-red'
+                });
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

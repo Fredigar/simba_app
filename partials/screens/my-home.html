@@ -1,0 +1,165 @@
+<template>
+
+    <div class="page" data-name="home">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    ${$f7.config.layout[$f7.config.layout.default].sidebar.enabled && $h`
+                    <a href="#" class="link ripple-color-gray" @click="${() => $f7.sidebar.toggle()}">
+                        <span class="shape-container shape-auto size-32 bg-color-mono">
+                            <i class="icon material-icons font-size-20 color-mono-invert">menu</i>
+                        </span>
+                    </a>
+                    `}
+                </div>
+                <div class="title">
+                    <img class="if-not-dark" src="${$f7.config.app.logos.logotypeLight}" alt="" />
+                    <img class="if-dark" src="${$f7.config.app.logos.logotypeDark}" alt="" />
+                </div>
+                <div class="right">
+                    ${$f7.config.i18n.enabled && $h`
+                    <a href="/select-language/" class="link ripple-color-gray tooltip-init" data-open-in="popup" data-tooltip="Language">
+                        <span class="shape-container shape-auto size-32 bg-color-chrome">
+                            <i class="icon material-icons font-size-20 color-mono">language</i>
+                        </span>
+                    </a>
+                    `}
+                    ${$f7.config.theming.enabled && $h`
+                    <a href="/select-appearance/" class="link ripple-color-gray tooltip-init" data-open-in="popup" data-tooltip="Appearance">
+                        <span class="shape-container shape-auto size-32 bg-color-chrome">
+                            <i class="icon material-icons font-size-20 color-mono">palette</i>
+                        </span>
+                    </a>
+                    `}
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <video id="cameraStream"></video>
+            <canvas id="photoCanvas" style="display:none;"></canvas>
+            <div class="fab fab-center-bottom color-indigo">
+                <a href="#" class="button" @click="${initCamera}">
+                    <i class="icon material-icons">camera</i>
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+<style>
+    #cameraStream {
+        width: 100vw;   /* 100% del ancho de la ventana */
+        height: 100vh;  /* 100% del alto de la ventana */
+        object-fit: cover; /* Asegura que el video cubra toda la pantalla */
+        position: fixed; /* Posicionamiento fijo */
+        top: 0;
+        left: 0;
+    }
+</style>
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+
+        let video = document.getElementById('cameraStream');
+        let canvas = document.getElementById('photoCanvas');
+        let isSending = false;
+        let intervalId = null;
+        let currentCamera = 'user';
+        const captureInterval = 2000; // Intervalo en milisegundos para la captura automática
+        let initCamera = function () {
+
+            console.log(currentCamera)
+            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                navigator.mediaDevices.getUserMedia({video: {facingMode: currentCamera}})
+                    .then(function (stream) {
+                        console.log(stream)
+                        video.srcObject = stream;
+                        video.play();
+                    }).catch(function (error) {
+                    console.log("Error al acceder a la cámara: ", error);
+                });
+            }
+            startCapture()
+        }
+
+        let startCapture = function() {
+            if (!intervalId) {
+                captureAndSendImage();
+                intervalId = setInterval(captureAndSendImage, captureInterval);
+            }
+        }
+
+        // Función para detener la captura automática
+        let stopCapture = function() {
+            if (intervalId) {
+                clearInterval(intervalId);
+                intervalId = null;
+            }
+        }
+
+        let captureAndSendImage = function(){
+            if (isSending) {
+                return; // Si se está enviando, no hacer nada
+            }
+            // Tamaño objetivo
+            const targetWidth = 512;
+            const targetHeight = 512;
+
+            // Calcular la relación de aspecto de la imagen original
+            const originalWidth = video.videoWidth;
+            const originalHeight = video.videoHeight;
+            const aspectRatio = originalWidth / originalHeight;
+
+            // Calcular las dimensiones ajustadas
+            let adjustedWidth, adjustedHeight;
+            if (originalWidth > originalHeight) {
+                // La imagen es más ancha que alta
+                adjustedWidth = targetWidth;
+                adjustedHeight = targetWidth / aspectRatio;
+            } else {
+                // La imagen es más alta que ancha
+                adjustedHeight = targetHeight;
+                adjustedWidth = targetHeight * aspectRatio;
+            }
+
+            // Ajustar el tamaño del canvas
+            canvas.width = targetWidth;
+            canvas.height = targetHeight;
+
+            // Calcular el punto de inicio para dibujar la imagen en el canvas
+            const startX = (targetWidth - adjustedWidth) / 2;
+            const startY = (targetHeight - adjustedHeight) / 2;
+
+            // Limpiar el canvas y dibujar la imagen ajustada
+            context.clearRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(video, startX, startY, adjustedWidth, adjustedHeight);
+            captureSound.play();
+
+            // Convertir la imagen del canvas a Blob y almacenarla
+            canvas.toBlob(function (blob) {
+                capturedImages.push(blob);
+                // Actualizar el slider con la nueva imagen
+                updateCapturedImagesSlider();
+            }, 'image/jpeg');
+        }
+
+        let initPage = function(){
+
+        }
+
+        $on('pageBeforeIn', function() {
+
+            let context = canvas.getContext('2d');
+            initPage();
+        });
+
+        $on('tabInit', function() {
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,258 @@
+<template>
+    <div class="page no-tabbar" data-name="chat">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">
+                    <div>${faker.name.firstName() + ' ' + faker.name.lastName()}</div>
+                    <div class="subtitle">Online</div>
+                </div>
+                <div class="right">
+                    <img class="avatar shape-circle" src="${faker.internet.avatar()}" height="40" width="40" alt="" />
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar messagebar">
+            <div class="toolbar-inner">
+                <a href="#" class="link ripple-color-gray" @click="${openAttachmentActions}">
+                    <i class="icon f7-icons if-not-md">paperclip</i>
+                    <i class="icon material-icons if-md">attach_file</i>
+                </a>
+                <div class="messagebar-area">
+                    <textarea placeholder="Message"></textarea>
+                </div>
+                <a href="#" class="link ripple-color-gray" @click="${sendMessage}">
+                    <i class="icon f7-icons if-not-md">paperplane</i>
+                    <i class="icon material-icons if-md">send</i>
+                </a>
+            </div>
+        </div>
+
+        <div class="page-content messages-content">
+
+            <div class="messages">
+
+                <div class="messages-title">
+                    <span class="badge badge-fade badge-round no-margin">January 01, 2023</span>
+                </div>
+                <div class="message message-sent">
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <div class="message-text">Hi, Jane</div>
+                            <div class="message-text-footer">1:00 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message message-sent">
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <div class="message-text">How are you?</div>
+                            <div class="message-text-footer">1:01 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message message-received">
+                    <div class="message-avatar">
+                        <img class="shape-circle" src="https://source.unsplash.com/jzY0KRJopEI/128x128" alt="" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-name">Jane</div>
+                        <div class="message-bubble">
+                            <div class="message-text">Hi, I am fine.</div>
+                            <div class="message-text-footer">3:14 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message message-received">
+                    <div class="message-avatar">
+                        <img class="shape-circle" src="https://source.unsplash.com/jzY0KRJopEI/128x128" alt="" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-name">Jane</div>
+                        <div class="message-bubble">
+                            <div class="message-text">How are you?</div>
+                            <div class="message-text-footer">3:15 PM</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="message message-sent">
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <div class="message-text">I am fine too.</div>
+                            <div class="message-text-footer">5:47 PM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="messages-title">
+                    <span class="badge badge-fade badge-round no-margin">Yesterday</span>
+                </div>
+                <div class="message message-sent">
+                    <div class="message-content">
+                        <div class="message-bubble">
+                            <div class="message-image">
+                                <img src="https://source.unsplash.com/Hs4dGxnCRxU" alt="" />
+                            </div>
+                            <div class="message-text">Look at this cutest puppy ever!</div>
+                            <div class="message-text-footer">7:15 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="messages-title">
+                    <span class="badge badge-fade badge-round no-margin">Today</span>
+                </div>
+                <div class="message message-received">
+                    <div class="message-avatar">
+                        <img class="shape-circle" src="https://source.unsplash.com/jzY0KRJopEI/128x128" alt="" />
+                    </div>
+                    <div class="message-content">
+                        <div class="message-name">Jane</div>
+                        <div class="message-bubble">
+                            <div class="message-text">That's beautiful</div>
+                            <div class="message-text-footer">6:05 AM</div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let messagebar = null;
+        let messages = null;
+
+        let initializeMessagebar = function() {
+            messagebar = $f7.messagebar.create({
+                el: $el.value.find('.messagebar'),
+                textareaEl: $el.value.find('.messagebar textarea')
+            });
+        }
+
+        let initializeMessages = function() {
+            messages = $f7.messages.create({
+                el: $('.messages'),
+                scrollMessages: true,
+                scrollMessagesOnEdge: false,
+                firstMessageRule: function(message, previousMessage, nextMessage) {
+                    if (message.isTitle) {
+                        return false;
+                    }
+                    if (!previousMessage || previousMessage.type !== message.type || previousMessage.name !== message.name) {
+                        return true;
+                    }
+                    return false;
+                },
+                lastMessageRule: function(message, previousMessage, nextMessage) {
+                    if (message.isTitle) {
+                        return false;
+                    }
+                    if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                        return true;
+                    }
+                    return false;
+                },
+                tailMessageRule: function(message, previousMessage, nextMessage) {
+                    if (message.isTitle) {
+                        return false;
+                    }
+                    if (!nextMessage || nextMessage.type !== message.type || nextMessage.name !== message.name) {
+                        return true;
+                    }
+                    return false;
+                }
+            });
+        }
+
+        let sendMessage = function() {
+            let text = messagebar.getValue().replace(/\n/g, '<br/>').trim();
+            if (text.length) {
+                messages.addMessage({
+                    text: text,
+                    textFooter: moment().format('h:m A'),
+                    type: 'sent'
+                });
+                messagebar.clear();
+                messagebar.focus();
+                receiveMessage();
+            }
+        }
+
+        let receiveMessage = function() {
+            let replies = ['Amazing', 'Are you sure?', 'I am not sure.', 'I need to think about it.', 'Of course', 'What?'];
+            let reply = replies.random();
+            setTimeout(function() {
+                messages.showTyping({
+                    name: 'Jane',
+                    avatar: 'https://source.unsplash.com/jzY0KRJopEI/128x128'
+                });
+                setTimeout(function() {
+                    messages.addMessage({
+                        name: 'Jane',
+                        avatar: 'https://source.unsplash.com/jzY0KRJopEI/128x128',
+                        text: reply,
+                        textFooter: moment().format('h:m A'),
+                        type: 'received'
+                    });
+                    messages.hideTyping();
+                }, 3000);
+            }, 2000);
+        }
+
+        let openAttachmentActions = function() {
+            let actions = $f7.actions.create({
+                grid: true,
+                buttons: [
+                    [
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-pink"><i class="icon fa-solid fa-camera color-white"></i></span>',
+                            text: 'Photo'
+                        },
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-green"><i class="icon fa-solid fa-video color-white"></i></span>',
+                            text: 'Video'
+                        },
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-blue"><i class="icon fa-solid fa-microphone color-white"></i></span>',
+                            text: 'Audio'
+                        },
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-teal"><i class="icon fa-solid fa-map-marker-alt color-white"></i></span>',
+                            text: 'Location'
+                        },
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-purple"><i class="icon fa-solid fa-address-card color-white"></i></span>',
+                            text: 'Contact'
+                        },
+                        {
+                            icon: '<span class="shape-container shape-circle size-48 bg-color-amber"><i class="icon fa-solid fa-file-alt color-white"></i></span>',
+                            text: 'Document'
+                        }
+                    ]
+                ]
+            });
+            actions.open();
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeMessagebar();
+            initializeMessages();
+        });
+
+        return $render;
+    }
+</script>

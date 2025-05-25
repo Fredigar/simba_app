@@ -1,0 +1,225 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">WordPress</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${flags.validating ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <span key="preloader" class="preloader color-multi" style="--f7-preloader-size: 40px;"></span>
+                </div>
+                <div class="empty-state-text">Connecting to ${$f7.wordpress.url}</div>
+            </div>
+            ` : $h`
+            ${flags.valid ? $h`
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+                    ${data.site ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <div class="margin-bottom-half">
+                            ${data.site.logo ? $h`
+                            <img class="shape-auto" src="${data.site.logo.medium ? data.site.logo.medium.source_url : data.site.logo.original.source_url}" loading="lazy" height="80" width="80" alt="" />
+                            ` : $h`
+                            <span class="shape-container shape-auto size-80 bg-color-random text-color-white">
+                                <span class="font-size-48 font-weight-900 text-uppercase">${data.site.name ? $h` ${data.site.name.trim().charAt(0)} ` : $h` ${(new URL($f7.wordpress.url).host).charAt(0)} `}</span>
+                            </span>
+                            `}
+                        </div>
+                        ${data.site.name ? $h`
+                        <div class="font-size-24 font-weight-bold">${data.site.name}</div>
+                        ` : $h` `}
+                        ${data.site.description ? $h`
+                        <div class="font-size-16 text-color-gray">${data.site.description}</div>
+                        ` : $h` `}
+                        <a href="${data.site.url}" target="${$f7.getExternalUrlTarget()}" class="external button button-fill button-round margin-horizontal-auto margin-top color-mono text-color-mono-invert" style="width: 192px;">Visit Website</a>
+                    </div>
+                    ` : $h` `}
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="/integrations/wordpress/categories/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-primary">
+                                                <i class="icon material-icons color-white">category</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Categories</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/integrations/wordpress/tags/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-primary">
+                                                <i class="icon material-icons color-white">local_offer</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Tags</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/integrations/wordpress/posts/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-primary">
+                                                <i class="icon material-icons color-white">description</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Posts</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/integrations/wordpress/pages/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-primary">
+                                                <i class="icon material-icons color-white">description</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Pages</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/integrations/wordpress/authors/" class="item-link">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-primary">
+                                                <i class="icon material-icons color-white">people</i>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Authors</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            ` : $h` `}
+            ${flags.invalid ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                ${$f7.online ? $h`
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">${messages.apiError}</div>
+                ` : $h`
+                <div class="empty-state-title">No Internet Connection</div>
+                <div class="empty-state-text">Please make sure you are connected to the Internet.</div>
+                `}
+                <div class="empty-state-actions">
+                    <div class="row">
+                        <div class="col-100 xsmall-50 margin-top-half">
+                            <a href="#" class="empty-state-action button button-fill button-round margin-horizontal-auto color-mono text-color-mono-invert" style="min-width: 192px; max-width: 256px;" @click="${validate}">Retry</a>
+                        </div>
+                        <div class="col-100 xsmall-50 margin-top-half">
+                            <a href="/integrations/wordpress/" class="empty-state-action button button-fade button-outline button-round margin-horizontal-auto color-mono" style="min-width: 192px; max-width: 256px;">Change Settings</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            ` : $h` `}
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let flags = {
+            validating: false,
+            valid: false,
+            invalid: false
+        }
+
+        let data = {
+            site: null
+        }
+
+        let messages = {
+            apiError: null
+        }
+
+        let validate = function() {
+            flags.validating = true;
+            flags.valid = false;
+            flags.invalid = false;
+            $update();
+            $f7.request({
+                url: $f7.wordpress.rootEndpoint,
+                method: 'GET',
+                data: {
+                    _embed: true
+                },
+                dataType: 'json'
+            })
+            .then(function(response) {
+                flags.validating = false;
+                flags.valid = true;
+                flags.invalid = false;
+                let site = {};
+                site.name = response.data.name || null;
+                site.description = response.data.description || null;
+                site.url = response.data.url || $f7.wordpress.url;
+                if (response.data._embedded && response.data._embedded['wp:featuredmedia'] && response.data._embedded['wp:featuredmedia'].length && response.data._embedded['wp:featuredmedia'][0].id) {
+                    if (response.data._embedded['wp:featuredmedia'][0].media_details && response.data._embedded['wp:featuredmedia'][0].media_details.sizes) {
+                        site.logo = response.data._embedded['wp:featuredmedia'][0].media_details.sizes;
+                    }
+                    site.logo.original = {};
+                    site.logo.original.source_url = response.data._embedded['wp:featuredmedia'][0].source_url;
+                }
+                else {
+                    site.logo = null;
+                }
+                data.site = site;
+                $update(function() {
+                    $f7.randomColorClassGenerator.initialize($el.value);
+                });
+            })
+            .catch(function(response) {
+                flags.validating = false;
+                flags.invalid = true;
+                messages.apiError = $f7.wordpress.parseHttpError(response);
+                $update();
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            validate();
+        });
+
+        return $render;
+    }
+</script>

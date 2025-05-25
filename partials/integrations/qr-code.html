@@ -1,0 +1,71 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">QR Code</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-bluegray-50);">
+                            <i class="icon material-icons font-size-48 color-mono">qr_code_2</i>
+                        </span>
+                        <p>Create and read QR codes in your app.</p>
+                    </div>
+
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="/integrations/qr-code/create" class="item-link" data-open-in="popup">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Create QR Code</div>
+                                            <div class="item-after">
+                                                <span class="badge color-blue">Web</span>
+                                                <span class="badge color-mono text-color-mono-invert">Cordova</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="/integrations/qr-code/read" class="item-link" data-open-in="popup">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title">Read QR Code</div>
+                                            <div class="item-after">
+                                                <span class="badge color-blue">Web</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                        </ul>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

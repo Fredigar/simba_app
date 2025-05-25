@@ -1,0 +1,159 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Device Orientation API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Device Orientation API allows web apps to access the gyroscope and compass data in order to determine the static orientation of the user's device in all the three dimensions.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${orientationInfo ? $h`
+                    <div class="note note-outline inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">The API won't return any data, if there is no in-built gyroscope or compass sensor available to the device.</div>
+                    </div>
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <img class="logo if-not-dark" src="${$f7.config.app.logos.logomarkLight}" alt="" height="96" width="96" />
+                        <img class="logo if-dark" src="${$f7.config.app.logos.logomarkDark}" alt="" height="96" width="96" />
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Alpha</div>
+                                        <div class="item-after">${orientationInfo.alpha}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Beta</div>
+                                        <div class="item-after">${orientationInfo.beta}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Gamma</div>
+                                        <div class="item-after">${orientationInfo.gamma}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="note note-outline inset color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Move and rotate your device in all directions.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.deviceOrientation ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Device Orientation API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Device Orientation API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/Events/Detecting_device_orientation#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let orientationInfo = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            updateInfo({
+                alpha: 0,
+                beta: 0,
+                gamma: 0
+            });
+            addEventListeners();
+        }
+
+        let addEventListeners = function() {
+            window.addEventListener('deviceorientation', onChange);
+        }
+
+        let removeEventListeners = function() {
+            window.removeEventListener('deviceorientation', onChange);
+        }
+
+        let onChange = function(event) {
+            updateInfo(event);
+        }
+
+        let updateInfo = function(orientation) {
+            let orientationData = {};
+            orientationData.alpha = orientation.alpha + ' deg';
+            orientationData.beta = orientation.beta + ' deg';
+            orientationData.gamma = orientation.gamma + ' deg';
+            orientationInfo = orientationData;
+            $update(function() {
+                $el.value.find('.logo').css('transform', 'rotate(' + orientation.gamma + 'deg) rotate3d(1, 0, 0, ' + (orientation.beta * -1) + 'deg)');
+            });
+        }
+
+        $on('pageBeforeRemove', function() {
+            removeEventListeners();
+        });
+
+        return $render;
+    }
+</script>

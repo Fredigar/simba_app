@@ -1,0 +1,89 @@
+<template>
+    <div class="page" data-name="about">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">About</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-75 large-60 xlarge-50 padding-vertical">
+
+                    <div class="block block-strong inset display-flex flex-direction-column align-items-center justify-content-flex-start height-100 no-margin-vertical text-align-center">
+
+                        <div>
+                            <img class="if-not-dark" src="${$f7.config.app.logos.logomarkLight}" height="96" alt="" />
+                            <img class="if-dark" src="${$f7.config.app.logos.logomarkDark}" height="96" alt="" />
+                        </div>
+
+                        <div class="margin-top">
+                            <img class="if-not-dark" src="${$f7.config.app.logos.logotypeLight}" height="24" alt="" />
+                            <img class="if-dark" src="${$f7.config.app.logos.logotypeDark}" height="24" alt="" />
+                        </div>
+
+                        <div class="font-size-16 font-weight-600 margin-top">${$f7.config.app.tagline}</div>
+
+                        <div class="font-size-14 font-weight-600 margin-top-half text-color-gray">${$f7.getAppVersion()}</div>
+
+                        <div class="font-size-14 margin-top text-color-gray">${$f7.config.app.description}</div>
+
+                        <div class="margin-top">
+                            <a href="https://behance.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Behance" style="background-color: rgba(var(--brand-color-behance), 1); --f7-touch-ripple-color: rgba(var(--brand-color-behance), 0.125);">
+                                <i class="icon fa-brands fa-behance color-white"></i>
+                            </a>
+                            <a href="https://dribbble.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Dribbble" style="background-color: rgba(var(--brand-color-dribbble), 1); --f7-touch-ripple-color: rgba(var(--brand-color-dribbble), 0.125);">
+                                <i class="icon fa-brands fa-dribbble color-white"></i>
+                            </a>
+                            <a href="https://facebook.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Facebook" style="background-color: rgba(var(--brand-color-facebook), 1); --f7-touch-ripple-color: rgba(var(--brand-color-facebook), 0.125);">
+                                <i class="icon fa-brands fa-facebook-f color-white"></i>
+                            </a>
+                            <a href="https://github.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="GitHub" style="background-color: rgba(var(--brand-color-github), 1); --f7-touch-ripple-color: rgba(var(--brand-color-github), 0.125);">
+                                <i class="icon fa-brands fa-github color-white"></i>
+                            </a>
+                            <a href="https://instagram.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Instagram" style="background-color: rgba(var(--brand-color-instagram), 1); --f7-touch-ripple-color: rgba(var(--brand-color-instagram), 0.125);">
+                                <i class="icon fa-brands fa-instagram color-white"></i>
+                            </a>
+                            <a href="https://linkedin.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="LinkedIn" style="background-color: rgba(var(--brand-color-linkedin), 1); --f7-touch-ripple-color: rgba(var(--brand-color-linkedin), 0.125);">
+                                <i class="icon fa-brands fa-linkedin-in color-white"></i>
+                            </a>
+                            <a href="https://medium.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Medium" style="background-color: rgba(var(--brand-color-medium), 1); --f7-touch-ripple-color: rgba(var(--brand-color-medium), 0.125);">
+                                <i class="icon fa-brands fa-medium color-white"></i>
+                            </a>
+                            <a href="https://twitter.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="Twitter" style="background-color: rgba(var(--brand-color-twitter), 1); --f7-touch-ripple-color: rgba(var(--brand-color-twitter), 0.125);">
+                                <i class="icon fa-brands fa-twitter color-white"></i>
+                            </a>
+                            <a href="https://whatsapp.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="WhatsApp" style="background-color: rgba(var(--brand-color-whatsapp), 1); --f7-touch-ripple-color: rgba(var(--brand-color-whatsapp), 0.125);">
+                                <i class="icon fa-brands fa-whatsapp color-white"></i>
+                            </a>
+                            <a href="https://youtube.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only margin-half shape-container shape-auto size-32 tooltip-init" data-tooltip="YouTube" style="background-color: rgba(var(--brand-color-youtube), 1); --f7-touch-ripple-color: rgba(var(--brand-color-youtube), 0.125);">
+                                <i class="icon fa-brands fa-youtube color-white"></i>
+                            </a>
+                        </div>
+
+                        <div class="font-size-10 letter-spacing-1 margin-top-auto padding-top text-color-gray">MADE WITH <i class="icon fa-solid fa-coffee text-gradient-brown tooltip-init" data-tooltip="Coffee"></i> AND <i class="icon fa-solid fa-heart text-gradient-red tooltip-init" data-tooltip="Love"></i> IN INDIA</div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

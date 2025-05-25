@@ -1,0 +1,228 @@
+<template>
+    <div class="page" data-name="select-appearance">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="title">Select Appearance</div>
+                <div class="right">
+                    <a class="link icon-only back">
+                        <i class="icon material-icons">cancel</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${$f7.theming.config.enabled ? $h`
+            <div class="block-title margin-vertical">Theme Color</div>
+            <div class="block block-strong inset margin-vertical padding-half text-align-center">
+                ${themeColors.map((item, index) => $h`
+                <label class="radio-media cursor-pointer margin-half no-grayscale no-outline" style="width: 80px;">
+                    <input type="radio" name="theme-color" value="${item.color}" checked="${$store.getters.themeColor.value == item.color}" @change="${(event) => $f7.theming.changeColor(event.target.value)}" />
+                    <div class="radio-inner shape-circle">
+                        <span class="shape-container shape-circle size-40" style="background-color: ${item.color};"></span>
+                    </div>
+                    <div class="radio-label font-size-12" style="color: ${item.color};">${item.name}</div>
+                </label>
+                `)}
+            </div>
+            <div class="list inset margin-vertical">
+                <ul>
+                    <li id="theme-color-selector">
+                        <a href="#" class="item-link" @click="${() => themeColorPicker.open()}">
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <i class="shape-container shape-circle size-40" style="background-color: ${$store.getters.themeColor.value};"></i>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title">Pick Custom Color</div>
+                                    <div class="item-after text-uppercase">${$store.getters.themeColor.value}</div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="block-title margin-bottom-half margin-top">Theme Mode</div>
+            <div class="list cards-list radio-list radio-outline inset margin-bottom margin-top-half no-hairlines-between">
+                <ul class="row">
+                    <li class="col-100 medium-33">
+                        <label class="item-content item-radio color-amber ripple-color-amber">
+                            <input type="radio" name="theme-mode" value="light" checked="${$store.getters.themeMode.value == 'light'}" @change="${() => $f7.theming.changeMode('light')}" />
+                            <div class="item-inner item-cell">
+                                <div class="item-row">
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <span class="shape-container shape-auto size-40 bg-color-amber">
+                                            <i class="icon material-icons color-white">light_mode</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-cell">Light</div>
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <i class="icon icon-radio"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="col-100 medium-33">
+                        <label class="item-content item-radio color-mono ripple-color-mono">
+                            <input type="radio" name="theme-mode" value="dark" checked="${$store.getters.themeMode.value == 'dark'}" @change="${() => $f7.theming.changeMode('dark')}" />
+                            <div class="item-inner item-cell">
+                                <div class="item-row">
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <span class="shape-container shape-auto size-40 bg-color-mono">
+                                            <i class="icon material-icons color-mono-invert">dark_mode</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-cell">Dark</div>
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <i class="icon icon-radio"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </li>
+                    <li class="col-100 medium-33">
+                        <label class="item-content item-radio color-bluegray ripple-color-bluegray">
+                            <input type="radio" name="theme-mode" value="system" checked="${$store.getters.themeMode.value == 'system'}" @change="${() => $f7.theming.changeMode('system')}" />
+                            <div class="item-inner item-cell">
+                                <div class="item-row">
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <span class="shape-container shape-auto size-40 bg-color-bluegray">
+                                            <i class="icon material-icons color-white">brightness_4</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-cell">System</div>
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <i class="icon icon-radio"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <span class="shape-container shape-auto bg-color-chrome">
+                        <i class="icon material-icons font-size-56">palette</i>
+                    </span>
+                </div>
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">You're not allowed to change appearance settings.</div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .page[data-name=select-appearance] .radio-media [name=theme-color] ~ .radio-inner:after {
+        background-color: transparent;
+        bottom: 0;
+        font-size: 16px;
+        height: 100%;
+        left: 0;
+        right: 0;
+        top: 0;
+        width: 100%;
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let themeColors = [
+            {
+                name: 'Red',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-red').trim()
+            },
+            {
+                name: 'Pink',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-pink').trim()
+            },
+            {
+                name: 'Purple',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-purple').trim()
+            },
+            {
+                name: 'Deep Purple',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-deeppurple').trim()
+            },
+            {
+                name: 'Indigo',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-indigo').trim()
+            },
+            {
+                name: 'Blue',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-blue').trim()
+            },
+            {
+                name: 'Light Blue',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-lightblue').trim()
+            },
+            {
+                name: 'Cyan',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-cyan').trim()
+            },
+            {
+                name: 'Teal',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-teal').trim()
+            },
+            {
+                name: 'Green',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-green').trim()
+            },
+            {
+                name: 'Light Green',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-lightgreen').trim()
+            },
+            {
+                name: 'Amber',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-amber').trim()
+            },
+            {
+                name: 'Orange',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-orange').trim()
+            },
+            {
+                name: 'Deep Orange',
+                color: $f7.stylesheet.getPropertyValue('--f7-color-deeporange').trim()
+            }
+        ]
+
+        let themeColorPicker = null;
+
+        let initializeThemeColorPicker = function() {
+            themeColorPicker = $f7.colorPicker.create({
+                targetEl: $el.value.find('#theme-color-selector'),
+                modules: ['rgb-sliders', 'hex', 'initial-current-colors'],
+                openIn: 'popover',
+                sliderLabel: true,
+                sliderValue: true,
+                sliderValueEditable: true,
+                hexValueEditable: true,
+                value: {
+                    hex: $f7.theming.currentColor()
+                },
+                on: {
+                    change: function(colorPicker, value) {
+                        $f7.theming.changeColor(value.hex);
+                    }
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeThemeColorPicker();
+        });
+
+        return $render;
+    }
+</script>

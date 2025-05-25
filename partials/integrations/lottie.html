@@ -1,0 +1,82 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Lottie</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-teal-50);">
+                            <img src="https://icon.horse/icon/lottiefiles.com" height="40" alt="" />
+                        </span>
+                        <p>Add high-quality interactive animations to your app.</p>
+                    </div>
+
+                    <div class="block-title margin-vertical">With Controls</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay controls loop background="transparent" speed="1" style="height: 256px;"></lottie-player>
+                    </div>
+
+                    <div class="block-title margin-vertical">Without Controls</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 256px;"></lottie-player>
+                    </div>
+
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="row" style="--f7-grid-gap: 4px;">
+                            <div class="col">
+                                <lottie-player class="emoji margin-horizontal-auto" src="https://assets4.lottiefiles.com/packages/lf20_vpzvfap4.json" background="transparent" speed="2" style="height: 48px; width: 48px; filter: grayscale(100);" @click="${animateEmoji}"></lottie-player>
+                            </div>
+                            <div class="col">
+                                <lottie-player class="emoji margin-horizontal-auto" src="https://assets2.lottiefiles.com/packages/lf20_pojzngga.json" background="transparent" speed="2" style="height: 48px; width: 48px; filter: grayscale(100);" @click="${animateEmoji}"></lottie-player>
+                            </div>
+                            <div class="col">
+                                <lottie-player class="emoji margin-horizontal-auto" src="https://assets3.lottiefiles.com/packages/lf20_s1u9tqu9.json" background="transparent" speed="2" style="height: 48px; width: 48px; filter: grayscale(100);" @click="${animateEmoji}"></lottie-player>
+                            </div>
+                            <div class="col">
+                                <lottie-player class="emoji margin-horizontal-auto" src="https://assets4.lottiefiles.com/packages/lf20_xlbwcmun.json" background="transparent" speed="2" style="height: 48px; width: 48px; filter: grayscale(100);" @click="${animateEmoji}"></lottie-player>
+                            </div>
+                            <div class="col">
+                                <lottie-player class="emoji margin-horizontal-auto" src="https://assets6.lottiefiles.com/packages/lf20_2rcvjuse.json" background="transparent" speed="2" style="height: 48px; width: 48px; filter: grayscale(100);" @click="${animateEmoji}"></lottie-player>
+                            </div>
+                        </div>
+                        <p class="text-color-gray text-align-center">Tap on the emojis to animate them.</p>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let animateEmoji = function(event) {
+            event.target.style.filter = 'grayscale(0)';
+            event.target.play();
+            setTimeout(function() {
+                event.target.style.filter = 'grayscale(100)';
+                event.target.stop();
+            }, 2500);
+        }
+
+        return $render;
+    }
+</script>

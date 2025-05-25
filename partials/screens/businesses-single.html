@@ -1,0 +1,785 @@
+<template>
+    <div class="page" data-name="businesses-single">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Businesses - Single</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block medium-inset medium-margin-top no-hairlines no-margin-vertical no-padding">
+                <div class="overlay-container elevation-8 shape-inherit">
+                    <div class="responsive-wrapper" style="max-height: 304px;">
+                        <div class="responsive-container">
+                            <img class="responsive-content" src="https://source.unsplash.com/wJ6xyh1YMxU/1920x1080" alt="" />
+                        </div>
+                    </div>
+                    <div class="overlay-content align-items-stretch justify-content-space-between text-align-start">
+                        <div class="display-flex justify-content-space-between">
+                            <span class="shape-container shape-circle size-40 font-size-16 font-weight-900 bg-color-green">9.2</span>
+                            <button type="button" class="state-toggle button button-fade button-icon button-round color-white" @stateChange="${(event) => toggleFavorites(event.detail)}">
+                                <i class="state-inactive icon material-icons font-size-20 color-white">favorite</i>
+                                <i class="state-active icon material-icons font-size-20 color-red">favorite</i>
+                            </button>
+                        </div>
+                        <div>
+                            <div>
+                                <a href="#" class="link badge color-pink">Featured</a>
+                                <a href="#" class="link badge color-amber text-color-black">Hotels & Resorts</a>
+                            </div>
+                            <div class="font-size-20 font-weight-bold single-line-text">
+                                <i class="icon material-icons color-blue tooltip-init" data-tooltip="Verified">verified</i>
+                                ${`\u0020`}
+                                <span class="vertical-align-middle">Atlantis, The Palm</span>
+                            </div>
+                            <div class="font-size-12 single-line-text">Dubai, UAE</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="block block-strong medium-hide no-hairlines no-margin-vertical sticky sticky-top">
+                <div class="segmented segmented-strong color-gray">
+                    <a href="#tab-overview" class="button font-size-12 tab-link tab-link-active color-blue">Overview</a>
+                    <a href="#tab-experiences" class="button font-size-12 tab-link color-pink">Experience</a>
+                    <a href="#tab-bookings" class="button font-size-12 tab-link color-green">Bookings</a>
+                    <a href="#tab-reviews" class="button font-size-12 tab-link color-amber">Reviews</a>
+                    <span class="segmented-highlight"></span>
+                </div>
+            </div>
+
+            <div class="row justify-content-center no-gap padding-horizontal-half" style="--f7-card-margin-horizontal: 8px;">
+
+                <div class="col-100 medium-35 large-30 xlarge-35 medium-show sticky sticky-top">
+                    <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-left' : 'no-safe-area-right'}">
+                        <div class="card-content">
+                            <div class="list media-list menu-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                <ul>
+                                    <li>
+                                        <a href="#tab-overview" class="item-link tab-link tab-link-active color-blue">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon material-icons">info_outline</i>
+                                                        <i class="icon material-icons icon-active">info</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Overview</div>
+                                                    </div>
+                                                    <div class="item-text">${faker.lorem.sentence(5)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-experiences" class="item-link tab-link color-pink">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon material-icons-outlined">celebration</i>
+                                                        <i class="icon material-icons icon-active">celebration</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Experiences</div>
+                                                    </div>
+                                                    <div class="item-text">${faker.lorem.sentence(5)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-bookings" class="item-link tab-link color-green">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon material-icons-outlined">calendar_month</i>
+                                                        <i class="icon material-icons icon-active">calendar_month</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Bookings</div>
+                                                    </div>
+                                                    <div class="item-text">${faker.lorem.sentence(5)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="#tab-reviews" class="item-link tab-link color-amber">
+                                            <div class="item-content">
+                                                <div class="item-media">
+                                                    <span class="icons">
+                                                        <i class="icon material-icons">star_outline</i>
+                                                        <i class="icon material-icons icon-active">star</i>
+                                                    </span>
+                                                </div>
+                                                <div class="item-inner">
+                                                    <div class="item-title-row">
+                                                        <div class="item-title">Reviews</div>
+                                                    </div>
+                                                    <div class="item-text">${faker.lorem.sentence(5)}</div>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-100 medium-65 large-70 xlarge-65">
+
+                    <div class="tabs-swipeable-wrap" data-auto-height="true">
+                        <div class="tabs">
+
+                            <div id="tab-overview" class="tab tab-active">
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">About</div>
+                                    <div class="card-content card-content-padding">
+                                        <p>An iconic entertainment destination comprised of two world-class resorts that bring you extraordinary experiences. Discover a world of amazement across stays, dining, entertainment, attractions and wellness.</p>
+                                        <p>Atlantis is the ultimate holiday destination for both couples and families to make lifetime memories. From thrill-seekers to foodies, sun lovers to explorers, there is an unforgettable experience for everyone.</p>
+                                    </div>
+                                </div>
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Contact</div>
+                                    <div class="card-content">
+                                        <div class="responsive-container">
+                                            <iframe class="responsive-content" src="https://www.google.com/maps/embed/v1/place?key=${$f7.config.googleMaps.apiKey}&q=25.1304426,55.1149611"></iframe>
+                                        </div>
+                                        <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                <li>
+                                                    <a href="https://maps.google.com?q=25.1304426,55.1149611" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                                                                <div class="shape-container shape-auto size-40 bg-color-blue">
+                                                                    <i class="icon material-icons font-size-20 color-white">place</i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title-row">
+                                                                    <div class="item-title">Address</div>
+                                                                </div>
+                                                                <div class="item-text">
+                                                                    Crescent Road,
+                                                                    <br/>
+                                                                    The Palm Jumeirah,
+                                                                    <br/>
+                                                                    Dubai, UAE
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="tel:+1-23456789" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                                                                <div class="shape-container shape-auto size-40 bg-color-green">
+                                                                    <i class="icon material-icons font-size-20 color-white">phone</i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title-row">
+                                                                    <div class="item-title">Phone</div>
+                                                                </div>
+                                                                <div class="item-text">+1-23456789</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="mailto:mail@example.org" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                                                                <div class="shape-container shape-auto size-40 bg-color-red">
+                                                                    <i class="icon material-icons font-size-20 color-white">email</i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title-row">
+                                                                    <div class="item-title">Email</div>
+                                                                </div>
+                                                                <div class="item-text">mail@example.org</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="https://example.org" target="${$f7.getExternalUrlTarget()}" class="item-link external">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                                                                <div class="shape-container shape-auto size-40 bg-color-bluegray">
+                                                                    <i class="icon material-icons font-size-20 color-white">language</i>
+                                                                </div>
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title-row">
+                                                                    <div class="item-title">Website</div>
+                                                                </div>
+                                                                <div class="item-text">https://example.org</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell">
+                                                            <div class="item-row">
+                                                                <div class="item-cell">
+                                                                    <a href="https://facebook.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 tooltip-init" data-tooltip="Facebook" style="background-color: rgba(var(--brand-color-facebook), 1); --f7-touch-ripple-color: rgba(var(--brand-color-facebook), 0.125);">
+                                                                        <i class="icon fa-brands fa-facebook-f color-white"></i>
+                                                                    </a>
+                                                                    ${`\u0020`}
+                                                                    <a href="https://instagram.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 tooltip-init" data-tooltip="Instagram" style="background-color: rgba(var(--brand-color-instagram), 1); --f7-touch-ripple-color: rgba(var(--brand-color-instagram), 0.125);">
+                                                                        <i class="icon fa-brands fa-instagram color-white"></i>
+                                                                    </a>
+                                                                    ${`\u0020`}
+                                                                    <a href="https://youtube.com" target="${$f7.getExternalUrlTarget()}" class="external link icon-only shape-container shape-auto size-40 tooltip-init" data-tooltip="YouTube" style="background-color: rgba(var(--brand-color-youtube), 1); --f7-touch-ripple-color: rgba(var(--brand-color-youtube), 0.125);">
+                                                                        <i class="icon fa-brands fa-youtube color-white"></i>
+                                                                    </a>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Business Hours</div>
+                                    <div class="card-content">
+                                        <div class="list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">Monday - Thursday</div>
+                                                            <div class="item-after flex-direction-column">
+                                                                <span>09:00 AM - 02:00 PM</span>
+                                                                <span>03:00 PM - 08:00 PM</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">Friday</div>
+                                                            <div class="item-after flex-direction-column">
+                                                                <span>09:00 AM - 02:00 PM</span>
+                                                                <span>03:00 PM - 06:00 PM</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">Saturday</div>
+                                                            <div class="item-after flex-direction-column">
+                                                                <span>09:00 AM - 02:00 PM</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner">
+                                                            <div class="item-title font-weight-600">Sunday</div>
+                                                            <div class="item-after flex-direction-column">
+                                                                <span>Closed</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="tab-experiences" class="tab">
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Atlantis Hotel</div>
+                                    <div class="card-content card-content-padding">
+                                        <div class="responsive-container shape-rounded-square">
+                                            <iframe class="responsive-content shape-rounded-square" src="https://youtube.com/embed/m2CxSIJB6kk" frameborder="0"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Aquaventure Waterpark</div>
+                                    <div class="card-content card-content-padding">
+                                        <div class="responsive-container shape-rounded-square">
+                                            <iframe class="responsive-content shape-rounded-square" src="https://youtube.com/embed/kbBMFf4IZzk" frameborder="0"></iframe>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="tab-bookings" class="tab">
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Make a Reservation</div>
+                                    <div class="card-content">
+                                        <form name="reservation" action="#" method="POST" enctype="multipart/form-data">
+                                            <div class="list no-hairlines no-hairlines-between no-safe-areas">
+                                                <ul class="row">
+                                                    <li class="col-100">
+                                                        <div class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-label">Name</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input type="text" name="name" required />
+                                                                    <span class="input-clear-button"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="col-100 small-50 medium-100 xlarge-50">
+                                                        <div class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-label">Mobile</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input type="text" name="mobile" inputmode="tel" required />
+                                                                    <span class="input-clear-button"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="col-100 small-50 medium-100 xlarge-50">
+                                                        <div class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-label">Email</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input type="email" name="email" inputmode="email" required />
+                                                                    <span class="input-clear-button"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="col-100 small-50 medium-100 xlarge-50">
+                                                        <div class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-label">Date & Time</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input type="text" name="datetime" required />
+                                                                    <span class="input-clear-button"></span>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <li class="col-100 small-50 medium-100 xlarge-50">
+                                                        <div class="item-content item-input item-input-outline">
+                                                            <div class="item-inner">
+                                                                <div class="item-title item-label">Guests</div>
+                                                                <div class="item-input-wrap">
+                                                                    <input type="text" name="guests" inputmode="numeric" value="1" required @input="${(event) => stepperGuests.setValue(event.target.value)}" />
+                                                                    <div id="stepper-guests" class="stepper stepper-small">
+                                                                        <div class="stepper-button-minus"></div>
+                                                                        <div class="stepper-button-plus"></div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                </ul>
+                                            </div>
+                                            <div class="padding-horizontal padding-vertical">
+                                                <button type="submit" class="button button-fill button-large">Reserve</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <div id="tab-reviews" class="tab">
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">
+                                        <span>Score</span>
+                                        <span class="shape-container shape-circle size-32 font-size-14 font-weight-bold bg-color-green text-color-white">9.2</span>
+                                    </div>
+                                    <div class="card-content padding-horizontal-half padding-top-half">
+                                        <div class="row no-gap">
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.93"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-green-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="9.3"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="CLEANLINESS"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.93"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-green-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="9.3"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="COMFORT"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.92"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-green-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="9.2"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="FACILITIES"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.92"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-green-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="9.2"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="LOCATION"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.91"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-green-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="9.1"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-green-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="STAFF"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                            <div class="col-50 xsmall-33 small-25 medium-33 large-25 text-align-center">
+                                                <div class="gauge gauge-init line-height-1 margin-half"
+                                                    data-type="circle"
+                                                    data-size="128"
+                                                    data-value="0.89"
+                                                    data-border-bg-color="${$f7.stylesheet.getPropertyValue('--color-orange-50')}"
+                                                    data-border-color="${$f7.stylesheet.getPropertyValue('--color-orange-500')}"
+                                                    data-border-width="12"
+                                                    data-value-text="8.9"
+                                                    data-value-text-color="${$f7.stylesheet.getPropertyValue('--color-orange-500')}"
+                                                    data-value-font-size="24"
+                                                    data-value-font-weight="bold"
+                                                    data-label-text="VALUE"
+                                                    data-label-text-color="${$f7.stylesheet.getPropertyValue('--color-gray-500')}"
+                                                    data-label-font-size="10"
+                                                    data-label-font-weight="bold">
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">Ratings</div>
+                                    <div class="card-content card-content-padding text-align-center">
+                                        <div class="font-size-56 font-weight-900 line-height-1">4.7</div>
+                                        <div class="rating rating-init margin-horizontal-auto margin-top-half" data-rateyo-rating="4.7" data-rateyo-star-width="24px"></div>
+                                        <div class="font-size-12 letter-spacing-1 margin-top-half text-color-gray text-uppercase">Based on 257 Reviews</div>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="list no-hairlines no-hairlines-between no-margin" style="--f7-list-item-min-height: 36px;">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell no-padding-vertical">
+                                                            <div class="item-row">
+                                                                <div class="item-cell flex-shrink-0" style="width: 128px;">
+                                                                    <div class="font-weight-600">Excellent</div>
+                                                                </div>
+                                                                <div class="item-cell">
+                                                                    <div class="progressbar progressbar-round color-green" data-progress="90"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell no-padding-vertical">
+                                                            <div class="item-row">
+                                                                <div class="item-cell flex-shrink-0" style="width: 128px;">
+                                                                    <div class="font-weight-600">Good</div>
+                                                                </div>
+                                                                <div class="item-cell">
+                                                                    <div class="progressbar progressbar-round color-lightgreen" data-progress="75"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell no-padding-vertical">
+                                                            <div class="item-row">
+                                                                <div class="item-cell flex-shrink-0" style="width: 128px;">
+                                                                    <div class="font-weight-600">Average</div>
+                                                                </div>
+                                                                <div class="item-cell">
+                                                                    <div class="progressbar progressbar-round color-amber" data-progress="60"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell no-padding-vertical">
+                                                            <div class="item-row">
+                                                                <div class="item-cell flex-shrink-0" style="width: 128px;">
+                                                                    <div class="font-weight-600">Below Average</div>
+                                                                </div>
+                                                                <div class="item-cell">
+                                                                    <div class="progressbar progressbar-round color-orange" data-progress="50"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                                <li>
+                                                    <div class="item-content">
+                                                        <div class="item-inner item-cell no-padding-vertical">
+                                                            <div class="item-row">
+                                                                <div class="item-cell flex-shrink-0" style="width: 128px;">
+                                                                    <div class="font-weight-600">Poor</div>
+                                                                </div>
+                                                                <div class="item-cell">
+                                                                    <div class="progressbar progressbar-round color-red" data-progress="35"></div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="card no-shadow ${$f7.rtl ? 'no-safe-area-right' : 'no-safe-area-left'}">
+                                    <div class="card-header">
+                                        <span>Reviews</span>
+                                        <button type="button" class="button button-fade button-small width-auto">Add Review</button>
+                                    </div>
+                                    <div class="card-content">
+                                        <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                ${Array(5).fill().map((item, index) => $h`
+                                                <li>
+                                                    <a href="#" class="item-link">
+                                                        <div class="item-content">
+                                                            <div class="item-media">
+                                                                <img class="shape-auto" src="${faker.internet.avatar()}" loading="lazy" height="40" width="40" alt="" />
+                                                            </div>
+                                                            <div class="item-inner">
+                                                                <div class="item-title-row">
+                                                                    <div class="item-title">
+                                                                        <span>${faker.name.firstName()} ${faker.name.lastName()}</span>
+                                                                        ${`\u0020`}
+                                                                        <span class="text-color-gray">${`\u2022`}</span>
+                                                                        ${`\u0020`}
+                                                                        <span class="font-size-12 font-weight-normal text-color-gray">${moment(faker.date.recent(90)).format('MMM DD')}</span>
+                                                                    </div>
+                                                                    <div class="item-after align-self-flex-start">
+                                                                        <div class="rating rating-init" data-rateyo-rating="${faker.datatype.number({min: 3, max: 5, precision: 0.5})}"></div>
+                                                                    </div>
+                                                                </div>
+                                                                <div class="item-text">${faker.lorem.sentences(3)}</div>
+                                                            </div>
+                                                        </div>
+                                                    </a>
+                                                </li>
+                                                `)}
+                                            </ul>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer">
+                                        <a href="#" class="button button-fill flex-grow-1">View All Reviews</a>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let dateTimePicker = null;
+        let stepperGuests = null;
+        let formValidator = null;
+
+        let initializeDateTimePicker = function() {
+            let today = new Date();
+            dateTimePicker = $f7.calendar.create({
+                inputEl: $el.value.find('input[name=datetime]'),
+                dateFormat: 'DD, dd MM yyyy, hh::mm A',
+                timePicker: true,
+                disabled: {
+                    to: today
+                }
+            });
+        }
+
+        let initializeStepperGuests = function() {
+            stepperGuests = $f7.stepper.create({
+                el: $el.value.find('#stepper-guests'),
+                step: 1,
+                min: 1,
+                max: 100,
+                value: 1,
+                autorepeat: true,
+                autorepeatDynamic: true,
+                on: {
+                    change: function(stepper, value) {
+                        $el.value.find('input[name=guests]').val(value);
+                    }
+                }
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=reservation]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    mobile: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    datetime: {
+                        required: true
+                    },
+                    guests: {
+                        required: true,
+                        digits: true,
+                        range: [1, 100]
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    mobile: {
+                        required: 'Please enter mobile number.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    datetime: {
+                        required: 'Please select date and time.'
+                    },
+                    guests: {
+                        required: 'Please enter number of guests.'
+                    }
+                },
+                submitHandler: function(form) {
+                    form.reset();
+                    $f7.toast.show({
+                        text: 'Thank you for the reservation.',
+                        cssClass: 'color-green'
+                    });
+                }
+            });
+        }
+
+        let toggleFavorites = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Favorites' : 'Removed from Favorites',
+                icon: state ? '<i class="icon material-icons color-red">favorite</i>' : '<i class="icon material-icons color-gray">favorite</i>',
+                position: 'center'
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeDateTimePicker();
+            initializeStepperGuests();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

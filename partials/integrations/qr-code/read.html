@@ -1,0 +1,149 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Read QR Code</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block medium-inset medium-margin-vertical no-margin-vertical no-padding">
+                        <div class="responsive-container margin-bottom shape-inherit">
+                            <video class="responsive-content shape-inherit"></video>
+                            ${isFlashAvailable && $h`
+                            <div class="menu menu-overlay">
+                                <div class="menu-inner">
+                                    <a href="#" class="menu-item icon-only" @click="${toggleFlash}">
+                                        <div class="menu-item-content">
+                                            ${isFlashOn ? $h`
+                                            <i class="icon material-icons color-amber">flashlight_on</i>
+                                            ` : $h`
+                                            <i class="icon material-icons color-white">flashlight_off</i>
+                                            `}
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                            `}
+                        </div>
+                        <p class="font-size-12 text-align-center text-color-gray text-uppercase">Point your camera at QR Code to scan</p>
+                    </div>
+
+                    <div class="block margin-vertical">
+                        ${isScanning ? $h`
+                        <button type="button" class="button button-large button-fade" @click="${stopScanner}">Stop Scan</button>
+                        ` : $h`
+                        <button type="button" class="button button-large button-fill" @click="${startScanner}">Start Scan</button>
+                        `}
+                    </div>
+
+                    ${scannerResult && $h`
+                    <div class="block-title block-title-medium margin-vertical">Result</div>
+                    <div class="block block-strong inset margin-vertical">
+                        <p>${scannerResult}</p>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let scanner = null;
+        let isScanning = false;
+        let scannerResult = null;
+        let isFlashAvailable = false;
+        let isFlashOn = false;
+
+        initializeScanner = function() {
+            scanner = new QrScanner(
+                $el.value.find('video')[0],
+                function(result) {
+                    scannerResult = result.data;
+                    stopScanner();
+                },
+                {
+                    highlightScanRegion: true,
+                    returnDetailedScanResult: true
+                }
+            );
+        }
+
+        let startScanner = function() {
+            scannerResult = null;
+            $update();
+            scanner.start()
+                .then(function() {
+                    isScanning = true;
+                    $update(function() {
+                        updateCameraFlashAvailability();
+                    });
+                })
+                .catch(function() {
+                    $f7.toast.show({
+                        text: 'Could not start scanner.',
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        let stopScanner = function() {
+            try {
+                scanner.stop();
+                isScanning = false;
+                $update();
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: 'Could not stop scanner.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let updateCameraFlashAvailability = function() {
+            scanner.hasFlash()
+                .then(function(hasFlash) {
+                    isFlashAvailable = hasFlash;
+                    $update();
+                });
+        }
+
+        let toggleFlash = function() {
+            scanner.toggleFlash()
+                .then(function() {
+                    isFlashOn = scanner.isFlashOn;
+                    $update();
+                });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeScanner();
+        });
+
+        $on('pageBeforeRemove', function() {
+            scanner.destroy();
+            scanner = null;
+        });
+
+        return $render;
+    }
+</script>

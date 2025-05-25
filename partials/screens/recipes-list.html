@@ -1,0 +1,141 @@
+<template>
+    <div class="page" data-name="recipes-list">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Recipes - List</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${recipes ? $h`
+            ${recipes == 'error' ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops...</div>
+                <div class="empty-state-text">An error occured while loading data.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            ` : $h`
+            ${recipes.length ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${recipes.map((item, index) => $h`
+                    <li class="col-50 medium-33 large-25 bg-cover elevation-24" style="background-image: url('${item.image}'); height: 288px;">
+                        <div class="item-content height-100">
+                            <div class="item-inner item-cell height-100 padding-vertical z-index-100">
+                                <div class="item-row flex-direction-column height-100">
+                                    <div class="item-row justify-content-flex-end">
+                                        <div class="item-cell flex-shrink-0 width-auto">
+                                            <button type="button" class="state-toggle ${item.favorite ? 'state-toggle-active' : ''} button button-fill button-icon button-round color-white" @stateChange="${(event) => toggleFavorite(item.id, event.detail)}">
+                                                <i class="state-inactive icon f7-icons font-size-20 color-gray">flame_fill</i>
+                                                <i class="state-active icon f7-icons font-size-20 color-orange">flame_fill</i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <a href="/recipes-single/" class="item-row margin-top-auto">
+                                        <div class="item-cell">
+                                            <div class="shape-rounded-square padding-half bg-translucent">
+                                                <div>
+                                                    <span class="badge no-margin-horizontal color-primary">${item.category}</span>
+                                                    ${`\u0020`}
+                                                    <span class="badge no-margin-horizontal color-mono">
+                                                        <i class="icon material-icons color-orange">star</i>
+                                                        <span class="text-color-mono-invert">${item.rating}</span>
+                                                    </span>
+                                                </div>
+                                                <div class="font-size-14 font-weight-bold multi-line-text lines-2 text-color-body">${item.title}</div>
+                                            </div>
+                                        </div>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Data Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            `}
+            `}
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let recipes = null;
+
+        let loadData = function() {
+            recipes = null;
+            $update();
+            $f7.request({
+                url: 'assets/custom/dataset/recipes.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                recipes = response.data.length ? response.data : [];
+                $update(function() {
+                    $f7.rating.initialize($el.value);
+                });
+            })
+            .catch(function(response) {
+                recipes = 'error';
+                $update();
+            });
+        }
+
+        let toggleFavorite = function(id, state) {
+            recipes.forEach(function(recipe) {
+                if (recipe.id == id) {
+                    recipe.favorite = state ? true : false;
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? 'Added to Cookbook' : 'Removed from Cookbook',
+                            icon: state ? '<i class="icon f7-icons color-orange">flame_fill</i>' : '<i class="icon f7-icons color-gray">flame_fill</i>',
+                            position: 'center'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,129 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="verify-email">
+
+        <div class="page-content">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-65 large-50 xlarge-40 padding-vertical">
+
+                    <div class="block block-strong inset display-flex flex-direction-column align-items-stretch justify-content-space-between height-100 no-margin-vertical text-align-center">
+
+                        <div class="margin-bottom">
+                            <div class="font-size-20 font-weight-bold">Verify Your Email Address</div>
+                        </div>
+
+                        <div class="margin-vertical">
+                            <lottie-player src="${$f7.config.lottie.assetUrl + 'verify-email.json'}" autoplay loop background="transparent" speed="1" style="height: 192px;"></lottie-player>
+                            <div class="font-size-20 font-weight-bold">Check Your Inbox</div>
+                            <div class="margin-top-half text-color-gray">To verify your email address, press the verify button in the email we have sent to</div>
+                            <div class="margin-top-half text-color-primary">${userEmail}</div>
+                            <button type="button" class="button button-fill button-large button-round margin-top" @click="${() => actionSheetMail.open()}">Open Mail App</button>
+                            <a href="#" class="back button button-fade button-large button-round margin-top" data-reload-current="true">Skip, I'll Verify Later</a>
+                        </div>
+
+                        <div class="margin-top">
+                            <div class="margin-bottom">Did not receive the email? Check your spam folder.</div>
+                            <div class="line-divider">
+                                <span class="font-size-12">OR</span>
+                            </div>
+                            <button type="button" class="button button-fade button-large button-round margin-top" @click="${resendMail}">Resend Verification Email</button>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    @media (max-width: 567.98px) {
+        .page[data-name=verify-email] {
+            background-color: var(--f7-block-strong-bg-color);
+        }
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let userEmail = 'praveen.mujawdiya@gmail.com';
+
+        let actionSheetMail = null;
+
+        let initializeActionSheetMail = function() {
+            actionSheetMail = $f7.actions.create({
+                buttons: [
+                    [
+                        {
+                            text: 'Open Mail App',
+                            label: true
+                        }
+                    ],
+                    [
+                        {
+                            text: 'Gmail',
+                            onClick: function() {
+                                $f7.openExternalUrl('https://mail.google.com');
+                            }
+                        },
+                        {
+                            text: 'Outlook',
+                            onClick: function() {
+                                $f7.openExternalUrl('https://outlook.live.com');
+                            }
+                        },
+                        {
+                            text: 'Yahoo Mail',
+                            onClick: function() {
+                                $f7.openExternalUrl('https://mail.yahoo.com');
+                            }
+                        },
+                        {
+                            text: 'iCloud Mail',
+                            onClick: function() {
+                                $f7.openExternalUrl('https://mail.icloud.com');
+                            }
+                        },
+                        {
+                            text: 'Proton Mail',
+                            onClick: function() {
+                                $f7.openExternalUrl('https://protonmail.com');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            text: 'Cancel',
+                            color: 'red'
+                        }
+                    ]
+                ]
+            });
+        }
+
+        let resendMail = function() {
+            $f7.toast.show({
+                text: 'Verification link has been sent to your email address successfully.',
+                cssClass: 'color-green',
+                closeTimeout: 0,
+                closeButton: true,
+                closeButtonText: 'Check Inbox',
+                on: {
+                    closeButtonClick: function(toast) {
+                        actionSheetMail.open();
+                    }
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeActionSheetMail();
+        });
+
+        return $render;
+    }
+</script>

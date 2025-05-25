@@ -1,0 +1,157 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">File API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>File API provides access to the filesystem-level information about the files such as name, size, MIME type, last modified date, content without sending the file to the server.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${fileInfo ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <img class="shape-rounded-square" src="${fileInfo.content}" alt="" />
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">
+                                            <div class="item-header">Name</div>
+                                            <div>${fileInfo.name}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">
+                                            <div class="item-header">Size</div>
+                                            <div>${fileInfo.size}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">
+                                            <div class="item-header">MIME Type</div>
+                                            <div>${fileInfo.type}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">
+                                            <div class="item-header">Last Modified</div>
+                                            <div>${fileInfo.lastModified}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    <div class="block block-strong inset margin-vertical">
+                        <label class="button button-fill button-file">
+                            <input type="file" accept="image/*" @change="${onChange}" />
+                            <span>Upload Image</span>
+                        </label>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.file ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">File API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">File API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/FileReader#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let fileInfo = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let onChange = function(event) {
+            let file = event.target.files[0];
+            updateInfo(file);
+        }
+
+        let updateInfo = function(file) {
+            let fileData = {};
+            fileData.name = file.name;
+            fileData.size = file.size + ' bytes';
+            fileData.type = file.type;
+            fileData.lastModified = window.moment ? moment(file.lastModified).format('dddd, DD MMMM YYYY, hh:mm:ss A') : new Date(file.lastModified).toLocaleString();
+            let reader = new FileReader();
+            reader.addEventListener('load', function() {
+                fileInfo = Object.assign({}, fileInfo, { content: reader.result });
+                $update();
+            });
+            reader.addEventListener('error', function() {
+                $f7.toast.show({
+                    text: reader.error,
+                    cssClass: 'color-red'
+                });
+            });
+            reader.readAsDataURL(file);
+            fileInfo = fileData;
+            $update();
+        }
+
+        return $render;
+    }
+</script>

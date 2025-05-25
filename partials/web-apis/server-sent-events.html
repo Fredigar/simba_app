@@ -1,0 +1,184 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Server-Sent Events API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Server-Sent Events API allows web apps to receive a stream of updates from a server over a HTTP connection without resorting to polling.</p>
+                        <p>Unlike WebSockets, Server-Sent Events are a one-way communication channel, ie, the messages flow from server to client only.</p>
+                        <p>Server-Sent Events API can be useful when you have some rapidly updating data to display, but you don't want to poll the server, for example, stock price ticker, scorecard, or live updates.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${flags.connecting ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <span class="preloader color-multi" key="preloader" style="--f7-preloader-size: 40px;"></span>
+                        </div>
+                        <div class="empty-state-text">Connecting to ${sourceUrl}</div>
+                    </div>
+                    ` : $h`
+                    ${flags.connected ? $h`
+                    ${data ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">The list below shows dummy real-time data fetched from a PHP server file using Server-Sent Events API.</div>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${data.map((item, index) => $h`
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img src="${item.logo}" height="40" width="40" alt="" />
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">${item.name}</div>
+                                        <div class="item-after">${item.price + ' USD'}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon material-icons font-size-64 color-red">error</i>
+                        </div>
+                        ${$f7.online ? $h`
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Unable to connect to ${sourceUrl}</div>
+                        ` : $h`
+                        <div class="empty-state-title">No Internet Connection</div>
+                        <div class="empty-state-text">Please make sure you are connected to the Internet.</div>
+                        `}
+                        <div class="empty-state-actions">
+                            <a href="#" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert text-uppercase" style="min-width: 192px;" @click="${initialize}">Retry</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+                    ` : $h`
+                    ${$f7.support.webApi.serverSentEvents ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Server-Sent Events API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Server-Sent Events API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Server-sent_events/Using_server-sent_events#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let eventSource = null;
+
+        let sourceUrl = 'assets/custom/php/server-sent-events.php';
+
+        let flags = {
+            connecting: false,
+            connected: false
+        }
+
+        let data = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            flags.connecting = true;
+            flags.connected = false;
+            eventSource = new EventSource(sourceUrl);
+            $update();
+            addEventListeners();
+        }
+
+        let addEventListeners = function() {
+            eventSource.addEventListener('open', onOpen);
+            eventSource.addEventListener('message', onMessage);
+            eventSource.addEventListener('error', onError);
+        }
+
+        let removeEventListeners = function() {
+            eventSource.removeEventListener('open', onOpen);
+            eventSource.removeEventListener('message', onMessage);
+            eventSource.removeEventListener('error', onError);
+        }
+
+        let onOpen = function(event) {
+            flags.connecting = false;
+            flags.connected = true;
+            $update();
+        }
+
+        let onMessage = function(event) {
+            data = JSON.parse(event.data);
+            $update();
+        }
+
+        let onError = function(event) {
+            flags.connecting = false;
+            flags.connected = false;
+            $update();
+        }
+
+        $on('pageBeforeRemove', function() {
+            if (eventSource) {
+                eventSource.close();
+                removeEventListeners();
+            }
+        });
+
+        return $render;
+    }
+</script>

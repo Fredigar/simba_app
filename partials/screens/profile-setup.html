@@ -1,0 +1,431 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="profile-setup">
+
+        <div class="page-content" style="--f7-page-navbar-offset: 0;">
+
+            <div class="row align-items-stretch justify-content-center height-full">
+                <div class="col-100 medium-75 large-60 xlarge-50 medium-padding-vertical no-padding">
+
+                    <form name="profile" action="#" method="POST" enctype="multipart/form-data" class="height-100">
+
+                        <div class="swiper height-100">
+                            <div class="swiper-wrapper height-100">
+
+                                <div class="swiper-slide height-100 color-theme-green">
+                                    <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding overflow-hidden text-align-center text-color-white">
+
+                                        <div class="display-flex flex-direction-column padding-horizontal bg-color-primary" style="height: 256px; padding-top: var(--f7-safe-area-top);">
+
+                                            <div class="display-flex justify-content-space-between margin-vertical">
+
+                                                <a href="#" class="back link icon-only">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                                                </a>
+                                                <a href="#" class="link icon-only" @click="${validateName}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                                                </a>
+                                            </div>
+
+                                            <div class="margin-top-auto padding-top" style="padding-bottom: 32px;">
+                                                <span class="shape-container shape-circle size-72" style="background-color: var(--color-green-700);">
+                                                    <i class="icon material-icons font-size-40 color-white">person</i>
+                                                </span>
+                                                <div class="font-size-24 font-weight-bold margin-top-half">What's your name?</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="list margin-vertical no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content item-input item-input-outline item-input-round">
+                                                        <div class="item-inner">
+                                                            <div class="item-input-wrap">
+                                                                <input type="text" name="name" class="font-size-18 font-weight-600 text-align-center" required />
+                                                                <span class="input-clear-button"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="margin-top-auto padding-horizontal padding-vertical">
+                                            <button type="button" class="button button-fill button-large button-round" @click="${validateName}">Next</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide height-100 color-theme-blue">
+                                    <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding overflow-hidden text-align-center text-color-white">
+
+                                        <div class="display-flex flex-direction-column padding-horizontal bg-color-primary" style="height: 256px; padding-top: var(--f7-safe-area-top);">
+
+                                            <div class="display-flex justify-content-space-between margin-vertical">
+                                                <a href="#" class="link icon-only" @click="${() => swiper.slidePrev()}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                                                </a>
+                                                <a href="#" class="link icon-only" @click="${validateGender}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                                                </a>
+                                            </div>
+
+                                            <div class="margin-top-auto padding-top" style="padding-bottom: 32px;">
+                                                <span class="shape-container shape-circle size-72" style="background-color: var(--color-blue-700);">
+                                                    <i class="icon material-icons font-size-40 color-white">face_2</i>
+                                                </span>
+                                                <div class="font-size-24 font-weight-bold margin-top-half">What's your gender?</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="block margin-vertical">
+                                            <div class="row">
+                                                <div class="col">
+                                                    <label class="chip-selectable selectable-fade width-100">
+                                                        <input type="radio" name="gender" value="male" />
+                                                        <div class="chip chip-outline justify-content-center width-100" style="--f7-chip-font-size: 16px; --f7-chip-height: 40px;">
+                                                            <div class="chip-label">Male</div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                                <div class="col">
+                                                    <label class="chip-selectable selectable-fade width-100">
+                                                        <input type="radio" name="gender" value="female" />
+                                                        <div class="chip chip-outline justify-content-center width-100" style="--f7-chip-font-size: 16px; --f7-chip-height: 40px;">
+                                                            <div class="chip-label">Female</div>
+                                                        </div>
+                                                    </label>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div class="margin-top-auto padding-horizontal padding-vertical">
+                                            <button type="button" class="button button-fill button-large button-round" @click="${validateGender}">Next</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide height-100 color-theme-orange">
+                                    <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding overflow-hidden text-align-center text-color-white">
+
+                                        <div class="display-flex flex-direction-column padding-horizontal bg-color-primary" style="height: 256px; padding-top: var(--f7-safe-area-top);">
+
+                                            <div class="display-flex justify-content-space-between margin-vertical">
+                                                <a href="#" class="link icon-only" @click="${() => swiper.slidePrev()}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                                                </a>
+                                                <a href="#" class="link icon-only" @click="${validateBirthday}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                                                </a>
+                                            </div>
+
+                                            <div class="margin-top-auto padding-top" style="padding-bottom: 32px;">
+                                                <span class="shape-container shape-circle size-72" style="background-color: var(--color-orange-700);">
+                                                    <i class="icon material-icons font-size-40 color-white">cake</i>
+                                                </span>
+                                                <div class="font-size-24 font-weight-bold margin-top-half">When's your birthday?</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="list margin-vertical no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content item-input item-input-outline item-input-round">
+                                                        <div class="item-inner">
+                                                            <div class="item-input-wrap">
+                                                                <input type="text" name="birthday" class="font-size-18 font-weight-600 text-align-center" required />
+                                                                <span class="input-clear-button"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="margin-top-auto padding-horizontal padding-vertical">
+                                            <button type="button" class="button button-fill button-large button-round" @click="${validateBirthday}">Next</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide height-100 color-theme-deeppurple">
+                                    <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding overflow-hidden text-align-center text-color-white">
+
+                                        <div class="display-flex flex-direction-column padding-horizontal bg-color-primary" style="height: 256px; padding-top: var(--f7-safe-area-top);">
+
+                                            <div class="display-flex justify-content-space-between margin-vertical">
+                                                <a href="#" class="link icon-only" @click="${() => swiper.slidePrev()}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                                                </a>
+                                                <a href="#" class="link icon-only" @click="${validateEmail}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                                                </a>
+                                            </div>
+
+                                            <div class="margin-top-auto padding-top" style="padding-bottom: 32px;">
+                                                <span class="shape-container shape-circle size-72" style="background-color: var(--color-deeppurple-700);">
+                                                    <i class="icon material-icons font-size-40 color-white">alternate_email</i>
+                                                </span>
+                                                <div class="font-size-24 font-weight-bold margin-top-half">What's your email?</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="list margin-vertical no-hairlines no-hairlines-between no-safe-areas">
+                                            <ul>
+                                                <li>
+                                                    <div class="item-content item-input item-input-outline item-input-round">
+                                                        <div class="item-inner">
+                                                            <div class="item-input-wrap">
+                                                                <input type="email" name="email" inputmode="email" class="font-size-18 font-weight-600 text-align-center" required />
+                                                                <span class="input-clear-button"></span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            </ul>
+                                        </div>
+
+                                        <div class="margin-top-auto padding-horizontal padding-vertical">
+                                            <button type="button" class="button button-fill button-large button-round" @click="${validateEmail}">Next</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                                <div class="swiper-slide height-100 color-theme-pink">
+                                    <div class="block block-strong medium-inset display-flex flex-direction-column justify-content-flex-start height-100 no-hairlines no-margin-vertical no-padding overflow-hidden text-align-center text-color-white">
+
+                                        <div class="display-flex flex-direction-column padding-horizontal bg-color-primary" style="height: 256px; padding-top: var(--f7-safe-area-top);">
+
+                                            <div class="display-flex justify-content-space-between margin-vertical">
+                                                <a href="#" class="link icon-only" @click="${() => swiper.slidePrev()}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                                                </a>
+                                                <a href="#" class="link icon-only" @click="${validateInterests}">
+                                                    <i class="icon f7-icons font-size-48 color-white">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                                                </a>
+                                            </div>
+
+                                            <div class="margin-top-auto padding-top" style="padding-bottom: 32px;">
+                                                <span class="shape-container shape-circle size-72" style="background-color: var(--color-pink-700);">
+                                                    <i class="icon material-icons font-size-40 color-white">auto_awesome</i>
+                                                </span>
+                                                <div class="font-size-24 font-weight-bold margin-top-half">What's your interests?</div>
+                                            </div>
+
+                                        </div>
+
+                                        <div class="block margin-vertical">
+                                            ${interests.map((item, index) => $h`
+                                            <label class="chip-selectable selectable-fade">
+                                                <input type="checkbox" name="interests[]" value="${item}" />
+                                                <div class="chip chip-outline">
+                                                    <div class="chip-label">${item}</div>
+                                                </div>
+                                            </label>
+                                            `)}
+                                        </div>
+
+                                        <div class="margin-top-auto padding-horizontal padding-vertical">
+                                            <button type="submit" class="button button-fill button-large button-round">Save Profile</button>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    @media (max-width: 767.98px) {
+        .page[data-name=profile-setup] {
+            background-color: var(--f7-block-strong-bg-color);
+        }
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let swiper = null;
+        let birthdayPicker = null;
+        let formValidator = null;
+
+        let interests = [
+            'Animation', 'Architecture', 'Art',
+            'Business',
+            'Cars',
+            'Dance', 'Design',
+            'Economics',
+            'Finance', 'Future',
+            'Gaming',
+            'Health', 'Humor',
+            'Internet of Things', 'Investing',
+            'Love',
+            'Movies', 'Music',
+            'Photography', 'Politics',
+            'Technology', 'Travel',
+            'Yoga'
+        ]
+
+        let initializeSwiper = function() {
+            swiper = $f7.swiper.create($el.value.find('.swiper'), {
+                allowTouchMove: false
+            });
+        }
+
+        let initializeBirthdayPicker = function() {
+            birthdayPicker = $f7.calendar.create({
+                inputEl: $el.value.find('input[name=birthday]'),
+                dateFormat: 'MM dd, yyyy',
+                maxDate: new Date(),
+                openIn: 'customModal',
+                closeOnSelect: true,
+                cssClass: 'color-orange'
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=profile]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    gender: {
+                        required: true
+                    },
+                    birthday: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email:true
+                    },
+                    'interests[]': {
+                        required: true,
+                        minlength: 1
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    gender: {
+                        required: 'Please select gender.'
+                    },
+                    birthday: {
+                        required: 'Please enter birthday.'
+                    },
+                    email: {
+                        required: 'Please enter email.',
+                        email: 'Please enter a valid email.'
+                    },
+                    'interests[]': {
+                        required: 'Please select at least one interest.'
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    return false;
+                },
+                submitHandler: function(form) {
+                    saveProfile();
+                }
+            });
+        }
+
+        let validateName = function() {
+            if (formValidator.check('[name=name]')) {
+                swiper.slideNext();
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please enter name.',
+                    cssClass: 'color-red'
+                });
+                $el.value.find('input[name=name]').focus();
+            }
+        }
+
+        let validateGender = function() {
+            if (formValidator.check('[name=gender]')) {
+                swiper.slideNext();
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please select gender.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let validateBirthday = function() {
+            if (formValidator.check('[name=birthday]')) {
+                swiper.slideNext();
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please enter birthday.',
+                    cssClass: 'color-red'
+                });
+                $el.value.find('input[name=birthday]').focus();
+            }
+        }
+
+        let validateEmail = function() {
+            if (formValidator.check('[name=email]')) {
+                swiper.slideNext();
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please enter a valid email address.',
+                    cssClass: 'color-red'
+                });
+                $el.value.find('input[name=email]').focus();
+            }
+        }
+
+        let validateInterests = function() {
+            if (formValidator.check('[name="interests[]"]')) {
+                saveProfile();
+            }
+            else {
+                $f7.toast.show({
+                    text: 'Please choose one or more interests.',
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let saveProfile = function() {
+            $f7.toast.show({
+                text: 'Your profile has been saved successfully.',
+                cssClass: 'color-green'
+            });
+            $f7router.back();
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeSwiper();
+            initializeBirthdayPicker();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

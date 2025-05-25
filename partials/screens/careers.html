@@ -1,0 +1,397 @@
+<template>
+    <div class="page" data-name="careers">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Careers</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 large-90 xlarge-80">
+
+                    <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical">
+                        <lottie-player src="${$f7.config.lottie.assetUrl + 'careers.json'}" autoplay loop background="transparent" speed="1" style="height: 384px;"></lottie-player>
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">Build What The World Needs</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">At our company, there are always opportunities for people who can think out of the box, take initiatives and also roll up their sleeves to get the job done.</div>
+                        </div>
+                    </div>
+
+                    <div class="block-title block-title-medium margin-vertical">Benefits</div>
+                    <div class="list media-list inset margin-vertical no-hairlines-between">
+                        <ul class="row">
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-blue color-blue">
+                                            <i class="icon material-icons font-size-32 color-white">schedule</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Flexible Hours</div>
+                                        </div>
+                                        <div class="item-text">We value results, not face time.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-orange color-orange">
+                                            <i class="icon material-icons font-size-32 color-white">local_dining</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Healthy Food</div>
+                                        </div>
+                                        <div class="item-text">Enjoy healthy and delicious catered lunches plus great free snacks and drinks.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-yellow color-yellow">
+                                            <i class="icon material-icons font-size-32 color-black">code</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Hackathons</div>
+                                        </div>
+                                        <div class="item-text">Work on whatever you are most passionate about every month. Learn, build and become better.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-pink color-pink">
+                                            <i class="icon material-icons font-size-32 color-white">celebration</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Team Hangouts</div>
+                                        </div>
+                                        <div class="item-text">Join the team for weekly hangouts and monthly fun activities.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-red color-red">
+                                            <i class="icon material-icons font-size-32 color-white">favorite</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Health Insurance</div>
+                                        </div>
+                                        <div class="item-text">You are covered with extensive health, dental, and vision insurance, so you can focus on your work.</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <span class="shape-container shape-auto size-56 elevation-24 bg-color-green color-green">
+                                            <i class="icon material-icons font-size-32 color-white">health_and_safety</i>
+                                        </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title font-size-16 font-weight-bold">Life Insurance</div>
+                                        </div>
+                                        <div class="item-text">You and your family are safe and covered in extreme cases of emergency.</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+
+                    ${jobs && jobs.length ? $h`
+                    <div class="block-title block-title-medium margin-vertical">Open Positions</div>
+                    <div class="list inset margin-vertical no-hairlines-between">
+                        <ul class="row">
+                            ${jobs.map((item, index) => $h`
+                            <li class="col-100 medium-50">
+                                <div class="item-content">
+                                    <div class="item-inner item-cell padding-vertical">
+                                        <div class="item-row">
+                                            <div class="item-cell">
+                                                <div class="font-size-16 font-weight-bold">${item.role}</div>
+                                                <div class="font-size-14 text-color-gray">${item.location}</div>
+                                            </div>
+                                            <div class="item-cell align-self-flex-start flex-shrink-0 width-auto">
+                                                <button type="button" class="button button-fill button-round button-small color-mono text-color-mono-invert" style="width: 96px;" @click="${() => openPopupApplyJob(item.id)}">Apply</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="block margin-vertical text-align-center">
+                        <div key="preloader" class="preloader"></div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-apply-job" class="popup">
+            <div class="page">
+
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Apply Job</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupApplyJob}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    ${currentJob && $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <i class="icon f7-icons font-size-56 text-gradient-blue">briefcase_fill</i>
+                        <div class="font-size-24 font-weight-bold">${currentJob.role}</div>
+                        <div class="font-size-16 text-color-gray">${currentJob.location}</div>
+                        <div innerHTML="${currentJob.description}"></div>
+                    </div>
+                    `}
+
+                    <div class="block-title block-title-medium margin-vertical">Apply Now</div>
+                    <form name="apply-job" action="#" method="POST" enctype="multipart/form-data">
+                        <input type="hidden" name="id" value="${currentJob.id}" />
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul class="padding-vertical-half">
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">person</i>
+                                                </div>
+                                                <input type="text" name="name" placeholder="Name" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">email</i>
+                                                </div>
+                                                <input type="email" name="email" inputmode="email" placeholder="Email" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">phone</i>
+                                                </div>
+                                                <input type="tel" name="phone" inputmode="tel" placeholder="Phone" />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon f7-icons">logo_linkedin</i>
+                                                </div>
+                                                <input type="url" name="linkedin" inputmode="url" placeholder="LinkedIn Profile URL" required />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">description</i>
+                                                </div>
+                                                <label class="button button-fade button-file button-small">
+                                                    <input type="file" name="resume" accept="application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document" required />
+                                                    <span>Upload Resume</span>
+                                                </label>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <button type="submit" class="button button-fill button-large">Apply</button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let jobs = [];
+        let currentJob = {};
+        let popupApplyJob = null;
+        let formValidator = null;
+
+        let loadData = function() {
+            let data = [];
+            for (i=1; i<=7; i++) {
+                data.push({
+                    id: i,
+                    role: faker.name.jobDescriptor() + ' ' + faker.name.jobArea() + ' ' + faker.name.jobType(),
+                    location: faker.address.cityName() + ', ' + faker.address.country(),
+                    description: `
+                        <h3>Job Description</h3>
+                        <p>${faker.lorem.paragraph(5)}</p>
+                        <p>${faker.lorem.paragraph(10)}</p>
+                        <h3>Responsibility</h3>
+                        <ul>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                        </ul>
+                        <h3>Experience</h3>
+                        <ul>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                            <li>${faker.lorem.sentence(10)}</li>
+                        </ul>
+                    `
+                });
+            }
+            jobs = data;
+            $update();
+        }
+
+        let initializePopupApplyJob = function() {
+            popupApplyJob = $f7.popup.create({
+                el: $el.value.find('#popup-apply-job')
+            });
+        }
+
+        let openPopupApplyJob = function(id) {
+            let result = jobs.find(function(job) {
+                return job.id == id;
+            });
+            currentJob = result;
+            $update(function() {
+                popupApplyJob.open();
+            });
+        }
+
+        let closePopupApplyJob = function() {
+            currentJob = {};
+            formValidator.resetForm();
+            $update(function() {
+                popupApplyJob.close();
+            });
+        }
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=apply-job]')).validate({
+                rules: {
+                    name: {
+                        required: true
+                    },
+                    email: {
+                        required: true,
+                        email: true
+                    },
+                    linkedin: {
+                        required: true,
+                        url: true
+                    },
+                    resume: {
+                        required: true,
+                        accept: 'application/pdf, application/msword, application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    }
+                },
+                messages: {
+                    name: {
+                        required: 'Please enter name.'
+                    },
+                    email: {
+                        required: 'Please enter email address.',
+                        email: 'Please enter a valid email address.'
+                    },
+                    linkedin: {
+                        required: 'Please enter LinkedIn Profile URL.',
+                        url: 'Please enter a valid LinkedIn Profile URL.'
+                    },
+                    resume: {
+                        required: 'Please upload resume in PDF or DOC format.',
+                        accept: 'Please upload resume in PDF or DOC format only.'
+                    }
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for applying. We will get back to you soon.',
+                        cssClass: 'color-green'
+                    });
+                    closePopupApplyJob();
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+            initializePopupApplyJob();
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

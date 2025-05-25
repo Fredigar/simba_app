@@ -1,0 +1,167 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Screen Wake Lock API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Screen Wake Lock API provides a way to prevent devices from dimming or locking the screen when the app needs to keep running.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        ${isWakeLockActive ? $h`
+                        <button type="button" class="button button-fade" @click="${releaseWakeLock}">Deactivate Wake Lock</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill" @click="${requestWakeLock}">Activate Wake Lock</button>
+                        `}
+                    </div>
+                    ${isWakeLockActive ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Wake Lock Active</div>
+                            <div class="note-message">Until the app is in foreground and you don't switch the tab or minimize the app, the device screen won't dim or lock even if it is idle.</div>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">
+                            <div class="note-title">Wake Lock Inactive</div>
+                            <div class="note-message">The device screen will dim or lock after a while depending upon the device display settings.</div>
+                        </div>
+                    </div>
+                    `}
+                    ` : $h`
+                    ${$f7.support.webApi.screenWakeLock ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Screen Wake Lock API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Screen Wake Lock API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Screen_Wake_Lock_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let wakeLock = null;
+        let isWakeLockActive = false;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let requestWakeLock = async function() {
+            try {
+                wakeLock = await navigator.wakeLock.request('screen');
+                isWakeLockActive = true;
+                $update();
+                addEventListeners();
+                $f7.toast.show({
+                    text: 'Wake Lock Activated!',
+                    cssClass: 'color-green'
+                });
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let releaseWakeLock = async function() {
+            try {
+                await wakeLock.release();
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let addEventListeners = function() {
+            wakeLock.addEventListener('release', onWakeLockRelease);
+            document.addEventListener('visibilitychange', onDocumentVisibilityChange);
+        }
+
+        let removeEventListeners = function() {
+            wakeLock.removeEventListener('release', onWakeLockRelease);
+            document.removeEventListener('visibilitychange', onDocumentVisibilityChange);
+        }
+
+        let onWakeLockRelease = function(event) {
+            isWakeLockActive = false;
+            $update();
+            $f7.toast.show({
+                text: 'Wake Lock Deactivated!',
+                cssClass: 'color-green'
+            });
+        }
+
+        let onDocumentVisibilityChange = function(event) {
+            if (document.visibilityState == 'visible' || document.visibilityState == 'webkitVisible' || document.visibilityState == 'mozVisible' || document.visibilityState == 'msVisible') {
+                requestWakeLock();
+            }
+        }
+
+        $on('pageBeforeRemove', function() {
+            if (wakeLock) {
+                releaseWakeLock();
+                removeEventListeners();
+            }
+        });
+
+        return $render;
+    }
+</script>

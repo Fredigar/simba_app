@@ -1,0 +1,245 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Battery Status API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Battery Status API provides information about the device's battery charge level and notifies you when the battery level or charging status change.</p>
+                        <p>This can be used to adjust your app's resource usage to reduce battery drain when the battery is low, or to save changes before the battery runs out in order to prevent data loss.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    ${batteryInfo ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">The charging and discharging time returned by the Battery Status API might not be precise.</div>
+                    </div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Battery Status</div>
+                                        <div class="item-after">${batteryInfo.status}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Battery Level</div>
+                                        <div class="item-after">${batteryInfo.level}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Charging Time</div>
+                                        <div class="item-after">${batteryInfo.chargingTime}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content">
+                                    <div class="item-inner">
+                                        <div class="item-title">Discharging Time</div>
+                                        <div class="item-after">${batteryInfo.dischargingTime}</div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Try plugging and unplugging the charger.</div>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.batteryStatus ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Battery Status API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Battery Status API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Battery_Status_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let batteryPromise = null;
+        let batteryInfo = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            try {
+                batteryPromise = navigator.getBattery() || Promise.resolve(navigator.battery);
+                if (batteryPromise) {
+                    batteryPromise.then(function(battery) {
+                        updateInfo(battery);
+                        addEventListeners(battery);
+                    })
+                    .catch(function(error) {
+                        $f7.toast.show({
+                            text: error,
+                            cssClass: 'color-red'
+                        });
+                    });
+                }
+                else {
+                    $f7.toast.show({
+                        text: 'Could not initialize Battery Status API.',
+                        cssClass: 'color-red'
+                    });
+                }
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let addEventListeners = function(battery) {
+            battery.addEventListener('chargingchange', onChargingChange);
+            battery.addEventListener('levelchange', onLevelChange);
+            battery.addEventListener('chargingtimechange', onChargingTimeChange);
+            battery.addEventListener('dischargingtimechange', onDischargingTimeChange);
+        }
+
+        let removeEventListeners = function(battery) {
+            battery.removeEventListener('chargingchange', onChargingChange);
+            battery.removeEventListener('levelchange', onLevelChange);
+            battery.removeEventListener('chargingtimechange', onChargingTimeChange);
+            battery.removeEventListener('dischargingtimechange', onDischargingTimeChange);
+        }
+
+        let onChargingChange = function(event) {
+            updateInfo(event.target);
+        }
+
+        let onLevelChange = function(event) {
+            updateInfo(event.target);
+        }
+
+        let onChargingTimeChange = function(event) {
+            updateInfo(event.target);
+        }
+
+        let onDischargingTimeChange = function(event) {
+            updateInfo(event.target);
+        }
+
+        let updateInfo = function(battery) {
+            let batteryData = {};
+            batteryData.status = battery.charging ? 'Charging' : 'Not Charging';
+            batteryData.level = (battery.level * 100).toFixed(0) + '%';
+            if (battery.chargingTime == Infinity) {
+                batteryData.chargingTime = battery.chargingTime;
+            }
+            else if (battery.chargingTime == 0) {
+                batteryData.chargingTime = 'Fully Charged';
+            }
+            else {
+                if (window.moment) {
+                    let chargingDuration = moment.duration(battery.chargingTime, 'seconds');
+                    let chargingHours = chargingDuration.hours() > 0 ? chargingDuration.hours() + ' hr ' : '';
+                    let chargingMinutes = chargingDuration.minutes() > 0 ? chargingDuration.minutes() + ' min' : '';
+                    batteryData.chargingTime = chargingHours + chargingMinutes;
+                }
+                else {
+                    batteryData.chargingTime = battery.chargingTime + ' sec';
+                }
+            }
+            if (battery.dischargingTime == Infinity) {
+                batteryData.dischargingTime = battery.dischargingTime;
+            }
+            else if (battery.dischargingTime == 0) {
+                batteryData.dischargingTime = 'Fully Discharged';
+            }
+            else {
+                if (window.moment) {
+                    let dischargingDuration = moment.duration(battery.dischargingTime, 'seconds');
+                    let dischargingHours = dischargingDuration.hours() > 0 ? dischargingDuration.hours() + ' hr ' : '';
+                    let dischargingMinutes = dischargingDuration.minutes() > 0 ? dischargingDuration.minutes() + ' min' : '';
+                    batteryData.dischargingTime = dischargingHours + dischargingMinutes;
+                }
+                else {
+                    batteryData.dischargingTime = battery.dischargingTime + ' sec';
+                }
+            }
+            batteryInfo = batteryData;
+            $update();
+        }
+
+        $on('pageBeforeRemove', function() {
+            if (batteryPromise) {
+                batteryPromise.then(function(battery) {
+                    removeEventListeners(battery);
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+            }
+        });
+
+        return $render;
+    }
+</script>

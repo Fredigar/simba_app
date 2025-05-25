@@ -1,0 +1,160 @@
+<template>
+    <div class="page" data-name="businesses-list">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Businesses - List</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${businesses ? $h`
+            ${businesses == 'error' ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops...</div>
+                <div class="empty-state-text">An error occured while loading data.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            ` : $h`
+            ${businesses.length ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${businesses.map((item, index) => $h`
+                    <li class="col-100 small-50 xlarge-33 overflow-hidden">
+                        <div class="item-content height-100 no-padding">
+                            <div class="item-inner item-cell height-100 no-padding">
+                                <div class="item-row">
+                                    <div class="item-cell">
+                                        <div class="overlay-container responsive-container">
+                                            <img class="responsive-content" src="${item.image}" loading="lazy" alt="" />
+                                            <div class="overlay-content align-items-stretch justify-content-space-between text-align-start">
+                                                <div class="display-flex justify-content-space-between">
+                                                    <span class="shape-container shape-circle size-40 font-size-14 font-weight-bold bg-color-green tooltip-init" data-tooltip="Score">${item.score}</span>
+                                                    <button type="button" class="state-toggle ${item.favorite ? 'state-toggle-active' : ''} button button-fill button-icon button-round color-white ripple-color-white" @stateChange="${(event) => toggleFavorite(item.id, event.detail)}">
+                                                        <i class="state-inactive icon material-icons font-size-20 color-gray">favorite</i>
+                                                        <i class="state-active icon material-icons font-size-20 color-red">favorite</i>
+                                                    </button>
+                                                </div>
+                                                <div class="margin-top-half">
+                                                    ${item.featured && $h`
+                                                    <a href="#" class="link badge color-pink">Featured</a>
+                                                    `}
+                                                    <a href="#" class="link badge color-amber text-color-black">${item.category}</a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <a href="/businesses-single/" class="item-row margin-vertical-half padding-horizontal-half">
+                                    <div class="item-cell">
+                                        <div class="font-size-16 font-weight-bold single-line-text text-color-body">
+                                            ${item.verified && $h`
+                                            <i class="icon material-icons font-size-18 color-blue tooltip-init" data-tooltip="Verified">verified</i>
+                                            ${`\u0020`}
+                                            `}
+                                            <span>${item.name}</span>
+                                        </div>
+                                        <div class="font-size-12 text-color-gray single-line-text">
+                                            <span>${item.location}</span>
+                                            ${`\u0020`}
+                                            ${`\u2022`}
+                                            ${`\u0020`}
+                                            <span>${item.distance} kms</span>
+                                        </div>
+                                    </div>
+                                    <div class="item-cell flex-shrink-0 width-auto">
+                                        <div class="rating rating-init tooltip-init" data-rateyo-rating="${item.rating}" data-tooltip="${item.rating} Rating"></div>
+                                        <div class="font-size-12 text-color-gray" style="margin-top: 4px;">${item.reviews} Reviews</div>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Data Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            `}
+            `}
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let businesses = null;
+
+        let loadData = function() {
+            businesses = null;
+            $update();
+            $f7.request({
+                url: 'assets/custom/dataset/businesses.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                businesses = response.data.length ? response.data : [];
+                $update(function() {
+                    $f7.rating.initialize($el.value);
+                });
+            })
+            .catch(function(response) {
+                businesses = 'error';
+                $update();
+            });
+        }
+
+        let toggleFavorite = function(id, state) {
+            businesses.forEach(function(business) {
+                if (business.id == id) {
+                    business.favorite = state ? true : false;
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? 'Added to Favorites' : 'Removed from Favorites',
+                            icon: state ? '<i class="icon material-icons color-red">favorite</i>' : '<i class="icon material-icons color-gray">favorite</i>',
+                            position: 'center'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,274 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Lista de conversaciones</div>
+                <div class="right">
+                    <a href="#" data-tooltip="Nueva conversación" @click="${createChat}" class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-assistants" data-tooltip="Change Assistant">
+                        <img class="shape-circle" width="40"  src="${curAssistant.avatar}"/>
+
+                    </a>
+                    <a href="#" class="link icon-only" @click="${enableSearchbar}">
+                    <i class="icon material-icons">search</i>
+                </a>
+                </div>
+                <form class="searchbar searchbar-expandable">
+                    <div class="searchbar-inner">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search" />
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="page-content">
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="searchbar-found">
+                        <div class="list links-list inset margin-vertical">
+                            <ul>
+                                ${conversations.map((item, index) => $h`
+                                <li>
+                                    <a href="/screens/cart/${item.guid}">${item.title}</a>
+                                </li>
+                                `)}
+
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="searchbar-not-found">
+                        <div class="empty-state empty-state-strong inset margin-vertical">
+                            <div class="empty-state-media">
+                                <span class="shape-container shape-auto bg-color-chrome">
+                                    <i class="icon material-icons font-size-32">search_off</i>
+                                </span>
+                            </div>
+                            <div class="empty-state-subtitle">No Search Results</div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+        <div id="popover-assistants" class="popover" style="min-width: 192px;">
+            <div class="popover-inner">
+                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                    <ul>
+
+                        ${assistants.map((item, index) => $h`
+                        <li>
+                            <a href="#" class="popover-close" @click="${() => switchAssistant(item.guid)}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img class="shape-circle" width="40"  height="40" src="${item.avatar}"/>
+
+                                    </div>
+                                    <div data-tooltip="${item.name}" class="tooltip-init item-inner">
+                                        <div class="item-title">${item.name}</div>
+                                        ${item.guid == curAssistant.guid && $h`
+                                        <i class="icon margin-left f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                        `}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let searchbar = null;
+        let conversations = [];
+        let curAssistant = {
+            avatar:'',
+            guid: '',
+            name:''
+        }
+        let assistants =[]
+
+        let switchAssistant = function(guid){
+            let foundAssistant = assistants.find(item => item.guid === guid);
+
+            if (foundAssistant) {
+                curAssistant = foundAssistant;
+                loadConversations(foundAssistant.guid)
+                $update();
+            } else {
+                console.error("No se encontró ningún asistente con el GUID especificado.");
+            }
+        }
+
+        let initializeSearchbar = function() {
+            let navbarEl = $f7.navbar.getElByPage($el.value);
+            searchbar = $f7.searchbar.create({
+                el: $(navbarEl).find('.searchbar'),
+                searchContainer: $el.value.find('.list'),
+                searchItem: 'li',
+                searchIn: 'a',
+                backdrop: false,
+                removeDiacritics: true,
+                on: {
+                    enable: function(searchbar) {
+                        searchbar.$el.find('input').focus();
+                    }
+                }
+            });
+            if ($f7route.query.search) {
+                searchSearchbar($f7route.query.search);
+            }
+        }
+        let createChat = function() {
+            $f7.request({
+                url: window.config.api_methods.create_chat+'?assistant='+curAssistant.guid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    var data = JSON.parse(responseText);
+                  //  eventSource['/chat/' +data.data.guid] = null;
+                    $f7router.navigate('/screens/cart/'+data.data.guid,{ignoreCache :true,reloadCurrent:true});
+
+                },
+                error: function (xhr, status, error) {
+                    audioManager.stopSound('thinking');
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let loadAssistants = function(){
+            $f7.request({
+                url: window.config.api_methods.load_assistants,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    assistants = data.data;
+                    if (assistants.length > 0) {
+                        // Busca un assistant con guid igual a $f7route.params.guid
+                        const foundAssistant = assistants.find(assistant => assistant.guid === $f7route.params.guid);
+
+                        // Asigna foundAssistant si existe, de lo contrario asigna el primer elemento del array
+                        curAssistant = foundAssistant || assistants[0];
+                        loadConversations(curAssistant.guid);
+                    } else {
+                        console.error("El array 'assistants' está vacío.");
+                    }
+                    //el primer elemento será el asistente por defecto
+
+                    $update();
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let loadConversations = function(assistantGuid){
+            $f7.request({
+                url: window.config.api_methods.load_conversations+'?assistant='+assistantGuid,
+                method: 'GET',
+                headers: {
+                    'X-AUTH-TOKEN': window.config.token
+                },
+                // processData: false, // Prevenir que jQuery procese los datos
+                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
+                success: function (responseText) {
+                    // messages.hideTyping();
+                    var data = JSON.parse(responseText);
+                    conversations = data.data;
+                    console.log(conversations);
+                    $update();
+                    initializeSearchbar();
+
+
+                },
+                error: function (xhr, status, error) {
+
+                    $f7.preloader.show();
+                    $f7.toast.show({
+                        text: 'An error occured: ' + error,
+                        cssClass: 'color-red'
+                    });
+                }
+            });
+        }
+        let enableSearchbar = function() {
+            if (searchbar) {
+                searchbar.enable();
+            }
+        }
+
+        let disableSearchbar = function() {
+            if (searchbar) {
+                searchbar.disable();
+            }
+        }
+
+        let searchSearchbar = function(query) {
+            if (searchbar) {
+                searchbar.search(query);
+            }
+        }
+        console.log("cargando conversaciones")
+        loadAssistants();
+        $on('pageAfterIn', function() {
+            console.log("cargando")
+            loadAssistants();
+
+        });
+
+        $on('pageBeforeIn', function() {
+            console.log("cargando")
+            initializeSearchbar();
+
+        });
+
+        $on('pageBeforeRemove', function() {
+            disableSearchbar();
+        });
+
+
+        return $render;
+    }
+</script>

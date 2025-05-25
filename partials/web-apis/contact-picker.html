@@ -1,0 +1,223 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Contact Picker API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Contact Picker API allows users to select entries from their contact list and share limited details of the selected entries with the web apps.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="block block-strong inset margin-vertical">
+                        <button type="button" class="button button-fill" @click="${openContactPicker}">Open Contact Picker</button>
+                    </div>
+                    ${contacts && contacts.length ? $h`
+                    <div class="block-title margin-vertical">Selected Contacts (${contacts.length})</div>
+                    <div class="list inset margin-vertical">
+                        <ul>
+                            ${contacts.map((item, index) => $h`
+                            <li>
+                                <a herf="#" class="item-link" @click="${() => openPopupContact(item.id)}">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <span class="shape-container shape-auto size-40 bg-color-random text-color-white">
+                                                <span class="font-size-20 font-weight-600">${item.name[0].trim().charAt(0)}</span>
+                                            </span>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">${item.name[0]}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h`
+                    ${$f7.support.webApi.contactPicker ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Contact Picker API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Contact Picker API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Contact_Picker_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+        <div id="popup-contact" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Contact Info</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupContact}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    ${currentContact ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-96 bg-color-mono text-color-mono-invert">
+                            <span class="font-size-48 font-weight-bold">${currentContact.name[0].trim().charAt(0)}</span>
+                        </span>
+                        <div class="font-size-20 font-weight-bold margin-top">${currentContact.name[0]}</div>
+                    </div>
+                    ${currentContact.name.length ? $h`
+                    <div class="block-title margin-vertical">Names</div>
+                    <div class="list simple-list inset margin-vertical">
+                        <ul>
+                            ${currentContact.name.map((item, index) => $h`
+                            <li>${item}</li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ${currentContact.address.length ? $h`
+                    <div class="block-title margin-vertical">Addresses</div>
+                    <div class="list simple-list inset margin-vertical">
+                        <ul>
+                            ${currentContact.address.map((item, index) => $h`
+                            <li innerHTML="${item.addressLine[0]}"></li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ${currentContact.tel.length ? $h`
+                    <div class="block-title margin-vertical">Phone Numbers</div>
+                    <div class="list links-list inset margin-vertical">
+                        <ul>
+                            ${currentContact.tel.map((item, index) => $h`
+                            <li>
+                                <a href="tel:${item}" target="${$f7.getExternalUrlTarget()}" class="external">${item}</a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ${currentContact.email.length ? $h`
+                    <div class="block-title margin-vertical">Email Addresses</div>
+                    <div class="list links-list inset margin-vertical">
+                        <ul>
+                            ${currentContact.email.map((item, index) => $h`
+                            <li>
+                                <a href="mailto:${item}" target="${$f7.getExternalUrlTarget()}" class="external">${item}</a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h` `}
+                    ` : $h` `}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let contacts = null;
+        let currentContact = null;
+        let popupContact = null;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let openContactPicker = async function() {
+            let properties = await navigator.contacts.getProperties();
+            let options = {
+                multiple: true
+            };
+            navigator.contacts.select(properties, options)
+                .then(function(result) {
+                    for(i=0; i<result.length; i++) {
+                        result[i].id = i + 1;
+                    }
+                    contacts = result;
+                    $update(function() {
+                        $f7.randomColorClassGenerator.initialize($el.value);
+                    });
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        let initializePopupContact = function() {
+            popupContact = $f7.popup.create({
+                el: $el.value.find('#popup-contact')
+            });
+        }
+
+        let openPopupContact = function(id) {
+            let result = contacts.find(function(contact) {
+                return contact.id == id;
+            });
+            currentContact = result;
+            $update(function() {
+                popupContact.open();
+            });
+        }
+
+        let closePopupContact = function() {
+            currentContact = null;
+            $update(function() {
+                popupContact.close();
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializePopupContact();
+        });
+
+       return $render;
+    }
+</script>

@@ -1,0 +1,438 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Google AdMob</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-red-50);">
+                            <img src="https://cdn.svgporn.com/logos/google-admob.svg" height="40" alt="" />
+                        </span>
+                        <p>Monetize your app by showing ads to the users.</p>
+                    </div>
+
+                    <div class="block-title margin-vertical">Banner</div>
+                    <div class="block block-strong inset margin-vertical">
+                        ${isBannerAdLoaded ? $h`
+                        ${isBannerAdShowing ? $h`
+                        <button type="button" class="button button-fade" @click="${hideBannerAd}">Hide Ad</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill" @click="${showBannerAd}">Show Ad</button>
+                        `}
+                        ` : $h`
+                        <button type="button" class="button button-fill button-preloader ${isBannerAdLoading ? 'button-loading' : ''}" @click="${loadBannerAd}">
+                            <span class="preloader"></span>
+                            <span>Load Ad</span>
+                        </button>
+                        `}
+                    </div>
+
+                    <div class="block-title margin-vertical">Interstitial</div>
+                    <div class="block block-strong inset margin-vertical">
+                        ${isInterstitialAdLoaded ? $h`
+                        <button type="button" class="button button-fill" @click="${showInterstitialAd}">Show Ad</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill button-preloader ${isInterstitialAdLoading ? 'button-loading' : ''}" @click="${loadInterstitialAd}">
+                            <span class="preloader"></span>
+                            <span>Load Ad</span>
+                        </button>
+                        `}
+                    </div>
+
+                    <div class="block-title margin-vertical">Interstitial Video</div>
+                    <div class="block block-strong inset margin-vertical">
+                        ${isInterstitialVideoAdLoaded ? $h`
+                        <button type="button" class="button button-fill" @click="${showInterstitialVideoAd}">Show Ad</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill button-preloader ${isInterstitialVideoAdLoading ? 'button-loading' : ''}" @click="${loadInterstitialVideoAd}">
+                            <span class="preloader"></span>
+                            <span>Load Ad</span>
+                        </button>
+                        `}
+                    </div>
+
+                    <div class="block-title margin-vertical">Rewarded</div>
+                    <div class="block block-strong inset margin-vertical">
+                        ${isRewardedAdLoaded ? $h`
+                        <button type="button" class="button button-fill" @click="${showRewardedAd}">Show Ad</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill button-preloader ${isRewardedAdLoading ? 'button-loading' : ''}" @click="${loadRewardedAd}">
+                            <span class="preloader"></span>
+                            <span>Load Ad</span>
+                        </button>
+                        `}
+                    </div>
+
+                    <div class="block-title margin-vertical">Rewarded Interstitial</div>
+                    <div class="block block-strong inset margin-vertical">
+                        ${isRewardedInterstitialAdLoaded ? $h`
+                        <button type="button" class="button button-fill" @click="${showRewardedInterstitialAd}">Show Ad</button>
+                        ` : $h`
+                        <button type="button" class="button button-fill button-preloader ${isRewardedInterstitialAdLoading ? 'button-loading' : ''}" @click="${loadRewardedInterstitialAd}">
+                            <span class="preloader"></span>
+                            <span>Load Ad</span>
+                        </button>
+                        `}
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let bannerAd = null;
+        let isBannerAdLoading = false;
+        let isBannerAdLoaded = false;
+        let isBannerAdShowing = false;
+
+        let loadBannerAd = function() {
+            isBannerAdLoading = true;
+            $update();
+
+            bannerAd = new admob.BannerAd({
+                adUnitId: $f7.config.admob.ads.banner.ad[$f7.device.os].id
+            });
+
+            bannerAd.on('load', function() {
+                $f7.toast.show({
+                    text: 'Banner Ad Load'
+                });
+                isBannerAdLoading = false;
+                isBannerAdLoaded = true;
+                $update();
+            });
+
+            bannerAd.on('loadfail', function() {
+                $f7.toast.show({
+                    text: 'Banner Ad Load Fail'
+                });
+                isBannerAdLoading = false;
+                isBannerAdLoaded = false;
+                $update();
+            });
+
+            bannerAd.on('impression', function() {
+                $f7.toast.show({
+                    text: 'Banner Ad Impression'
+                });
+            });
+
+            showBannerAd();
+        }
+
+        let showBannerAd = function() {
+            if (bannerAd) {
+                bannerAd.show()
+                    .then(function() {
+                        isBannerAdShowing = true;
+                        $update();
+                    });
+            }
+        }
+
+        let hideBannerAd = function() {
+            if (bannerAd) {
+                bannerAd.hide()
+                    .then(function() {
+                        isBannerAdShowing = false;
+                        $update();
+                    });
+            }
+        }
+
+        let interstitialAd = null;
+        let isInterstitialAdLoading = false;
+        let isInterstitialAdLoaded = false;
+
+        let loadInterstitialAd = function() {
+            isInterstitialAdLoading = true;
+            $update();
+
+            interstitialAd = new admob.InterstitialAd({
+                adUnitId: $f7.config.admob.ads.interstitial.ad[$f7.device.os].id
+            });
+            interstitialAd.load();
+
+            interstitialAd.on('load', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Load'
+                });
+                isInterstitialAdLoading = false;
+                isInterstitialAdLoaded = true;
+                $update();
+            });
+
+            interstitialAd.on('loadfail', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Load Fail'
+                });
+                isInterstitialAdLoading = false;
+                isInterstitialAdLoaded = false;
+                $update();
+            });
+
+            interstitialAd.on('impression', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Impression'
+                });
+            });
+
+            interstitialAd.on('show', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Show'
+                });
+            });
+
+            interstitialAd.on('showfail', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Show Fail'
+                });
+            });
+
+            interstitialAd.on('dismiss', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Ad Dismiss'
+                });
+                isInterstitialAdLoaded = false;
+                $update();
+            });
+        }
+
+        let showInterstitialAd = function() {
+            if (interstitialAd) {
+                interstitialAd.show();
+            }
+        }
+
+        let interstitialVideoAd = null;
+        let isInterstitialVideoAdLoading = false;
+        let isInterstitialVideoAdLoaded = false;
+
+        let loadInterstitialVideoAd = function() {
+            isInterstitialVideoAdLoading = true;
+            $update();
+
+            interstitialVideoAd = new admob.InterstitialAd({
+                adUnitId: $f7.config.admob.ads.interstitialVideo.ad[$f7.device.os].id
+            });
+            interstitialVideoAd.load();
+
+            interstitialVideoAd.on('load', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Load'
+                });
+                isInterstitialVideoAdLoading = false;
+                isInterstitialVideoAdLoaded = true;
+                $update();
+            });
+
+            interstitialVideoAd.on('loadfail', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Load Fail'
+                });
+                isInterstitialVideoAdLoading = false;
+                isInterstitialVideoAdLoaded = false;
+                $update();
+            });
+
+            interstitialVideoAd.on('impression', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Impression'
+                });
+            });
+
+            interstitialVideoAd.on('show', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Show'
+                });
+            });
+
+            interstitialVideoAd.on('showfail', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Show Fail'
+                });
+            });
+
+            interstitialVideoAd.on('dismiss', function() {
+                $f7.toast.show({
+                    text: 'Interstitial Video Ad Dismiss'
+                });
+                isInterstitialVideoAdLoaded = false;
+                $update();
+            });
+        }
+
+        let showInterstitialVideoAd = function() {
+            if (interstitialVideoAd) {
+                interstitialVideoAd.show();
+            }
+        }
+
+        let rewardedAd = null;
+        let isRewardedAdLoading = false;
+        let isRewardedAdLoaded = false;
+
+        let loadRewardedAd = function() {
+            isRewardedAdLoading = true;
+            $update();
+
+            rewardedAd = new admob.RewardedAd({
+                adUnitId: $f7.config.admob.ads.rewarded.ad[$f7.device.os].id
+            });
+            rewardedAd.load();
+
+            rewardedAd.on('load', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Load'
+                });
+                isRewardedAdLoading = false;
+                isRewardedAdLoaded = true;
+                $update();
+            });
+
+            rewardedAd.on('loadfail', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Load Fail'
+                });
+                isRewardedAdLoading = false;
+                isRewardedAdLoaded = false;
+                $update();
+            });
+
+            rewardedAd.on('impression', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Impression'
+                });
+            });
+
+            rewardedAd.on('show', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Show'
+                });
+            });
+
+            rewardedAd.on('showfail', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Show Fail'
+                });
+            });
+
+            rewardedAd.on('dismiss', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Dismiss'
+                });
+                isRewardedAdLoaded = false;
+                $update();
+            });
+
+            rewardedAd.on('reward', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Ad Reward'
+                });
+            });
+        }
+
+        let showRewardedAd = function() {
+            if (rewardedAd) {
+                rewardedAd.show();
+            }
+        }
+
+        let rewardedInterstitialAd = null;
+        let isRewardedInterstitialAdLoading = false;
+        let isRewardedInterstitialAdLoaded = false;
+
+        let loadRewardedInterstitialAd = function() {
+            isRewardedInterstitialAdLoading = true;
+            $update();
+
+            rewardedInterstitialAd = new admob.RewardedInterstitialAd({
+                adUnitId: $f7.config.admob.ads.rewardedInterstitial.ad[$f7.device.os].id
+            });
+            rewardedInterstitialAd.load();
+
+            rewardedInterstitialAd.on('load', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Load'
+                });
+                isRewardedInterstitialAdLoading = false;
+                isRewardedInterstitialAdLoaded = true;
+                $update();
+            });
+
+            rewardedInterstitialAd.on('loadfail', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Load Fail'
+                });
+                isRewardedInterstitialAdLoading = false;
+                isRewardedInterstitialAdLoaded = false;
+                $update();
+            });
+
+            rewardedInterstitialAd.on('impression', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Impression'
+                });
+            });
+
+            rewardedInterstitialAd.on('show', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Show'
+                });
+            });
+
+            rewardedInterstitialAd.on('showfail', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Show Fail'
+                });
+            });
+
+            rewardedInterstitialAd.on('dismiss', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Dismiss'
+                });
+                isRewardedInterstitialAdLoaded = false;
+                $update();
+            });
+
+            rewardedInterstitialAd.on('reward', function() {
+                $f7.toast.show({
+                    text: 'Rewarded Interstitial Ad Reward'
+                });
+            });
+        }
+
+        let showRewardedInterstitialAd = function() {
+            if (rewardedInterstitialAd) {
+                rewardedInterstitialAd.show();
+            }
+        }
+
+        $on('pageBeforeRemove', function() {
+            hideBannerAd();
+        });
+
+        return $render;
+    }
+</script>

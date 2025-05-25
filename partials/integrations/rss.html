@@ -1,0 +1,186 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">RSS</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-orange-50);">
+                            <i class="icon material-icons font-size-56 color-orange">rss_feed</i>
+                        </span>
+                        <p>Show the RSS feed made available by any website in your app.</p>
+                    </div>
+
+                    <form name="rss" action="#" method="GET" enctype="application/x-www-form-urlencoded">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input item-input-with-info">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <input type="url" name="url" inputmode="url" value="https://www.nasa.gov/rss/dyn/breaking_news.rss" required />
+                                                <span class="input-clear-button"></span>
+                                                <div class="item-input-info">Enter RSS Feed URL</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill button-large">Load Feed</button>
+                        </div>
+                    </form>
+
+                </div>
+            </div>
+
+        </div>
+
+        ${feed && $h`
+        <div id="popup-feed" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Feed</div>
+                        <div class="right">
+                            <a class="link icon-only popup-close">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="page-content">
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        ${feed.image && feed.image.url ? $h`
+                        <img class="shape-auto" src="${feed.image.url}" height="80" width="80" alt="" />
+                        ` : $h`
+                        <span class="shape-container shape-auto size-80 bg-color-mono text-color-mono-invert">
+                            <span class="font-size-48 font-weight-bold text-uppercase">${feed.title.trim().charAt(0)}</span>
+                        </span>
+                        `}
+                        <div class="font-size-24 font-weight-bold margin-top-half">${feed.title}</div>
+                        ${feed.description && $h`
+                        <div class="font-size-16 text-color-gray">${feed.description}</div>
+                        `}
+                    </div>
+                    ${feed.lastBuildDate && $h`
+                    <div class="note note-outline inset margin-vertical color-primary">
+                        <div class="note-content">This feed was last updated on ${moment(feed.lastBuildDate).format('dddd, DD MMMM YYYY')} at ${moment(feed.lastBuildDate).format('hh:mm:ss A')}</div>
+                    </div>
+                    `}
+                    ${feed.items && feed.items.length ? $h`
+                    <div class="list media-list inset margin-vertical no-chevron">
+                        <ul>
+                            ${feed.items.map((item, index) => $h`
+                            <li>
+                                <a href="${item.link || '#'}" target="${item.link ? $f7.getExternalUrlTarget() : '_self'}" class="item-link ${item.link ? 'external' : ''}">
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <div class="item-title-row">
+                                                <div class="item-title">${item.title}</div>
+                                            </div>
+                                            <div class="item-subtitle margin-top-half" innerHTML="${item.contentSnippet || item.description}"></div>
+                                            <div class="item-text font-size-12 margin-top-half">
+                                                ${(item.author || item.creator) && $h`
+                                                <span>${item.author || item.creator}</span>
+                                                ${`\u0020\u2022\u0020`}
+                                                `}
+                                                ${item.isoDate && $h`
+                                                <span>${moment(item.isoDate).format('dddd, DD MMMM yyyy, hh:mm A')}</span>
+                                                `}
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            `)}
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical" style="min-height: auto !important;">
+                        <div class="empty-state-media">
+                            <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                        </div>
+                        <div class="empty-state-title">No Data Found</div>
+                        <div class="empty-state-text">There is no data available at the moment.</div>
+                    </div>
+                    `}
+                </div>
+            </div>
+        </div>
+        `}
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+        let feed = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=rss]')).validate({
+                rules: {
+                    url: {
+                        required: true,
+                        url: true
+                    }
+                },
+                messages: {
+                    url: {
+                        required: 'Please enter URL.',
+                        email: 'Please enter a valid URL.'
+                    }
+                },
+                submitHandler: function(form) {
+                    let url = $f7.config.cors.proxy + '?url=' + form.elements.namedItem('url').value;
+                    loadFeed(url);
+                }
+            });
+        }
+
+        let loadFeed = function(url) {
+            let parser = new RSSParser();
+            $f7.preloader.show();
+            parser.parseURL(url, function(error, data) {
+                $f7.preloader.hide();
+                if (error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                }
+                if (data) {
+                    feed = data;
+                    $update(function() {
+                        $f7.popup.open($el.value.find('#popup-feed'));
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

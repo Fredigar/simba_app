@@ -1,0 +1,72 @@
+{
+  "procedure": {
+    "name": "Calibración del Offset del Amplificador del Motion",
+    "description": "Procedimiento de calibración del offset del amplificador del motion para el simulador A400M.",
+    "equipments": {},
+    "instructions": {
+      "0": {
+        "guid": "step-001",
+        "text": "Seleccionar el modo de calibración",
+        "description": "Ingresar al sistema ECAL, seleccionar Motion Cal, Position Calibration y Start Calibration. Asegurarse de que el simulador esté en el modo Engaged y a mitad de carrera de su recorrido.",
+        "nextInstruction": 1,
+        "type": "instruction",
+        "estimatedTime": 5
+      },
+      "1": {
+        "guid": "step-002",
+        "text": "Calibrar todos los jacks",
+        "description": "Seleccionar Offset Calibration Mode y esperar 30-40 segundos. Luego, seleccionar Rec All Offset para calibrar todos los jacks a la vez.",
+        "nextInstruction": 2,
+        "type": "instruction",
+        "estimatedTime": 1
+      },
+      "2": {
+        "guid": "step-003",
+        "text": "Guardar los cambios",
+        "description": "Seleccionar Save Offset to Calibration File para guardar los cambios en el archivo de calibración motion_cal.cur.",
+        "nextInstruction": 3,
+        "type": "instruction",
+        "estimatedTime": 1
+      },
+      "3": {
+        "guid": "step-004",
+        "text": "Salir del modo de calibración",
+        "description": "Seleccionar Exit Calibration.",
+        "nextInstruction": 4,
+        "type": "instruction",
+        "estimatedTime": 1
+      },
+      "4": {
+        "guid": "step-005",
+        "text": "Verificar la calibración",
+        "description": "Verificar que todos los jacks estén calibrados correctamente y que los cambios se hayan guardado en el archivo de calibración.",
+        "nextInstruction": 5,
+        "type": "condition",
+        "conditions": {
+          "conditionQuery": "#calibration_status# == 'success'",
+          "goToInstruction": {
+            "true": 5,
+            "false": 6
+          }
+        },
+        "estimatedTime": 1
+      },
+      "5": {
+        "guid": "step-006",
+        "text": "Finalizar el procedimiento",
+        "description": "El procedimiento de calibración ha sido completado exitosamente.",
+        "nextInstruction": -1,
+        "type": "instruction",
+        "estimatedTime": 1
+      },
+      "6": {
+        "guid": "step-007",
+        "text": "Revisar y repetir",
+        "description": "Revisar los pasos anteriores y repetir la calibración si es necesario.",
+        "nextInstruction": 0,
+        "type": "instruction",
+        "estimatedTime": 1
+      }
+    }
+  }
+}

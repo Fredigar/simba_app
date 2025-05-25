@@ -1,0 +1,110 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Dialogs</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to access native dialogs.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="list links-list inset margin-vertical">
+                        <ul>
+                            <li>
+                                <a href="#" @click="${alert}">Alert</a>
+                            </li>
+                            <li>
+                                <a href="#" @click="${confirm}">Confirm</a>
+                            </li>
+                            <li>
+                                <a href="#" @click="${prompt}">Prompt</a>
+                            </li>
+                            <li>
+                                <a href="#" @click="${beep}">Beep</a>
+                            </li>
+                        </ul>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let alert = function() {
+            navigator.notification.alert(
+                'You are the winner!',
+                function() {
+                    $f7.toast.show({
+                        text: 'Tap to play again.'
+                    });
+                },
+                'Game Over',
+                'Done'
+            );
+        }
+
+        let confirm = function() {
+            navigator.notification.confirm(
+                'You are the winner!',
+                function(buttonIndex) {
+                    $f7.toast.show({
+                        text: 'You pressed: ' + buttonIndex
+                    });
+                },
+                'Game Over',
+                ['Restart', 'Exit']
+            );
+        }
+
+        let prompt = function() {
+            navigator.notification.prompt(
+                'Please enter your name.',
+                function(results) {
+                    $f7.toast.show({
+                        text: 'Hello ' + results.input1 + '!'
+                    });
+                },
+                'Registration',
+                ['OK', 'Cancel'],
+                'Anonymous'
+            );
+        }
+
+        let beep = function() {
+            navigator.notification.beep(1);
+        }
+
+        return $render;
+    }
+</script>

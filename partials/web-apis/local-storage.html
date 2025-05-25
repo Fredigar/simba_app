@@ -1,0 +1,184 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Local Storage API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Local Storage API is a part of Web Storage API which allows web apps to store data locally as key/value pairs within the browser's storage.</p>
+                        <p>The data stored using Local Storage API is persistent - ie, the stored data for the same origin is accessible across multiple tabs and sessions, and it does not get cleared from the storage even if the tab or browser is closed.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">In Private or Incognito mode, the data stored using Local Storage API gets cleared when all the tabs of the same origin are closed.</div>
+                    </div>
+                    <form name="storage" action="#" method="GET" enctype="application/x-www-form-urlencoded" @submit="${onFormSubmit}" @reset="${onFormReset}">
+                        <div class="list inset margin-vertical no-hairlines-between">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner padding-top">
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="first_name" placeholder="First Name" required validate />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner padding-bottom">
+                                            <div class="item-input-wrap">
+                                                <input type="text" name="last_name" placeholder="Last Name" required validate />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical no-padding-top">
+                            <div class="row">
+                                <div class="col-100 small-50 margin-top-half">
+                                    <button type="submit" class="button button-fill">Store Data</button>
+                                </div>
+                                <div class="col-100 small-50 margin-top-half">
+                                    <button type="reset" class="button button-fade" >Clear Data</button>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">Fill the form above and store data. Once done, close the tab or browser and re-open the page, or open the same page in new tab or window. The form will be filled automatically with the stored data.</div>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.localStorage ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Local Storage API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Local Storage API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let explore = function() {
+            isExploring = true;
+            $update(function() {
+                initialize();
+            });
+        }
+
+        let initialize = function() {
+            getData();
+        }
+
+        let getData = function() {
+            try {
+                let data = localStorage.getItem('Nectar_Local_Storage_Demo');
+                $f7.form.fillFromData($el.value.find('form[name=storage]'), JSON.parse(data));
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let storeData = function(data) {
+            try {
+                localStorage.setItem('Nectar_Local_Storage_Demo', JSON.stringify(data));
+                $f7.toast.show({
+                    text: 'Data Stored!',
+                    cssClass: 'color-green'
+                });
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let clearData = function() {
+            try {
+                localStorage.removeItem('Nectar_Local_Storage_Demo');
+                $f7.toast.show({
+                    text: 'Data Cleared!',
+                    cssClass: 'color-green'
+                });
+            }
+            catch(error) {
+                $f7.toast.show({
+                    text: error,
+                    cssClass: 'color-red'
+                });
+            }
+        }
+
+        let onFormSubmit = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            let formData = $f7.form.convertToData(form);
+            storeData(formData);
+        }
+
+        let onFormReset = function(event) {
+            clearData();
+        }
+
+        return $render;
+    }
+</script>

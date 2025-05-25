@@ -1,0 +1,142 @@
+<template>
+    <div class="page" data-name="feedback">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Feedback</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-65 large-55 xlarge-45">
+
+                    <div class="block block-strong inset margin-vertical">
+
+                        <div class="margin-bottom">
+                            <lottie-player src="${$f7.config.lottie.assetUrl + 'feedback.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                            <div class="font-size-20 font-weight-bold margin-top text-align-center">How do you feel about Nectar?</div>
+                        </div>
+
+                        <form name="feedback" action="#" method="POST" enctype="multipart/form-data">
+
+                            <div class="radio-wrapper margin-vertical text-align-center">
+                                <label class="radio-media no-outline no-tick margin-half tooltip-init color-red" data-tooltip="Angry">
+                                    <input type="radio" name="reaction" value="1" />
+                                    <div class="radio-inner">
+                                        <i class="icon fa-solid fa-face-angry font-size-40"></i>
+                                    </div>
+                                </label>
+                                <label class="radio-media no-outline no-tick margin-half tooltip-init color-orange" data-tooltip="Sad">
+                                    <input type="radio" name="reaction" value="2" />
+                                    <div class="radio-inner">
+                                        <i class="icon fa-solid fa-face-frown font-size-40"></i>
+                                    </div>
+                                </label>
+                                <label class="radio-media no-outline no-tick margin-half tooltip-init color-amber" data-tooltip="Meh">
+                                    <input type="radio" name="reaction" value="3" />
+                                    <div class="radio-inner">
+                                        <i class="icon fa-solid fa-face-meh font-size-40"></i>
+                                    </div>
+                                </label>
+                                <label class="radio-media no-outline no-tick margin-half tooltip-init color-lime" data-tooltip="Happy">
+                                    <input type="radio" name="reaction" value="4" />
+                                    <div class="radio-inner">
+                                        <i class="icon fa-solid fa-face-smile font-size-40"></i>
+                                    </div>
+                                </label>
+                                <label class="radio-media no-outline no-tick margin-half tooltip-init color-green" data-tooltip="Wow">
+                                    <input type="radio" name="reaction" value="5" />
+                                    <div class="radio-inner">
+                                        <i class="icon fa-solid fa-face-grin-stars font-size-40"></i>
+                                    </div>
+                                </label>
+                            </div>
+
+                            <div class="list no-hairlines no-margin-vertical no-safe-areas" style="--f7-list-item-padding-horizontal: 0px;">
+                                <ul>
+                                    <li>
+                                        <div class="item-content item-input item-input-outline item-input-fill">
+                                            <div class="item-inner no-padding-vertical">
+                                                <div class="item-input-wrap">
+                                                    <textarea class="resizable" placeholder="Write your comments here." style="min-height: 128px;"></textarea>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="margin-top">
+                                <button type="submit" class="button button-fill button-large">Submit</button>
+                            </div>
+
+                        </form>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<style>
+    .page[data-name=feedback] form[name=feedback] .radio-media .radio-inner {
+        transition: all 0.5s;
+    }
+
+    .page[data-name=feedback] form[name=feedback] .radio-media input:checked ~ .radio-inner {
+        transform: scale(1.2);
+    }
+</style>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let formValidator = null;
+
+        let initializeFormValidator = function() {
+            formValidator = jQuery($el.value.find('form[name=feedback]')).validate({
+                rules: {
+                    reaction: {
+                        required: true
+                    }
+                },
+                messages: {
+                    reaction: {
+                        required: 'Please provide your feedback.'
+                    }
+                },
+                errorPlacement: function(error, element) {
+                    error.addClass('justify-content-center position-relative');
+                    error.css('margin-top', '4px');
+                    error.appendTo(element.parents('.radio-wrapper'));
+                },
+                submitHandler: function(form) {
+                    $f7.toast.show({
+                        text: 'Thank you for your valuable feedback.',
+                        cssClass: 'color-green'
+                    });
+                    $f7router.back();
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeFormValidator();
+        });
+
+        return $render;
+    }
+</script>

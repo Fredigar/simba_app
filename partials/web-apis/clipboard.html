@@ -1,0 +1,157 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Clipboard API</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>Clipboard API allows web apps to programatically react on cut, copy, and paste operations performed by the user as well as read from or write to the system clipboard directly on behalf of the user.</p>
+                    </div>
+
+                    ${isExploring ? $h`
+                    <div class="list inset margin-vertical no-hairlines-between">
+                        <ul>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner padding-top">
+                                        <div class="item-input-wrap">
+                                            <textarea>${$f7.config.app.description}</textarea>
+                                            <a href="#" class="link icon-only tooltip-init" data-tooltip="Cut" @click="${cutText}">
+                                                <i class="icon material-icons font-size-18">content_cut</i>
+                                            </a>
+                                            <a href="#" class="link icon-only tooltip-init" data-tooltip="Copy" @click="${copyText}">
+                                                <i class="icon material-icons font-size-18">content_copy</i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                            <li>
+                                <div class="item-content item-input item-input-outline">
+                                    <div class="item-inner padding-bottom">
+                                        <div class="item-input-wrap">
+                                            <textarea></textarea>
+                                            <a href="#" class="link icon-only tooltip-init" data-tooltip="Paste" @click="${pasteText}">
+                                                <i class="icon material-icons font-size-18">content_paste</i>
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </li>
+                        </ul>
+                    </div>
+                    ` : $h`
+                    ${$f7.support.webApi.clipboard ? $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-smile font-size-64 color-green"></i>
+                        </div>
+                        <div class="empty-state-title">Yaay!</div>
+                        <div class="empty-state-text">Clipboard API is supported.</div>
+                        <div class="empty-state-actions">
+                            <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${explore}">Explore</button>
+                        </div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">Clipboard API is not supported.</div>
+                        <div class="empty-state-actions">
+                            <a href="https://developer.mozilla.org/en-US/docs/Web/API/Clipboard_API#browser_compatibility" target="${$f7.getExternalUrlTarget()}" class="empty-state-action external button button-fill button-round color-mono text-color-mono-invert">Supported Browsers</a>
+                        </div>
+                    </div>
+                    `}
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let isExploring = false;
+
+        let explore = function() {
+            isExploring = true;
+            $update();
+        }
+
+        let cutText = function(event) {
+            let textEl = $(event.target).closest('.item-input-wrap').find('textarea');
+            navigator.clipboard.writeText(textEl.val())
+                .then(function() {
+                    textEl.val('');
+                    $f7.toast.show({
+                        text: 'Text Cut!',
+                        cssClass: 'color-green'
+                    });
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        let copyText = function(event) {
+            let textEl = $(event.target).closest('.item-input-wrap').find('textarea');
+            navigator.clipboard.writeText(textEl.val())
+                .then(function() {
+                    $f7.toast.show({
+                        text: 'Text Copied!',
+                        cssClass: 'color-green'
+                    });
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        let pasteText = function(event) {
+            let textEl = $(event.target).closest('.item-input-wrap').find('textarea');
+            navigator.clipboard.readText()
+                .then(function(text) {
+                    textEl.val(text);
+                    $f7.toast.show({
+                        text: 'Text Pasted!',
+                        cssClass: 'color-green'
+                    });
+                })
+                .catch(function(error) {
+                    $f7.toast.show({
+                        text: error,
+                        cssClass: 'color-red'
+                    });
+                });
+        }
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,52 @@
+<!doctype HTML>
+<html>
+<link rel="icon" href="data:;base64,iVBORw0KGgo=">
+<script src="js/aframe.min.js"></script>
+<script src="js/aframe-ar.js"></script>
+<body style="margin: 0px; overflow: hidden;">
+
+<script>
+AFRAME.registerComponent('registerevents', {
+    init: function () {
+        let marker = this.el;
+        let card = document.querySelector("#card");
+
+        marker.addEventListener('markerFound', function () {
+            // Mostrar la carta cuando se encuentra el marcador
+            card.setAttribute("visible", "true");
+        });
+
+        marker.addEventListener('markerLost', function () {
+            // Ocultar la carta cuando se pierde el marcador
+         //   card.setAttribute("visible", "true");
+        });
+    }
+});
+</script>
+
+<a-scene embedded vr-mode-ui="enabled: false;" arjs="debugUIEnabled: false; detectionMode: mono_and_matrix; matrixCodeType: 3x3;">
+
+    <a-assets>
+        <!-- Imagen de la carta (As de Corazones) -->
+        <img id="cardTexture" src="images/as_corazones.png" />
+    </a-assets>
+
+    <!-- Marcador -->
+    <a-marker type="pattern" url="data/2d.patt" id="baseMarker" registerevents>
+        <!-- Carta pegada al marcador -->
+        <a-plane id="card"
+                 position="0 0 0"
+                 rotation="-90 0 0"
+                 width="1"
+                 height="1.5"
+                 material="src: #cardTexture; transparent: true; opacity: 0.10;"
+                 visible="false">
+        </a-plane>
+    </a-marker>
+    
+    <!-- Cámara -->
+    <a-entity camera></a-entity>
+
+</a-scene>
+</body>
+</html>

@@ -1,0 +1,66 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Facebook Comments</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <span class="shape-container shape-auto size-80" style="background-color: var(--color-blue-50);">
+                            <img src="https://icon.horse/icon/facebook.com" height="48" alt="" />
+                        </span>
+                        <p>Let visitors comment on the content on your site using their Facebook account.</p>
+                    </div>
+
+                    <div class="block margin-vertical">
+                        <div class="fb-comments" data-href="${comments.url}" data-numposts="${comments.perPage}" data-order-by="${comments.orderBy}" data-width="100%"></div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let comments = {
+            url: 'https://nectar.website/comments#test',
+            perPage: 100,
+            orderBy: 'reverse_time'
+        }
+
+        let loadComments = function() {
+            FB.init({
+                appId: $f7.config.facebook.appId,
+                autoLogAppEvents: true,
+                xfbml: true,
+                version: 'v15.0'
+            });
+            FB.XFBML.parse();
+        }
+
+        $on('pageBeforeIn', function() {
+            loadComments();
+        });
+
+        return $render;
+    }
+</script>

@@ -1,0 +1,33 @@
+<template>
+    <div class="page no-navbar no-sidebar no-tabbar" data-name="404" style="background-color: var(--f7-block-strong-bg-color);">
+
+        <div class="page-content">
+
+            <div class="empty-state empty-state-strong inset">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + '404.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops!</div>
+                <div class="empty-state-text">The page you are looking for doesn't exist.</div>
+                <div class="empty-state-actions">
+                    <div class="row">
+                        <div class="col-100 medium-50 margin-top">
+                            <a href="#" class="empty-state-action back button button-fill button-large button-round color-mono text-color-mono-invert" style="min-width: 256px;">Go Back</a>
+                        </div>
+                        <div class="col-100 medium-50 margin-top">
+                            <a href="/contact/" class="empty-state-action button button-large button-outline button-round color-mono" data-open-in="popup" style="min-width: 256px;">Contact Us</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+        return $render;
+    }
+</script>

@@ -1,0 +1,180 @@
+<template>
+    <div class="page" data-name="jobs-list">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Jobs - List</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            ${jobs ? $h`
+            ${jobs == 'error' ? $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'data-load-error.json'}" autoplay loop background="transparent" speed="1" style="height: 128px; transform: scale(2);"></lottie-player>
+                </div>
+                <div class="empty-state-title">Oops...</div>
+                <div class="empty-state-text">An error occured while loading data.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            ` : $h`
+            ${jobs.length ? $h`
+            <div class="list cards-list inset margin-vertical-half no-chevron no-hairlines no-hairlines-between">
+                <ul class="row align-items-stretch">
+                    ${jobs.map((item, index) => $h`
+                    <li class="col-100 small-50 xlarge-33">
+                        <div class="item-content height-100">
+                            <div class="item-inner item-cell height-100 padding-vertical">
+                                <div class="item-row flex-direction-column height-100">
+                                    <div class="item-row">
+                                        <div class="item-cell flex-shrink-0 width-auto align-self-flex-start">
+                                            <a href="#" class="link color-gray">
+                                                <img class="shape-auto" src="${item.company.logo}" loading="lazy" height="48" width="48" alt="" />
+                                            </a>
+                                        </div>
+                                        <div class="item-cell">
+                                            <div class="item-row">
+                                                <div class="item-cell">
+                                                    <a href="/jobs-single/" class="font-size-16 font-weight-bold single-line-text text-color-body">${item.title}</a>
+                                                </div>
+                                                <div class="item-cell flex-shrink-0 width-auto line-height-1">
+                                                    <a href="#" class="link icon-only color-gray state-toggle ${item.saved ? 'state-toggle-active' : ''}" @stateChange="${(event) => toggleSave(item.id, event.detail)}">
+                                                        <i class="state-inactive icon material-icons color-gray">bookmark</i>
+                                                        <i class="state-active icon material-icons color-red">bookmark</i>
+                                                    </a>
+                                                </div>
+                                            </div>
+                                            <div class="item-row">
+                                                <div class="item-cell">
+                                                    <a href="/jobs-single/" class="font-size-14 text-color-gray">${item.company.name}</a>
+                                                    ${item.urgent && $h`
+                                                    <span class="badge color-green margin-horizontal-half no-margin-vertical">Urgent</span>
+                                                    `}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="item-row margin-top">
+                                        <div class="item-cell">
+                                            <a href="/jobs-single/" class="font-size-14 multi-line-text lines-3 text-color-gray">${item.description}</a>
+                                        </div>
+                                    </div>
+                                    <div class="item-row margin-top">
+                                        <div class="item-cell">
+                                            <a href="#" class="link badge badge-fade color-primary">
+                                                <i class="icon f7-icons">placemark</i>
+                                                <span>${item.location}</span>
+                                            </a>
+                                            <a href="#" class="link badge badge-fade color-primary">
+                                                <i class="icon f7-icons">clock</i>
+                                                <span>${item.contract}</span>
+                                            </a>
+                                            <a href="#" class="link badge badge-fade color-primary">
+                                                <i class="icon f7-icons">briefcase</i>
+                                                <span>${item.experience}</span>
+                                            </a>
+                                            <a href="#" class="link badge badge-fade color-primary">
+                                                <i class="icon f7-icons">money_dollar_circle</i>
+                                                <span>${item.salary}</span>
+                                            </a>
+                                        </div>
+                                    </div>
+                                    <div class="item-row margin-top-auto padding-top">
+                                        <div class="item-cell flex-shrink-0 width-auto">
+                                            <span class="badge badge-fade">
+                                                <i class="icon f7-icons">clock</i>
+                                                <span class="text-capitalize">${moment(item.date).fromNow()}</span>
+                                            </span>
+                                        </div>
+                                        <div class="item-cell">
+                                            <a href="/jobs-single/" class="button button-fill">Apply</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            ` : $h`
+            <div class="empty-state empty-state-strong inset margin-vertical">
+                <div class="empty-state-media">
+                    <lottie-player src="${$f7.config.lottie.assetUrl + 'no-data-found.json'}" autoplay loop background="transparent" speed="1" style="height: 128px;"></lottie-player>
+                </div>
+                <div class="empty-state-title">No Data Found</div>
+                <div class="empty-state-text">There is no data available at the moment.</div>
+                <div class="empty-state-actions">
+                    <button type="button" class="empty-state-action button button-fill button-round color-mono text-color-mono-invert" @click="${loadData}">Retry</button>
+                </div>
+            </div>
+            `}
+            `}
+            ` : $h`
+            <div class="block margin-vertical text-align-center">
+                <div key="preloader" class="preloader"></div>
+            </div>
+            `}
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let jobs = null;
+
+        let loadData = function() {
+            jobs = null;
+            $update();
+            $f7.request({
+                url: 'assets/custom/dataset/jobs.json',
+                method: 'GET',
+                data: null,
+                dataType: 'json'
+            })
+            .then(function(response) {
+                jobs = response.data.length ? response.data : [];
+                $update();
+            })
+            .catch(function(response) {
+                jobs = 'error';
+                $update();
+            });
+        }
+
+        let toggleSave = function(id, state) {
+            jobs.forEach(function(job) {
+                if (job.id == id) {
+                    job.saved = state ? true : false;
+                    $update(function() {
+                        $f7.toast.show({
+                            text: state ? 'Job Saved' : 'Job Unsaved',
+                            icon: state ? '<i class="icon material-icons color-red">bookmark</i>' : '<i class="icon material-icons color-gray">bookmark</i>',
+                            position: 'center'
+                        });
+                    });
+                }
+            });
+        }
+
+        $on('pageBeforeIn', function() {
+            loadData();
+        });
+
+        return $render;
+    }
+</script>

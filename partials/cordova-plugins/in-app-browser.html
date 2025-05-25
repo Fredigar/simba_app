@@ -1,0 +1,113 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">In-App Browser</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin acts as a standard web browser that allows to show external web pages inside the app without leaving it.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <form name="in-app-browser" @submit="${openUrl}">
+                        <div class="list inset margin-vertical">
+                            <ul>
+                                <li>
+                                    <div class="item-content item-input">
+                                        <div class="item-inner">
+                                            <div class="item-title item-label">URL</div>
+                                            <div class="item-input-wrap">
+                                                <input type="url" name="url" value="${$f7.config.app.themeforestUrl}" required validate data-error-message="Please enter URL." />
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="block margin-vertical">
+                            <button type="submit" class="button button-fill">Open URL</button>
+                        </div>
+                    </form>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let openUrl = function(event) {
+            event.preventDefault();
+            let form = event.target;
+            let url = form.elements.namedItem('url').value;
+            let actions = $f7.actions.create({
+                buttons: [
+                    [
+                        {
+                            text: 'Open URL',
+                            label: true
+                        }
+                    ],
+                    [
+                        {
+                            text: 'Open in In-App Browser',
+                            onClick: function() {
+                                let options = [
+                                    'hideurlbar=yes',
+                                    $f7.theming.currentMode() == 'dark' ? 'toolbarcolor=#000000' : 'toolbarcolor=#FFFFFF',
+                                    $f7.theming.currentMode() == 'dark' ? 'navigationbuttoncolor=#FFFFFF' : 'navigationbuttoncolor=#000000',
+                                    $f7.theming.currentMode() == 'dark' ? 'closebuttoncolor=#FFFFFF' : 'closebuttoncolor=#000000'
+                                ];
+                                cordova.InAppBrowser.open(url, '_blank', options.join());
+                            }
+                        },
+                        {
+                            text: 'Open in System\'s Web Browser',
+                            onClick: function() {
+                                cordova.InAppBrowser.open(url, '_system');
+                            }
+                        }
+                    ],
+                    [
+                        {
+                            text: 'Cancel',
+                            color: 'red'
+                        }
+                    ]
+                ]
+            });
+            actions.open();
+        }
+
+        return $render;
+    }
+</script>

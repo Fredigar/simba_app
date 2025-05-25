@@ -1,0 +1,90 @@
+<template>
+    <div class="page">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Splash Screen</div>
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="row justify-content-center">
+                <div class="col-100 medium-75 large-60 xlarge-50">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <p>This plugin can be used to show and hide splash screen during app launch.</p>
+                    </div>
+
+                    ${$f7.device.cordova ? $h`
+                    <div class="block block-strong inset margin-vertical text-align-center">
+                        <div class="stepper stepper-fill stepper-large stepper-init" data-autorepeat="true" data-autorepeat-dynamic="true">
+                            <div class="stepper-button-minus"></div>
+                            <div class="stepper-input-wrap">
+                                <input type="text" value="${duration/1000}" min="1" max="30" step="1" readonly @input="${setDuration}" />
+                            </div>
+                            <div class="stepper-button-plus"></div>
+                        </div>
+                    </div>
+
+                    <div class="block margin-vertical">
+                        <button type="button" class="button button-fill" @click="${showSplashScreen}">Show Splash Screen</button>
+                    </div>
+
+                    <div class="note note-outline inset margin-vertical color-blue">
+                        <div class="note-media">
+                            <i class="icon material-icons">info</i>
+                        </div>
+                        <div class="note-content">The splash screen will automatically hide after ${duration/1000} second(s).</div>
+                    </div>
+                    ` : $h`
+                    <div class="empty-state empty-state-strong inset margin-vertical">
+                        <div class="empty-state-media">
+                            <i class="icon fa-solid fa-face-frown font-size-64 color-red"></i>
+                        </div>
+                        <div class="empty-state-title">Oops!</div>
+                        <div class="empty-state-text">This plugin works inside Cordova only.</div>
+                    </div>
+                    `}
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let duration = 5000;
+
+        let setDuration = function(event) {
+            duration = parseInt(event.target.value) * 1000;
+            $update();
+        }
+
+        let showSplashScreen = function() {
+            StatusBar.hide();
+            navigator.splashscreen.show();
+            setTimeout(function() {
+                hideSplashScreen();
+            }, duration);
+        }
+
+        let hideSplashScreen = function() {
+            navigator.splashscreen.hide();
+            StatusBar.show();
+        }
+
+        return $render;
+    }
+</script>

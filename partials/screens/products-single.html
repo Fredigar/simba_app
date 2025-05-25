@@ -1,0 +1,550 @@
+<template>
+    <div class="page no-tabbar" data-name="products-single" style="--f7-toolbar-height: 80px;">
+
+        <div class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link back">
+                        <i class="icon icon-back"></i>
+                        <span class="if-not-md">Back</span>
+                    </a>
+                </div>
+                <div class="title">Products - Single</div>
+                <div class="right">
+                    <a href="#" class="state-toggle link icon-only ripple-color-gray" @stateChange="${(event) => toggleWishlist(event.detail)}">
+                        <i class="state-inactive icon material-icons color-gray">favorite</i>
+                        <i class="state-active icon material-icons color-red">favorite</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar toolbar-bottom">
+            <div class="toolbar-inner">
+                ${productQuantity > 0 ? $h`
+                <div class="stepper stepper-init stepper-fill stepper-large flex-shrink-0 margin-horizontal-half" style="height: var(--f7-button-large-height);" @stepper:change="${(stepper, value) => updateQuantity(value)}">
+                    <div class="stepper-button-minus"></div>
+                    <div class="stepper-input-wrap">
+                        <input type="number" value="${productQuantity}" min="0" step="1" readonly />
+                    </div>
+                    <div class="stepper-button-plus"></div>
+                </div>
+                <button type="button" class="button button-fade button-large flex-grow-1 margin-horizontal-half color-red" @click="${() => updateQuantity(0)}">Remove from Cart</button>
+                ` : $h`
+                <button type="button" class="button button-fill button-large flex-grow-1 margin-horizontal-half" @click="${() => updateQuantity(1)}">Add to Cart</button>
+                `}
+            </div>
+        </div>
+
+        <div class="page-content">
+
+            <div class="block block-strong medium-inset medium-margin-vertical no-hairlines no-margin-vertical no-padding-vertical">
+
+                <div class="row align-items-stretch">
+
+                    <div class="col-100 medium-50 margin-vertical">
+
+                        <div id="swiper-product-images" class="swiper">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/940wS2deo9k" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/TMUQWi4UOUM" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/ZIihTgf5uGg" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/OXCWQNLR--A" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/ShgFu6BqFnM" alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="swiper-navigation-button-next button button-icon button-large button-round color-white">
+                                <i class="icon f7-icons font-size-32">${$f7.rtl ? 'arrow_left_circle_fill' : 'arrow_right_circle_fill'}</i>
+                            </button>
+                            <button class="swiper-navigation-button-previous button button-icon button-large button-round color-white">
+                                <i class="icon f7-icons font-size-32">${$f7.rtl ? 'arrow_right_circle_fill' : 'arrow_left_circle_fill'}</i>
+                            </button>
+                        </div>
+
+                        <div id="swiper-product-thumbs" class="swiper margin-top">
+                            <div class="swiper-wrapper">
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/940wS2deo9k" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/TMUQWi4UOUM" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/ZIihTgf5uGg" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/OXCWQNLR--A" alt="" />
+                                    </div>
+                                </div>
+                                <div class="swiper-slide">
+                                    <div class="responsive-container">
+                                        <img class="responsive-content shape-rounded-square" src="https://source.unsplash.com/ShgFu6BqFnM" alt="" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div class="col-100 medium-50 margin-vertical">
+
+                        <div class="font-size-24 font-weight-bold">${faker.commerce.productName()}</div>
+                        <a href="#" class="font-size-14 font-weight-600">${faker.company.companyName()}</a>
+                        <p>${faker.commerce.productDescription()}</p>
+                        <div class="margin-top-half">
+                            <span class="font-size-28 font-weight-900">$79</span>
+                            ${`\u0020`}
+                            <del class="font-size-16 font-weight-600 text-color-gray">$99</del>
+                            ${`\u0020`}
+                            <span class="font-size-12 font-weight-600 text-color-green">OFFER</span>
+                        </div>
+                        <div class="timer-countdown countdown-init margin-top" data-countdown-datetime="${new Date(new Date().getTime() + 7 * 24 * 60 * 60 * 1000).toISOString()}">
+                            <div class="countdown-result"></div>
+                            <div class="countdown-inner">
+                                <div class="display-flex flex-wrap-wrap">
+                                    <div class="shape-container shape-rounded-square size-64 margin-half bg-color-chrome">
+                                        <div class="countdown-days font-size-24 font-weight-bold">00</div>
+                                        <div class="font-size-10 letter-spacing-1 text-uppercase">Days</div>
+                                    </div>
+                                    <div class="shape-container shape-rounded-square size-64 margin-half bg-color-chrome">
+                                        <div class="countdown-hours font-size-24 font-weight-bold">00</div>
+                                        <div class="font-size-10 letter-spacing-1 text-uppercase">Hours</div>
+                                    </div>
+                                    <div class="shape-container shape-rounded-square size-64 margin-half bg-color-chrome">
+                                        <div class="countdown-minutes font-size-24 font-weight-bold">00</div>
+                                        <div class="font-size-10 letter-spacing-1 text-uppercase">Minutes</div>
+                                    </div>
+                                    <div class="shape-container shape-rounded-square size-64 margin-half bg-color-chrome">
+                                        <div class="countdown-seconds font-size-24 font-weight-bold">00</div>
+                                        <div class="font-size-10 letter-spacing-1 text-uppercase">Seconds</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="block block-strong medium-inset no-margin-vertical sticky sticky-top">
+                <div class="segmented segmented-strong">
+                    <a href="#tab-description" class="button font-size-12 tab-link tab-link-active">Description</a>
+                    <a href="#tab-specifications" class="button font-size-12 tab-link">Specifications</a>
+                    <a href="#tab-reviews" class="button font-size-12 tab-link">Reviews</a>
+                    <span class="segmented-highlight"></span>
+                </div>
+            </div>
+
+            <div class="tabs-swipeable-wrap" data-auto-height="true">
+                <div class="tabs">
+
+                    <div id="tab-description" class="tab tab-active">
+
+                        <div class="block block-strong inset margin-vertical">
+                            <p>iPhone 7 Plus dramatically improves the most important aspects of the iPhone experience and it looks every bit as powerful as it is.</p>
+                            <ul>
+                                <li>High Resolution Dual 12 MP Cameras</li>
+                                <li>A Display Like Never Before</li>
+                                <li>Most Powerful Chip in a Smartphone</li>
+                                <li>Dust, Water and Splash Resistant</li>
+                                <li>Enjoy 7MP Front Camera</li>
+                                <li>The Brand New Home Button</li>
+                                <li>Stereo Speakers for Great Audio Output</li>
+                                <li>The Latest iOS</li>
+                            </ul>
+                        </div>
+
+                    </div>
+
+                    <div id="tab-specifications" class="tab">
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Body</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Dimensions</td>
+                                            <td>6.23 x 3.07 x 0.29 in</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Weight</td>
+                                            <td>188 g</td>
+                                        </tr>
+                                        <tr>
+                                            <td>SIM</td>
+                                            <td>Nano-SIM</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Battery</td>
+                                            <td>Non-removable Li-Ion 2900 mAh Battery (11.1 Wh)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Display</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Type</td>
+                                            <td>LED-Backlit IPS LCD, Capacitive Touchscreen, 16M Colors</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Size</td>
+                                            <td>5.5 inches (~67.7% Screen-to-Body Ratio)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Resolution</td>
+                                            <td>1080 x 1920 Pixels (~401 PPI Pixel Density)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Resolution</td>
+                                            <td>Yes</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Protection</td>
+                                            <td>Ion-Strengthened Glass, Oleophobic Coating</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Platform</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Operating System</td>
+                                            <td>iOS 10.0.1, Upgradable to iOS 10.3.2</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Chipset</td>
+                                            <td>Apple A10 Fusion</td>
+                                        </tr>
+                                        <tr>
+                                            <td>CPU</td>
+                                            <td>Quad-core 2.34 GHz (2x Hurricane + 2x Zephyr)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>GPU</td>
+                                            <td>PowerVR Series7XT Plus (Six-core Graphics)</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Memory</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>ROM</td>
+                                            <td>128 GB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>RAM</td>
+                                            <td>3 GB</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Card Slot</td>
+                                            <td>No</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Camera</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Primary</td>
+                                            <td>Dual 12 MP, Quad-LED (Dual Tone) Flash,</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Secondary</td>
+                                            <td>7 MP</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <div class="data-table data-table-init card margin-vertical no-shadow">
+                            <div class="card-header">Communication</div>
+                            <div class="card-content">
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                            <td>Network</td>
+                                            <td>GSM / CDMA / HSPA / EVDO / LTE</td>
+                                        </tr>
+                                        <tr>
+                                            <td>WLAN</td>
+                                            <td>Wi-Fi 802.11 a/b/g/n/ac, Dual-Band, Hotspot</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Bluetooth</td>
+                                            <td>4.2, A2DP, LE</td>
+                                        </tr>
+                                        <tr>
+                                            <td>GPS</td>
+                                            <td>Yes, with A-GPS, GLONASS</td>
+                                        </tr>
+                                        <tr>
+                                            <td>NFC</td>
+                                            <td>Yes (Apple Pay only)</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Radio</td>
+                                            <td>No</td>
+                                        </tr>
+                                        <tr>
+                                            <td>USB</td>
+                                            <td>2.0, Reversible Connector</td>
+                                        </tr>
+                                        <tr>
+                                            <td>Sensors</td>
+                                            <td>Fingerprint (Front-Mounted), Accelerometer, Gyro, Proximity, Compass, Barometer</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+
+                    <div id="tab-reviews" class="tab">
+
+                        <div class="card margin-vertical no-shadow">
+                            <div class="card-header">Ratings</div>
+                            <div class="card-content">
+                                <div class="list no-hairlines no-hairlines-between no-safe-areas">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner item-cell">
+                                                    <div class="item-row">
+                                                        <div class="item-cell flex-shrink-0 width-auto">
+                                                            <div class="font-size-56 font-weight-900 line-height-1">4.5</div>
+                                                        </div>
+                                                        <div class="item-cell">
+                                                            <div class="rating rating-init" data-rateyo-rating="4.5" data-rateyo-star-width="24px"></div>
+                                                            <div class="font-size-12 font-weight-600 margin-top-half text-color-gray">Based on 100 Reviews</div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                                <div class="list no-hairlines no-hairlines-between no-safe-areas" style="--f7-list-item-min-height: 32px;">
+                                    <ul>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner no-padding-vertical">
+                                                    <div class="item-title">
+                                                        ${Array(5).fill().map((item, index) => $h`
+                                                        <i class="icon material-icons color-green">star</i>
+                                                        `)}
+                                                    </div>
+                                                    <div class="item-after font-size-16 font-weight-bold text-color-body">72</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner no-padding-vertical">
+                                                    <div class="item-title">
+                                                        ${Array(4).fill().map((item, index) => $h`
+                                                        <i class="icon material-icons color-lime">star</i>
+                                                        `)}
+                                                    </div>
+                                                    <div class="item-after font-size-16 font-weight-bold text-color-body">13</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner no-padding-vertical">
+                                                    <div class="item-title">
+                                                        ${Array(3).fill().map((item, index) => $h`
+                                                        <i class="icon material-icons color-amber">star</i>
+                                                        `)}
+                                                    </div>
+                                                    <div class="item-after font-size-16 font-weight-bold text-color-body">7</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner no-padding-vertical">
+                                                    <div class="item-title">
+                                                        ${Array(2).fill().map((item, index) => $h`
+                                                        <i class="icon material-icons color-orange">star</i>
+                                                        `)}
+                                                    </div>
+                                                    <div class="item-after font-size-16 font-weight-bold text-color-body">5</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="item-content">
+                                                <div class="item-inner no-padding-vertical">
+                                                    <div class="item-title">
+                                                        ${Array(1).fill().map((item, index) => $h`
+                                                        <i class="icon material-icons color-red">star</i>
+                                                        `)}
+                                                    </div>
+                                                    <div class="item-after font-size-16 font-weight-bold text-color-body">3</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card margin-vertical no-shadow">
+                            <div class="card-header">
+                                <span>Reviews</span>
+                                <a href="#" class="link link-button font-size-14 font-weight-600">View All</a>
+                            </div>
+                            <div class="card-content">
+                                <div class="list media-list no-chevron no-hairlines no-hairlines-between no-safe-areas">
+                                    <ul>
+                                        ${Array(5).fill().map((item, index) => $h`
+                                        <li>
+                                            <a href="#" class="item-link">
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <img class="shape-auto" src="${faker.internet.avatar()}" loading="lazy" height="40" width="40" alt="" />
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title-row">
+                                                            <div class="item-title">
+                                                                <span>${faker.name.firstName()} ${faker.name.lastName()}</span>
+                                                                ${`\u0020`}
+                                                                <span class="text-color-gray">${`\u2022`}</span>
+                                                                ${`\u0020`}
+                                                                <span class="font-size-12 font-weight-normal text-color-gray">${moment(faker.date.recent(90)).format('MMM DD')}</span>
+                                                            </div>
+                                                            <div class="item-after align-self-flex-start">
+                                                                <div class="rating rating-init" data-rateyo-rating="${faker.datatype.number({min: 1, max: 5, precision: 0.5})}"></div>
+                                                            </div>
+                                                        </div>
+                                                        <div class="item-text">${faker.lorem.sentences(3)}</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        `)}
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+</template>
+
+<script>
+    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+
+        let swiperProductThumbs = null;
+        let swiperProductImages = null;
+
+        let productQuantity = 0;
+
+        let initializeSwiperProductThumbs = function() {
+            swiperProductThumbs = $f7.swiper.create($el.value.find('#swiper-product-thumbs'), {
+                freeMode: true,
+                grabCursor: true,
+                loop: true,
+                spaceBetween: 16,
+                slidesPerView: 3,
+                watchSlidesProgress: true
+            });
+        }
+
+        let initializeSwiperProductImages = function() {
+            swiperProductImages = $f7.swiper.create($el.value.find('#swiper-product-images'), {
+                grabCursor: true,
+                loop: true,
+                navigation: {
+                    nextEl: $el.value.find('#swiper-product-images .swiper-navigation-button-next'),
+                    prevEl: $el.value.find('#swiper-product-images .swiper-navigation-button-previous')
+                },
+                spaceBetween: 16,
+                thumbs: {
+                    swiper: swiperProductThumbs
+                }
+            });
+        }
+
+        let toggleWishlist = function(state) {
+            $f7.toast.show({
+                text: state ? 'Added to Wishlist' : 'Removed from Wishlist',
+                icon: state ? '<i class="icon material-icons color-red">favorite</i>' : '<i class="icon material-icons color-gray">favorite</i>',
+                position: 'center'
+            });
+        }
+
+        let updateQuantity = function(quantity) {
+            productQuantity = quantity;
+            $update();
+        }
+
+        $on('pageBeforeIn', function() {
+            initializeSwiperProductThumbs();
+            initializeSwiperProductImages();
+        });
+
+        return $render;
+    }
+</script>
