@@ -50,7 +50,7 @@ window.routes.push({
 if (window.config.layout[window.config.layout.default].sidebar.enabled) {
     window.routes.push({
         path: '/sidebar',
-        componentUrl: './partials/sidebar.html'
+        componentUrl: './screens/conversation-list'
     });
 }
 
@@ -202,6 +202,10 @@ window.routes.push(
         path: '/walkthrough',
         alias: ['/screens/walkthrough'],
         componentUrl: './partials/screens/walkthrough.html'
+    },{
+        path: '/coming-soon',
+        alias: ['/screens/coming-soon'],
+        componentUrl: './partials/screens/coming-soon.html'
     }
 );
 /*

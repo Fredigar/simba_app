@@ -188,7 +188,7 @@ window.config.i18n = {
 window.config.layout = {
     singleView: {
         sidebar: {
-            enabled: false
+            enabled: true
         },
         tabbar: {
             enabled: false
@@ -338,13 +338,19 @@ window.config.zooming = {
 | myEyes configuration
 |------------------------------------------------------------------------------
 */
-
+window.config.voice = {
+    enabled: true,
+    defaultLanguage: 'en-US'
+};
+window.config.domain = "https://survey.simeng.es"
 window.config.api_url = "https://survey.simeng.es/api/v1/assistant/";
 window.config.api_urlbase = "https://survey.simeng.es/api/v1/";
-window.config.token = "8f0bf7b2762ef782e231e336b7375cce09a9e53a";//localStorage.getItem('Jobify_User_Access_Token') || null;
+window.config.token = "acec116fe48e1f788e76afbebc678e52a1bb3dfc";//localStorage.getItem('Jobify_User_Access_Token') || null;
 window.config.completion = {
-    url:  'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/chat/completions',
-    apiKey: "sk-865d562c8d55db276dbe14a954e6ae3e"
+    url:  'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/chat/completions',//'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/chat/completions',//https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus.corp/api/v1/chat/completions',
+    apiKey: "sk-9532ebabfd8aff986fc36657f87512ef",//"sk-9532ebabfd8aff986fc36657f87512ef"//"sk-663592038ca171795e3226b441628922"
+    models: 'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/models',
+    vision: 'phi-3-5-instruct-vision'
 }
 window.config.sse_hub = 'https://push.woodocs.com/wss2/.well-known/mercure';
 window.config.api_methods = {
@@ -354,6 +360,7 @@ window.config.api_methods = {
     load_conversation:window.config.api_url+'load-conversation',
     load_conversations:window.config.api_url+'load-conversations',
     load_assistants:window.config.api_url+'load-assistants',
+    load_assistant:window.config.api_url+'load-assistant',
     delete_conversation: window.config.api_url + 'delete-conversation',
     create_chat:window.config.api_url+'create-chat',
     call_tool:window.config.api_url+'call-tool'

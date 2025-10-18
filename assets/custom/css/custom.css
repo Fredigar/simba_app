@@ -159,6 +159,11 @@ li > h1, li > h2, li > h3, li > h4, li > h5, li > h6 {
     margin-bottom: 0.3em;
 }
 
+.reference a {
+    pointer-events: none;
+    color: white;
+    text-decoration: none; 
+}
 /*
  * Clase auxiliar para aplicar a elementos individuales
  * que tienen numeración incorrecta
@@ -282,7 +287,41 @@ li > h1, li > h2, li > h3, li > h4, li > h5, li > h6 {
         opacity: 1;
     }
 }
+.chart-button {
+    background-color: #667eea;
+    color: white !important;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+}
 
+.chart-button:hover {
+    background-color: #5a67d8;
+    color: white !important;
+}
+
+.export-csv-button {
+    background-color: #48bb78;
+    color: white !important;
+    padding: 5px 10px;
+    border-radius: 4px;
+    text-decoration: none;
+    font-size: 12px;
+}
+
+.export-csv-button:hover {
+    background-color: #38a169;
+    color: white !important;
+}
+
+.chart-wrapper {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    padding: 20px;
+    margin: 20px 0;
+}
 /* New styles for the centered messagebar container */
 .centered-messagebar-container {
     position: relative;
@@ -509,7 +548,11 @@ pre .hljs {
     margin-left: 3px;
     animation: thinking-animation 2s infinite;
 }
-
+.dropzone-disabled {
+    opacity: 0.5;
+    pointer-events: none;
+    background-color: #f5f5f5;
+}
 .speech-icon {
     float: right;
     margin-left: 5px;

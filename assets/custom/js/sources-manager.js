@@ -15,11 +15,10 @@
         /**
          * Guarda tempSources en múltiples ubicaciones de localStorage
          * @param {string} messageId - ID del mensaje para la clave sources_
-         * @param {Array} tempSources - Array de sources a guardar (opcional, usa window.tempSources si no se pasa)
          * @param {Object} params - Parámetros adicionales
          * @param {Object} options - Opciones de configuración
          */
-        static saveTempSources(messageId, tempSources = null, params = {}, options = {}) {
+        static saveTempSources(messageId, params = {}, options = {}) {
             const defaultOptions = {
                 saveToSourcesKey: true,      // Guardar en sources_{messageId}
                 saveToSimbaKey: true,        // Guardar en simba_sources por GUID
@@ -31,14 +30,10 @@
 
             const config = { ...defaultOptions, ...options };
 
-            // Determinar qué sources usar
-            const sourcesToUse = tempSources || global.tempSources;
-
             if (config.logActivity) {
                 console.log('🔄 Iniciando guardado de tempSources...', {
                     messageId,
-                    sourcesCount: sourcesToUse?.length || 0,
-                    usingPassedSources: !!tempSources,
+                    sourcesCount: global.tempSources?.length || 0,
                     config
                 });
             }
@@ -49,19 +44,19 @@
                 return false;
             }
 
-            if (!sourcesToUse || !Array.isArray(sourcesToUse)) {
-                console.warn('⚠️ tempSources no es válido:', sourcesToUse);
+            if (!global.tempSources || !Array.isArray(global.tempSources)) {
+                console.warn('⚠️ tempSources no es válido:', global.tempSources);
                 return false;
             }
 
-            if (sourcesToUse.length === 0) {
+            if (global.tempSources.length === 0) {
                 console.warn('⚠️ tempSources está vacío');
                 return false;
             }
 
             try {
                 // Procesar sources (añadir timestamp si está habilitado)
-                const processedSources = sourcesToUse.map(source => {
+                const processedSources = global.tempSources.map(source => {
                     const processedSource = { ...source };
 
                     if (config.addTimestamp) {
@@ -221,17 +216,10 @@
         }
 
         /**
-         * Función de conveniencia - uso simple (usa window.tempSources automáticamente)
+         * Función de conveniencia - uso simple
          */
         static save(messageId, params = {}) {
-            return this.saveTempSources(messageId, null, params);
-        }
-
-        /**
-         * Función de conveniencia - con sources específicos
-         */
-        static saveCustom(messageId, tempSources, params = {}) {
-            return this.saveTempSources(messageId, tempSources, params);
+            return this.saveTempSources(messageId, params);
         }
 
         /**
@@ -360,14 +348,7 @@
     global.SourcesManager = SourcesManager;
 
     // Funciones de conveniencia globales
-    global.saveTempSources = (messageId, tempSources, params, options) => {
-        // Si tempSources es un objeto (params), ajustar parámetros
-        if (tempSources && !Array.isArray(tempSources) && typeof tempSources === 'object') {
-            return SourcesManager.saveTempSources(messageId, null, tempSources, params);
-        }
-        return SourcesManager.saveTempSources(messageId, tempSources, params, options);
-    };
-    global.saveCustomSources = (messageId, tempSources, params, options) => SourcesManager.saveTempSources(messageId, tempSources, params, options);
+    global.saveTempSources = (messageId, params, options) => SourcesManager.saveTempSources(messageId, params, options);
     global.getSourceByGuid = (guid) => SourcesManager.getSourceByGuid(guid);
     global.getSourcesByMessageId = (messageId) => SourcesManager.getSourcesByMessageId(messageId);
     global.getAllSimbaSources = () => SourcesManager.getAllSimbaSources();

@@ -62,7 +62,7 @@
 
                                     <div class="margin-top-auto font-weight-bold font-size-40 margin-vertical text-align-center">
                                         ${instruction.text}
-                                        <div style="font-weight: lighter" class="font-size-20 margin-vertical text-align-center">
+                                        <div style="font-weight: lighter" class="font-size-20 margin-vertical text-align-center" >
                                             ${instruction.description}
                                         </div>
                                     </div>
@@ -1940,6 +1940,39 @@
             popupCamera.open();
         };
 
+        let md = null; // Variable para almacenar la instancia de MarkdownIt
+
+// 2. Función para inicializar MarkdownIt
+        let initializeMarkdown = function() {
+            if (window.markdownit) {
+                md = window.markdownit({
+                    html: true,        // Permitir HTML en el markdown
+                    linkify: true,     // Convertir URLs en enlaces automáticamente
+                    typographer: true, // Habilitar algunas sustituciones de lenguaje
+                    breaks: true       // Convertir '\n' en <br>
+                });
+                console.log('MarkdownIt inicializado correctamente');
+            } else {
+                console.error('MarkdownIt no está disponible. Asegúrate de que la librería esté cargada.');
+            }
+        };
+
+// 3. Función helper para procesar markdown
+        let processMarkdown = function(text) {
+            if (!text) return '';
+
+            if (md) {
+                try {
+                    return md.render(text);
+                } catch (error) {
+                    console.error('Error al procesar markdown:', error);
+                    return text; // Fallback al texto original
+                }
+            } else {
+                // Fallback si MarkdownIt no está disponible
+                return text.replace(/\n/g, '<br>');
+            }
+        };
         // Usar la cámara del sistema (para Cordova)
         let takePhoto = function () {
             checkCameraPermissions();
@@ -2353,6 +2386,7 @@
             initializePopupCamera();
             initializePopupComment();
             initializePopupAudio();
+            initializeMarkdown();
             window.addEventListener('storage', function(e) {
                 if (e.key === 'stask' && e.newValue) {
                     console.log('Detectado cambio en localStorage');

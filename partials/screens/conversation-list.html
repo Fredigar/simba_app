@@ -1,273 +1,763 @@
 <template>
-    <div class="page">
+    <div class="page" data-name="conversations-sidebar" style="background-color: var(--f7-block-strong-bg-color);">
 
-        <div class="navbar">
+        <div class="navbar navbar-transparent color-theme-white dark">
             <div class="navbar-bg"></div>
             <div class="navbar-inner">
                 <div class="left">
-                    <a href="#" class="link back">
-                        <i class="icon icon-back"></i>
-                        <span class="if-not-md">Back</span>
+                    <a href="#" class="link" @click="${() =>app.panel.close('left')}">
+                        <i class="icon material-icons">chevron_left</i>
                     </a>
                 </div>
-                <div class="title">Lista de conversaciones</div>
-                <div class="right">
-                    <a href="#" data-tooltip="Nueva conversación" @click="${createChat}" class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
-                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-assistants" data-tooltip="Change Assistant">
-                        <img class="shape-circle" width="40"  src="${curAssistant.avatar}"/>
+                <div class="title no-margin">
 
-                    </a>
-                    <a href="#" class="link icon-only" @click="${enableSearchbar}">
-                    <i class="icon material-icons">search</i>
-                </a>
                 </div>
-                <form class="searchbar searchbar-expandable">
-                    <div class="searchbar-inner">
-                        <div class="searchbar-input-wrap">
-                            <input type="search" placeholder="Search" />
-                            <i class="searchbar-icon"></i>
-                            <span class="input-clear-button"></span>
-                        </div>
-                        <span class="searchbar-disable-button if-not-aurora">Cancel</span>
-                    </div>
-                </form>
+                <!--div class="right">
+                    <a href="#" class="link" @click="${newConversation}">
+                        <i class="icon material-icons">add</i>
+                    </a>
+                    <a href="#" class="link popover-open" data-popover="#conversations-menu-sidebar">
+                        <i class="icon material-icons">more_vert</i>
+                    </a>
+                </div-->
             </div>
         </div>
 
-        <div class="page-content">
-            <div class="row justify-content-center">
-                <div class="col-100 medium-75 large-60 xlarge-50">
-
-                    <div class="searchbar-found">
-                        <div class="list links-list inset margin-vertical">
-                            <ul>
-                                ${conversations.map((item, index) => $h`
-                                <li>
-                                    <a href="/screens/cart/${item.guid}">${item.title}</a>
-                                </li>
-                                `)}
-
-                            </ul>
-                        </div>
-                    </div>
-
-                    <div class="searchbar-not-found">
-                        <div class="empty-state empty-state-strong inset margin-vertical">
-                            <div class="empty-state-media">
-                                <span class="shape-container shape-auto bg-color-chrome">
-                                    <i class="icon material-icons font-size-32">search_off</i>
-                                </span>
-                            </div>
-                            <div class="empty-state-subtitle">No Search Results</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-
-        </div>
-        <div id="popover-assistants" class="popover" style="min-width: 192px;">
-            <div class="popover-inner">
-                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+        <div class="toolbar toolbar-bottom">
+            <div class="toolbar-inner">
+                <!-- Menu inferior -->
+                <div class="list menu-list no-hairlines no-margin-vertical">
                     <ul>
-
-                        ${assistants.map((item, index) => $h`
                         <li>
-                            <a href="#" class="popover-close" @click="${() => switchAssistant(item.guid)}">
+                            <a href="#" class="item-link panel-close color-blue ripple-color-blue text-color-blue" @click="${showConversationStats}">
                                 <div class="item-content">
-                                    <div class="item-media">
-                                        <img class="shape-circle" width="40"  height="40" src="${item.avatar}"/>
-
+                                    <div class="item-media tooltip-init" data-tooltip="Statistics">
+                                        <i class="icon material-icons font-size-20">analytics</i>
                                     </div>
-                                    <div data-tooltip="${item.name}" class="tooltip-init item-inner">
-                                        <div class="item-title">${item.name}</div>
-                                        ${item.guid == curAssistant.guid && $h`
-                                        <i class="icon margin-left f7-icons color-primary">checkmark_alt_circle_fill</i>
-                                        `}
+                                    <div class="item-inner panel-collapsed-hide">
+                                        <div class="item-title">Statistics</div>
                                     </div>
                                 </div>
                             </a>
                         </li>
-                        `)}
+                        <li>
+                            <a href="#" class="item-link panel-close color-green ripple-color-green text-color-green" @click="${exportAllConversations}">
+                                <div class="item-content">
+                                    <div class="item-media tooltip-init" data-tooltip="Export All">
+                                        <i class="icon material-icons font-size-20">download</i>
+                                    </div>
+                                    <div class="item-inner panel-collapsed-hide">
+                                        <div class="item-title">Export All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="item-link panel-close color-red ripple-color-red text-color-red" @click="${clearAllConversations}">
+                                <div class="item-content">
+                                    <div class="item-media tooltip-init" data-tooltip="Clear All">
+                                        <i class="icon material-icons font-size-20">delete_sweep</i>
+                                    </div>
+                                    <div class="item-inner panel-collapsed-hide">
+                                        <div class="item-title">Clear All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
                     </ul>
                 </div>
             </div>
         </div>
 
+        <div class="page-content hide-toolbar-on-scroll display-flex flex-direction-column justify-content-space-between" style="min-height: 100%;">
+            <div class="subnavbar">
+                <div class="subnavbar-inner">
+                    <form class="searchbar searchbar-inline width-100">
+                        <div class="searchbar-input-wrap">
+                            <input type="search" placeholder="Search conversations..." @input="${searchConversations}"/>
+                            <i class="searchbar-icon"></i>
+                            <span class="input-clear-button"></span>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Estadísticas -->
+            <div class="block no-margin-vertical panel-collapsed-hide" id="stats-container" style="display: ${showStats ? 'block' : 'none'};">
+                <div class="row">
+                    <div class="col-33">
+                        <div class="text-align-center">
+                            <div class="text-color-gray">Total</div>
+                            <div class="font-size-18 font-weight-600">${filteredConversations.length}</div>
+                        </div>
+                    </div>
+                    <div class="col-33">
+                        <div class="text-align-center">
+                            <div class="text-color-gray">Today</div>
+                            <div class="font-size-18 font-weight-600">${getTodayCount()}</div>
+                        </div>
+                    </div>
+                    <div class="col-33">
+                        <div class="text-align-center">
+                            <div class="text-color-gray">Messages</div>
+                            <div class="font-size-18 font-weight-600">${getTotalMessages()}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Lista de conversaciones -->
+            ${isLoading ? $h`
+            <div class="list menu-list menu-list-fill no-hairlines no-margin-vertical">
+                <ul>
+                    <li class="loading-state">
+                        <i class="preloader margin-right"></i>
+                        Loading conversations...
+                    </li>
+                </ul>
+            </div>
+            ` : filteredConversations.length === 0 ? $h`
+            <!-- Estado vacío -->
+            <div class="block text-align-center margin-top panel-collapsed-hide">
+                <div class="margin-vertical">
+                    <i class="icon material-icons color-gray" style="font-size: 64px;">chat_bubble_outline</i>
+                </div>
+                <h3 class="margin-top">No Conversations Yet</h3>
+                <p class="text-color-gray margin-bottom">Start a new conversation to see it here.</p>
+                <a href="#" class="button button-fill" @click="${newConversation}">
+                    <i class="icon material-icons margin-right">add</i>
+                    New Conversation
+                </a>
+            </div>
+            ` : $h`
+            <div class="list menu-list menu-list-fill no-hairlines no-margin-vertical">
+                <ul>
+                    ${filteredConversations.map((conv, index) => $h`
+                    <li class="conversation-item ${conversationManager && conversationManager.currentConversationId === conv.id ? 'active' : ''}"
+                        data-id="${conv.id}">
+                        <a href="#" class="item-link no-chevron panel-close color-bluegray"
+                           @click="${() => loadConversationFromSidebar(conv.id)}">
+                            <div class="item-content">
+
+                                <div class="item-inner panel-collapsed-hide">
+                                    <div class="item-title-row">
+                                        <div class="item-title font-size-12">
+                                            ${conv.title}
+
+                                        </div>
+
+                                    </div>
+
+                                </div>
+                            </div>
+                        </a>
+                        <!-- Menu de opciones que aparece en hover -->
+                        <div class="conversation-options">
+                            <div class="options-trigger popover-open" data-popover="#conversation-options-${conv.id}">
+                                <i class="icon material-icons">more_horiz</i>
+                            </div>
+                        </div>
+                        <!-- Popover de opciones para cada conversación -->
+                        <div class="popover" id="conversation-options-${conv.id}">
+                            <div class="popover-inner">
+                                <div class="list">
+                                    <ul>
+                                        <li>
+                                            <a href="#" class="item-link popover-close" @click="${() => renameConversation(conv.id)}">
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">edit</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Rename</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                        <li>
+                                            <a href="#" class="item-link popover-close" @click="${() => deleteConversation(conv.id)}">
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons color-red">delete</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title color-red">Delete</div>
+                                                    </div>
+                                                </div>
+                                            </a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    `)}
+                </ul>
+            </div>
+            `}
+
+            <!-- Botones de acción -->
+            <div class="block margin-vertical panel-collapsed-hide">
+                <a href="#" class="button button-fill button-large color-blue" @click="${newConversation}">
+                    <i class="icon material-icons">add</i>
+                    <span class="margin-horizontal-half">New Chat</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Popover para el sidebar -->
+        <div class="popover" id="conversations-menu-sidebar">
+            <div class="popover-inner">
+                <div class="list">
+                    <ul>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${exportAllConversations}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons">download</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Export All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${showConversationStats}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons">analytics</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Statistics</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${clearAllConversations}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons color-red">delete_sweep</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title color-red">Clear All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
+<style>
+    .conversation-item {
+        position: relative;
+        transition: background-color 0.3s ease;
+    }
+
+    .conversation-item.active {
+        background-color: var(--f7-list-item-selected-bg-color, rgba(0, 122, 255, 0.15));
+    }
+
+    .conversation-item .item-media img {
+        border: 2px solid var(--f7-bars-bg-color);
+        width: 32px;
+        height: 32px;
+    }
+
+    .conversation-item .item-after {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .conversation-item .time-badge {
+        font-size: 10px;
+        padding: 2px 4px;
+        border-radius: 8px;
+        background-color: var(--f7-bars-bg-color);
+        color: var(--f7-bars-text-color);
+    }
+
+    .conversation-item .file-indicator {
+        color: var(--f7-text-color);
+        opacity: 0.6;
+        font-size: 12px;
+    }
+
+    .conversation-item .item-text {
+        display: -webkit-box;
+        -webkit-line-clamp: 1;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-height: 1.2em;
+        line-height: 1.2em;
+        font-size: 12px;
+        opacity: 0.7;
+    }
+
+    .conversation-assistant-badge {
+        font-size: 9px;
+        padding: 1px 3px;
+        border-radius: 4px;
+        background-color: var(--f7-button-fill-bg-color);
+        color: var(--f7-button-fill-text-color);
+        margin-left: 4px;
+    }
+
+    .conversation-item .item-title {
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .conversation-item .item-subtitle {
+        font-size: 11px;
+        opacity: 0.6;
+        display: flex;
+        align-items: center;
+        gap: 2px;
+    }
+
+    .panel-collapsed .conversation-item .item-media {
+        margin-right: 0;
+    }
+
+    .panel-collapsed .conversation-item .item-title,
+    .panel-collapsed .conversation-item .item-subtitle,
+    .panel-collapsed .conversation-item .item-text {
+        display: none;
+    }
+
+    .menu-list .conversation-item .item-link {
+        border-radius: 8px;
+        margin: 2px 8px;
+    }
+
+    .menu-list .conversation-item.active .item-link {
+        background-color: var(--f7-list-item-selected-bg-color, rgba(0, 122, 255, 0.15));
+    }
+
+    .loading-state {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: var(--f7-text-color);
+        opacity: 0.6;
+    }
+
+    .error-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        color: var(--f7-color-red);
+    }
+
+    /* Estilos para el menú de opciones en hover */
+    .conversation-options {
+        position: absolute;
+        top: 50%;
+        right: 10px;
+        transform: translateY(-50%);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+    }
+
+    .conversation-item:hover .conversation-options {
+        opacity: 1;
+    }
+
+    .options-trigger {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background-color: var(--f7-bars-bg-color);
+        color: var(--f7-text-color);
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .options-trigger:hover {
+        background-color: var(--f7-list-item-selected-bg-color, rgba(0, 122, 255, 0.15));
+    }
+
+    .options-trigger .icon {
+        font-size: 18px;
+    }
+
+    /* Ajuste para el item-link cuando hay opciones */
+    .conversation-item .item-link {
+        padding-right: 50px; /* Espacio para los 3 puntos */
+    }
+
+    .panel-collapsed .conversation-options {
+        right: 5px;
+    }
+
+    .panel-collapsed .conversation-item .item-link {
+        padding-right: 45px;
+    }
+</style>
+
 <script>
-    export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
+    export default function (props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
 
-        let searchbar = null;
+        let conversationManager = null;
         let conversations = [];
-        let curAssistant = {
-            avatar:'',
-            guid: '',
-            name:''
+        let filteredConversations = [];
+        let showStats = false;
+        let searchTerm = '';
+        let isLoading = false;
+
+        // Helper functions
+        function formatTime(timestamp) {
+            const date = new Date(timestamp);
+            const now = new Date();
+            const diff = now - date;
+
+            if (diff < 60000) return 'now';
+            if (diff < 3600000) return Math.floor(diff / 60000) + 'm';
+            if (diff < 86400000) return Math.floor(diff / 3600000) + 'h';
+            return Math.floor(diff / 86400000) + 'd';
         }
-        let assistants =[]
 
-        let switchAssistant = function(guid){
-            let foundAssistant = assistants.find(item => item.guid === guid);
+        function getTodayCount() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return filteredConversations.filter(conv => new Date(conv.updatedAt) >= today).length;
+        }
 
-            if (foundAssistant) {
-                curAssistant = foundAssistant;
-                loadConversations(foundAssistant.guid)
+        function getTotalMessages() {
+            return filteredConversations.reduce((sum, conv) => sum + (conv.messageCount || 0), 0);
+        }
+
+        function filterConversations(convs, term) {
+            if (!term) return convs;
+            const searchLower = term.toLowerCase();
+            return convs.filter(conv =>
+                conv.title.toLowerCase().includes(searchLower) ||
+                (conv.lastMessage && conv.lastMessage.toLowerCase().includes(searchLower)) ||
+                conv.assistant.name.toLowerCase().includes(searchLower)
+            );
+        }
+
+        // Main functions
+        let searchConversations = function (e) {
+            searchTerm = e.target.value.toLowerCase();
+            filteredConversations = filterConversations(conversations, searchTerm);
+            $update();
+        };
+
+        let loadConversationsList = async function () {
+            if (!conversationManager) {
+                console.warn('ConversationManager not available');
+                return;
+            }
+
+            try {
+                isLoading = true;
                 $update();
-            } else {
-                console.error("No se encontró ningún asistente con el GUID especificado.");
-            }
-        }
 
-        let initializeSearchbar = function() {
-            let navbarEl = $f7.navbar.getElByPage($el.value);
-            searchbar = $f7.searchbar.create({
-                el: $(navbarEl).find('.searchbar'),
-                searchContainer: $el.value.find('.list'),
-                searchItem: 'li',
-                searchIn: 'a',
-                backdrop: false,
-                removeDiacritics: true,
-                on: {
-                    enable: function(searchbar) {
-                        searchbar.$el.find('input').focus();
+                conversations = await conversationManager.storage.listConversations();
+                filteredConversations = filterConversations(conversations, searchTerm);
+
+                console.log(`Loaded ${conversations.length} conversations`);
+
+            } catch (error) {
+                console.error('Error loading conversations:', error);
+                $f7.toast.show({
+                    text: 'Error loading conversations',
+                    position: 'center',
+                    closeTimeout: 3000,
+                    cssClass: 'color-red'
+                });
+            } finally {
+                isLoading = false;
+                $update();
+            }
+        };
+
+        let showConversationStats = function () {
+            showStats = !showStats;
+            $update();
+        };
+
+        let exportAllConversations = async function () {
+            try {
+                if (!conversationManager) {
+                    throw new Error('ConversationManager not available');
+                }
+
+                const fullConversations = [];
+                for (const conv of conversations) {
+                    const fullConv = await conversationManager.storage.loadConversation(conv.id);
+                    if (fullConv) {
+                        fullConversations.push(fullConv);
                     }
                 }
-            });
-            if ($f7route.query.search) {
-                searchSearchbar($f7route.query.search);
+
+                const exportData = {
+                    exportDate: new Date().toISOString(),
+                    version: '1.0',
+                    totalConversations: fullConversations.length,
+                    conversations: fullConversations
+                };
+
+                const dataStr = JSON.stringify(exportData, null, 2);
+                const blob = new Blob([dataStr], {type: 'application/json'});
+                const url = URL.createObjectURL(blob);
+
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `simba-conversations-${new Date().toISOString().split('T')[0]}.json`;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+
+                $f7.toast.show({
+                    text: `${fullConversations.length} conversations exported`,
+                    position: 'center',
+                    closeTimeout: 2000
+                });
+            } catch (error) {
+                console.error('Error exporting conversations:', error);
+                $f7.toast.show({
+                    text: `Error exporting: ${error.message}`,
+                    position: 'center',
+                    closeTimeout: 3000,
+                    cssClass: 'color-red'
+                });
             }
-        }
-        let createChat = function() {
-            $f7.request({
-                url: window.config.api_methods.create_chat+'?assistant='+curAssistant.guid,
-                method: 'GET',
-                headers: {
-                    'X-AUTH-TOKEN': window.config.token
-                },
-                // processData: false, // Prevenir que jQuery procese los datos
-                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
-                success: function (responseText) {
-                    var data = JSON.parse(responseText);
-                  //  eventSource['/chat/' +data.data.guid] = null;
-                    $f7router.navigate('/screens/cart/'+data.data.guid,{ignoreCache :true,reloadCurrent:true});
+        };
 
-                },
-                error: function (xhr, status, error) {
-                    audioManager.stopSound('thinking');
-                    $f7.preloader.show();
-                    $f7.toast.show({
-                        text: 'An error occured: ' + error,
-                        cssClass: 'color-red'
-                    });
-                }
-            });
-        }
-        let loadAssistants = function(){
-            $f7.request({
-                url: window.config.api_methods.load_assistants,
-                method: 'GET',
-                headers: {
-                    'X-AUTH-TOKEN': window.config.token
-                },
-                // processData: false, // Prevenir que jQuery procese los datos
-                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
-                success: function (responseText) {
-                    // messages.hideTyping();
-                    var data = JSON.parse(responseText);
-                    assistants = data.data;
-                    if (assistants.length > 0) {
-                        // Busca un assistant con guid igual a $f7route.params.guid
-                        const foundAssistant = assistants.find(assistant => assistant.guid === $f7route.params.guid);
+        let clearAllConversations = function () {
+            $f7.dialog.confirm(
+                'This will permanently delete all conversations. This action cannot be undone.',
+                'Clear All Conversations',
+                async function () {
+                    try {
+                        if (!conversationManager) {
+                            throw new Error('ConversationManager not available');
+                        }
 
-                        // Asigna foundAssistant si existe, de lo contrario asigna el primer elemento del array
-                        curAssistant = foundAssistant || assistants[0];
-                        loadConversations(curAssistant.guid);
-                    } else {
-                        console.error("El array 'assistants' está vacío.");
+                        for (const conv of conversations) {
+                            await conversationManager.storage.deleteConversation(conv.id);
+                        }
+
+                        conversationManager.currentConversationId = null;
+                        await loadConversationsList();
+
+                        $f7.toast.show({
+                            text: 'All conversations cleared',
+                            position: 'center',
+                            closeTimeout: 2000
+                        });
+                    } catch (error) {
+                        console.error('Error clearing conversations:', error);
+                        $f7.toast.show({
+                            text: `Error clearing: ${error.message}`,
+                            position: 'center',
+                            closeTimeout: 3000,
+                            cssClass: 'color-red'
+                        });
                     }
-                    //el primer elemento será el asistente por defecto
-
-                    $update();
-
-
-                },
-                error: function (xhr, status, error) {
-
-                    $f7.preloader.show();
-                    $f7.toast.show({
-                        text: 'An error occured: ' + error,
-                        cssClass: 'color-red'
-                    });
                 }
+            );
+        };
+
+        let newConversation = function () {
+            $f7.panel.close('left');
+            if (conversationManager) {
+                conversationManager.currentConversationId = null;
+            }
+            $f7router.navigate('/screens/conversation/new');
+            $f7.toast.show({
+                text: 'Starting new conversation',
+                position: 'center',
+                closeTimeout: 2000
             });
-        }
-        let loadConversations = function(assistantGuid){
-            $f7.request({
-                url: window.config.api_methods.load_conversations+'?assistant='+assistantGuid,
-                method: 'GET',
-                headers: {
-                    'X-AUTH-TOKEN': window.config.token
-                },
-                // processData: false, // Prevenir que jQuery procese los datos
-                // contentType: false, // Prevenir que jQuery establezca el tipo de contenido
-                success: function (responseText) {
-                    // messages.hideTyping();
-                    var data = JSON.parse(responseText);
-                    conversations = data.data;
-                    console.log(conversations);
-                    $update();
-                    initializeSearchbar();
+        };
 
+        let loadConversationFromSidebar = function (conversationId) {
+            try {
+                $f7.panel.close('left');
+                $f7.views.main.router.navigate(`/screens/conversation/${conversationId}`, {
+                    reloadCurrent: true,
+                    clearPreviousHistory: true
+                });
 
-                },
-                error: function (xhr, status, error) {
+                $f7.toast.show({
+                    text: 'Loading conversation...',
+                    position: 'center',
+                    closeTimeout: 1500
+                });
+            } catch (error) {
+                console.error('Error loading conversation from sidebar:', error);
+                $f7.toast.show({
+                    text: 'Error loading conversation',
+                    position: 'center',
+                    closeTimeout: 3000,
+                    cssClass: 'color-red'
+                });
+            }
+        };
 
-                    $f7.preloader.show();
-                    $f7.toast.show({
-                        text: 'An error occured: ' + error,
-                        cssClass: 'color-red'
-                    });
+        let deleteConversation = function (conversationId) {
+            const conversation = conversations.find(c => c.id === conversationId);
+            const conversationTitle = conversation ? conversation.title : 'this conversation';
+
+            $f7.dialog.confirm(
+                `Are you sure you want to delete "${conversationTitle}"?`,
+                'Delete Conversation',
+                async function () {
+                    try {
+                        if (!conversationManager) {
+                            throw new Error('ConversationManager not available');
+                        }
+
+                        await conversationManager.storage.deleteConversation(conversationId);
+
+                        if (conversationManager.currentConversationId === conversationId) {
+                            conversationManager.currentConversationId = null;
+                        }
+
+                        await loadConversationsList();
+
+                        $f7.toast.show({
+                            text: 'Conversation deleted',
+                            position: 'center',
+                            closeTimeout: 2000
+                        });
+                    } catch (error) {
+                        console.error('Error deleting conversation:', error);
+                        $f7.toast.show({
+                            text: `Error deleting: ${error.message}`,
+                            position: 'center',
+                            closeTimeout: 3000,
+                            cssClass: 'color-red'
+                        });
+                    }
                 }
-            });
-        }
-        let enableSearchbar = function() {
-            if (searchbar) {
-                searchbar.enable();
-            }
-        }
+            );
+        };
 
-        let disableSearchbar = function() {
-            if (searchbar) {
-                searchbar.disable();
-            }
-        }
+        let renameConversation = function (conversationId) {
+            const conversation = conversations.find(c => c.id === conversationId);
+            const currentTitle = conversation ? conversation.title : '';
 
-        let searchSearchbar = function(query) {
-            if (searchbar) {
-                searchbar.search(query);
-            }
-        }
-        console.log("cargando conversaciones")
-        loadAssistants();
-        $on('pageAfterIn', function() {
-            console.log("cargando")
-            loadAssistants();
+            $f7.dialog.prompt(
+                'Enter new conversation title:',
+                'Rename Conversation',
+                async function (newTitle) {
+                    if (newTitle && newTitle.trim() && newTitle.trim() !== currentTitle) {
+                        try {
+                            if (!conversationManager) {
+                                throw new Error('ConversationManager not available');
+                            }
 
+                            const fullConversation = await conversationManager.storage.loadConversation(conversationId);
+                            if (fullConversation) {
+                                fullConversation.title = newTitle.trim();
+                                fullConversation.updatedAt = Date.now();
+                                await conversationManager.storage.saveConversation(fullConversation);
+                                await loadConversationsList();
+
+                                $f7.toast.show({
+                                    text: 'Conversation renamed',
+                                    position: 'center',
+                                    closeTimeout: 2000
+                                });
+                            }
+                        } catch (error) {
+                            console.error('Error renaming conversation:', error);
+                            $f7.toast.show({
+                                text: `Error renaming: ${error.message}`,
+                                position: 'center',
+                                closeTimeout: 3000,
+                                cssClass: 'color-red'
+                            });
+                        }
+                    }
+                },
+                function () {
+                    // User cancelled
+                },
+                currentTitle
+            );
+        };
+
+        // Lifecycle events
+        $on('pageInit', function () {
+            console.log('Conversations sidebar - pageInit');
+            try {
+                conversationManager = new SIMBA.ConversationManager();
+                console.log('ConversationManager initialized in sidebar');
+                setTimeout(() => {
+                    loadConversationsList();
+                }, 100);
+            } catch (error) {
+                console.error('Error initializing ConversationManager in sidebar:', error);
+            }
         });
 
-        $on('pageBeforeIn', function() {
-            console.log("cargando")
-            initializeSearchbar();
-
+        $on('pageReinit', function () {
+            console.log('Conversations sidebar - pageReinit');
+            if (conversationManager) {
+                loadConversationsList();
+            }
         });
 
-        $on('pageBeforeRemove', function() {
-            disableSearchbar();
+        $on('pageBeforeRemove', function () {
+            console.log('Conversations sidebar - pageBeforeRemove');
+            if (conversationManager && conversationManager.destroy) {
+                conversationManager.destroy();
+            }
         });
 
+        // Listen for conversation updates
+        $on('conversationUpdated', function () {
+            console.log('Received conversationUpdated event');
+            if (conversationManager) {
+                loadConversationsList();
+            }
+        });
+
+        $on('conversationCreated', function () {
+            console.log('Received conversationCreated event');
+            if (conversationManager) {
+                loadConversationsList();
+            }
+        });
+
+        // Refresh when panel opens
+        document.addEventListener('panel:open', function(e) {
+            /*if (e.detail.el.id === 'panel-left' && conversationManager) {
+                console.log('Left panel opened, refreshing conversations');
+                loadConversationsList();
+            }*/
+        });
+
+        // Public methods
+        window.refreshConversationsSidebar = function() {
+            if (conversationManager) {
+                loadConversationsList();
+            }
+        };
+
+        // Expose conversation manager for debugging
+        window.sidebarConversationManager = conversationManager;
 
         return $render;
     }

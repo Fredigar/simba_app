@@ -291,6 +291,9 @@
 <!-- markdown-it-texmath -->
 <script src="assets/vendor/markdown-it-texmath/texmath.min.js"></script>
 <script defer src="assets/vendor/show-more/showMore.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.8.0/sql-asm.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="assets/custom/js/chartgen.js"></script>
 <!--script defer type="module">
     import {faker} from 'https://cdn.skypack.dev/@faker-js/faker@v7.6.0';
 
@@ -305,6 +308,92 @@
     window.fastSort.inPlaceSort = inPlaceSort;
 </script>
 
+<!-- ============================================ -->
+<!-- CSS DEPENDENCIES -->
+<!-- ============================================ -->
+<link rel="stylesheet" href="https://pptx.js.org/pages/css/pptxjs.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.css">
+
+<!-- ============================================ -->
+<!-- STEP 1: LOAD JSZIP VERSIONS -->
+<!-- ============================================ -->
+
+<!-- JSZip 2.6.1 (para pptxjs) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/2.6.1/jszip.min.js"></script>
+<script>
+    window.JSZipV2 = window.JSZip;
+    window.JSZip = null;
+    console.log('✅ JSZip 2.6.1 loaded as JSZipV2');
+</script>
+
+<!-- JSZip 3.10.1 (para Excel y otros) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+    window.JSZipV3 = window.JSZip;
+    console.log('✅ JSZip 3.10.1 loaded as JSZipV3');
+</script>
+
+<!-- ============================================ -->
+<!-- STEP 2: LOAD PPTXJS WITH JSZIP 2.X -->
+<!-- ============================================ -->
+<script>
+    window.JSZip = window.JSZipV2;
+    console.log('🔄 Switched to JSZip 2.x for pptxjs');
+</script>
+
+<script type="text/javascript" src="https://pptx.js.org/pages/js/filereader.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/d3/3.5.17/d3.min.js"></script>
+<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/nvd3/1.8.6/nv.d3.min.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@latest/js/pptxjs.js"></script>
+<script type="text/javascript" src="https://cdn.jsdelivr.net/gh/meshesha/PPTXjs@latest/js/divs2slides.js"></script>
+
+<script>
+    window.JSZip = window.JSZipV3;
+    console.log('✅ Restored JSZip 3.x as default');
+</script>
+
+<!-- ============================================ -->
+<!-- STEP 3: EXTERNAL APIS (async) -->
+<!-- ============================================ -->
+<script src="https://accounts.google.com/gsi/client" async></script>
+<script src="https://www.youtube.com/iframe_api"></script>
+
+<!-- ============================================ -->
+<!-- STEP 4: DOCUMENT PROCESSING LIBRARIES -->
+<!-- ============================================ -->
+
+<!-- Word Documents -->
+<script src="https://unpkg.com/docx-preview@latest/dist/docx-preview.min.js"></script>
+<script src="assets/vendor/mammoth/mammoth.browser.min.js"></script>
+<script src="assets/vendor/html-docx/html-docx.js"></script>
+<script src="assets/vendor/html-docx/FileSaver.js"></script>
+
+<!-- Excel -->
+<script src="assets/vendor/xlsx/xlsx.full.min.js"></script>
+
+<!-- PDF & OCR -->
+<script src="assets/vendor/pdf/pdf.min.js"></script>
+<script src="assets/vendor/tesseract/tesseract.min.js"></script>
+
+<!-- ============================================ -->
+<!-- STEP 5: CODE EDITOR (ACE) -->
+<!-- ============================================ -->
+<script src="assets/vendor/ace/1_32_6/ace.min.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-javascript.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-html.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-css.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-python.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-php.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-json.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-sh.js"></script>
+<script src="assets/vendor/ace/1_32_6/mode-markdown.js"></script>
+<script src="assets/vendor/ace/1_32_6/theme-monokai.js"></script>
+
+<!-- ============================================ -->
+<!-- STEP 6: YOUR CUSTOM SCRIPTS -->
+<!-- ============================================ -->
+
+<!-- Core files (with defer) -->
 <script defer src="assets/custom/js/config.js"></script>
 <script defer src="assets/custom/js/routes.js?id=3"></script>
 <script defer src="assets/custom/js/store.js"></script>
@@ -313,35 +402,34 @@
 <script defer src="assets/custom/js/custom.js"></script>
 <script defer src="assets/custom/js/flowfollow.js"></script>
 <script defer src="assets/custom/js/sources-manager.js"></script>
-<script defer src="assets/custom/js/filedropezone.js"></script>
+
+<!-- FileDropzone (WITHOUT defer - needs JSZipV2/V3 access) -->
+<script src="assets/custom/js/filedropezone.js"></script>
+
+<!-- Other utilities -->
 <script defer src="assets/vendor/fix-numbering/fix-numbering.js"></script>
-<script src="https://accounts.google.com/gsi/client" async></script>
-<script src="https://www.youtube.com/iframe_api"></script>
-<script src="assets/vendor/html-docx/html-docx.js"></script>
-<script src="assets/vendor/html-docx/FileSaver.js"></script>
-<!-- Para archivos DOCX -->
-<script src="assets/vendor/mammoth/mammoth.browser.min.js"></script>
-<!-- Para archivos Excel -->
-<script src="assets/vendor/xlsx/xlsx.full.min.js"></script>
-<script src="assets/vendor/pdf/pdf.min.js"></script>
-<script src="assets/vendor/tesseract/tesseract.min.js"></script>
-<script src="assets/vendor/ace/1_32_6/ace.min.js"></script>
-<!-- Modos de lenguaje solicitados y comunes -->
-<script src = "assets/vendor/ace/1_32_6/mode-javascript.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-html.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-css.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-python.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-php.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-json.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-sh.js"></script>
-<script src = "assets/vendor/ace/1_32_6/mode-markdown.js"></script>
-<script  type="module" src="assets/vendor/mistral-tokernizer/global-tokernizer.js"></script>
+<script type="module" src="assets/vendor/mistral-tokernizer/global-tokernizer.js"></script>
 <script defer src="assets/custom/js/conversation-optimizer.js"></script>
 <script defer src="assets/custom/js/simba.js"></script>
 
-<!-- Temas, incluyendo dark (twilight) -->
-<script src = "assets/vendor/ace/1_32_6/theme-monokai.js"></script>
-
+<!-- ============================================ -->
+<!-- STEP 7: VERIFICATION SCRIPT -->
+<!-- ============================================ -->
+<script>
+    // Verificar que todo esté cargado correctamente
+    window.addEventListener('DOMContentLoaded', function() {
+        console.log('=== LIBRARY VERIFICATION ===');
+        console.log('✓ JSZipV2:', typeof window.JSZipV2 !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ JSZipV3:', typeof window.JSZipV3 !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ Current JSZip:', window.JSZip ? (window.JSZip === window.JSZipV3 ? 'V3 (correct)' : 'V2 (incorrect)') : '❌ MISSING');
+        console.log('✓ jQuery:', typeof $ !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ pptxToHtml:', typeof $ !== 'undefined' && typeof $.fn.pptxToHtml !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ Mammoth:', typeof mammoth !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ XLSX:', typeof XLSX !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('✓ docx-preview:', typeof docx !== 'undefined' ? 'OK' : '❌ MISSING');
+        console.log('=========================');
+    });
+</script>
 
 <script>     // Configurar el worker de PDF.js
 if (typeof pdfjsLib !== 'undefined') {

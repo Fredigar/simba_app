@@ -439,7 +439,7 @@
                 $f7.views.create($el.value.find('#view-sidebar'), {
                     name: 'sidebar',
                     main: false,
-                    url: '/sidebar/'
+                    url: '/coversations/'
                 });
                 $f7.panel.create({
                     el: $el.value.find('#sidebar'),
@@ -484,7 +484,6 @@
                         }, 300);
                     }
                 },
-
                 open: function (content, options = {}) {
                     const viewSecondary = $('#view-secondary');
                     const viewMain = $('.split-view-main');
@@ -495,7 +494,8 @@
                     const defaultOptions = {
                         isHtml: false,
                         pushState: false,
-                        pageTitle: 'Secondary View'
+                        pageTitle: 'Secondary View',
+                        onRendered: null  // 🔥 NUEVO: Callback después de renderizar
                     };
 
                     options = Object.assign({}, defaultOptions, options);
@@ -508,48 +508,51 @@
                     }
                     // Si es HTML, cargarlo directamente
                     else if (options.isHtml && content) {
-                        // Si ya tenemos un div con el contenedor en la vista secundaria, lo usamos
                         let mainPage = viewSecondary.find('.page-current .page-content');
 
                         // Si no hay página en la vista secundaria, creamos una
                         if (mainPage.length === 0) {
                             const newPage = `
-                                <div class="page">
-                                    <div class="navbar">
-                                        <div class="navbar-inner">
-                                            <div class="title">${options.pageTitle}</div>
-                                            <div class="right">
-                                                <a href="#" class="link icon-only close-split-view">
-                                                    <i class="icon f7-icons">xmark</i>
-                                                </a>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="page-content"></div>
-                                </div>
-                            `;
+                <div class="page">
+                    <div class="navbar">
+                        <div class="navbar-inner">
+                            <div class="title">${options.pageTitle}</div>
+                            <div class="right">
+                                <a href="#" class="link icon-only close-split-view">
+                                    <i class="icon f7-icons">xmark</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content"></div>
+                </div>
+            `;
 
                             secondaryView.router.clearPreviousPages();
                             secondaryView.router.clearPreviousHistory();
                             secondaryView.el.innerHTML = newPage;
 
-                            // Reintentar obtener el contenedor después de crear la página
                             mainPage = viewSecondary.find('.page-content');
 
-                            // Añadir evento para cerrar
                             viewSecondary.find('.close-split-view').on('click', function () {
                                 $f7.splitView.close();
                             });
                         }
 
-                        // Ahora contenedor existe, asignar el HTML
+                        // Asignar el HTML
                         if (mainPage.length > 0) {
                             mainPage.html(content);
                         }
                     }
-                    viewSecondary.find('.title').text(options.pageTitle)
+
+                    viewSecondary.find('.title').text(options.pageTitle);
+
                     // Si la vista secundaria ya está visible, solo cambiar el contenido
                     if (viewSecondary.css('display') !== 'none') {
+                        // 🔥 Llamar callback inmediatamente si ya está visible
+                        if (typeof options.onRendered === 'function') {
+                            setTimeout(options.onRendered, 100);
+                        }
                         return;
                     }
 
@@ -560,6 +563,11 @@
                         'width': '50%'
                     });
                     splitter.css('display', 'block');
+
+                    // 🔥 Llamar callback después de la animación (300ms) + margen de seguridad
+                    if (typeof options.onRendered === 'function') {
+                        setTimeout(options.onRendered, 500);
+                    }
                 },
 
                 close: function () {

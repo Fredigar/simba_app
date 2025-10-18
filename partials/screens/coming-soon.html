@@ -277,7 +277,8 @@
                            // this.isAccumulatedCountingDown = true; // Cambiamos a activar contador acumulado
                         }
                     } else if (this.isAccumulatedCountingDown) { // Agregamos esta condición para el contador acumulado
-                        this.updateAccumulatedTime();
+                        this
+                            .updateAccumulatedTime();
                     }
                     this.render();
                 }, 1000);
@@ -556,7 +557,7 @@
             const accumulatedAccumulatedTimeElementId = 'countdownAccumulatedTimer';
             setInterval(updateClock, 1000);
             presenters = agenda.map(item => {
-                document.getElementById('agenda-title').textContent = "9th Simulator Maintenance Workshop ("+item.date.split(' ')[0]+")"
+                document.getElementById('agenda-title').textContent = "SIMposium 2025 ("+item.date.split(' ')[0]+")"
                 item.time = item.time+':00';
                 item.time = subtractHours(item.initTime,item.endTime);
                 var originalTime = item.time+':00'

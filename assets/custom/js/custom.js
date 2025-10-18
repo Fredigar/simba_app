@@ -1,4 +1,95 @@
+const DEBUG_CONFIG = {
+    enabled: true, // Master switch
+    levels: {
+        error: true,   // console.error
+        warn: true,    // console.warn
+        info: false,   // console.info
+        log: true,    // console.log
+        sql: false     // logs específicos de SQL
+    }
+};
 
+// Guardar las funciones originales
+const originalConsole = {
+    log: console.log,
+    error: console.error,
+    warn: console.warn,
+    info: console.info
+};
+
+// Sobrescribir console methods
+// Función para extraer información del stack trace
+function getCallerInfo() {
+    const stack = new Error().stack;
+    const stackLines = stack.split('\n');
+
+    // Buscar la línea que no sea esta función ni console.log
+    for (let i = 2; i < stackLines.length; i++) {
+        const line = stackLines[i];
+        if (line && !line.includes('console.log') && !line.includes('getCallerInfo')) {
+            // Extraer información usando regex
+            // Formatos comunes: "at function (file:line:column)" o "file:line:column"
+            const match = line.match(/(?:at\s+.*?\s+\()?(.+?):(\d+):(\d+)\)?/) ||
+                line.match(/(.+?):(\d+):(\d+)/);
+
+            if (match) {
+                const [, fullPath, lineNumber, columnNumber] = match;
+                // Extraer solo el nombre del archivo
+                const fileName = fullPath.split('/').pop().split('\\').pop();
+
+                return {
+                    file: fileName,
+                    line: lineNumber,
+                    column: columnNumber,
+                    fullPath: fullPath
+                };
+            }
+        }
+    }
+
+    return {
+        file: 'unknown',
+        line: '?',
+        column: '?',
+        fullPath: 'unknown'
+    };
+}
+
+// Console.log mejorado
+console.error = function(...args) {
+    if (DEBUG_CONFIG.enabled && DEBUG_CONFIG.levels.error) {
+        const caller = getCallerInfo();
+        originalConsole.error(
+            `🔴 ERROR [${caller.file}:${caller.line}:${caller.column}]:`,
+            ...args
+        );
+    }
+};
+
+console.error = function(...args) {
+    if (DEBUG_CONFIG.enabled && DEBUG_CONFIG.levels.error) {
+        originalConsole.error('🔴 ERROR:', ...args);
+    }
+};
+
+console.warn = function(...args) {
+    if (DEBUG_CONFIG.enabled && DEBUG_CONFIG.levels.warn) {
+        originalConsole.warn('🟡 WARN:', ...args);
+    }
+};
+
+console.info = function(...args) {
+    if (DEBUG_CONFIG.enabled && DEBUG_CONFIG.levels.info) {
+        originalConsole.info('🔵 INFO:', ...args);
+    }
+};
+
+// Función especial para SQL (opcional)
+const sqlLog = function(...args) {
+    if (DEBUG_CONFIG.enabled && DEBUG_CONFIG.levels.sql) {
+        originalConsole.log('🗄️ SQL:', ...args);
+    }
+};
 function viewDocument(url, title, openInSplitView = false) {
     title = title || '';
 
@@ -866,6 +957,23 @@ $("#print-btn").bind('click', function() {
     // Llamar a la función de impresión
     printContent(content, pageTitle);
 });
+function isSqlQuery(text) {
+    if (!text || typeof text !== 'string') return false;
+
+    const cleanText = text.trim();
+
+    // 1. Verificar que no sea demasiado largo (las queries suelen ser concisas)
+    if (cleanText.length > 1000) return false;
+
+    // 2. No debe contener muchos párrafos (SQL suele ser más compacto)
+    const paragraphs = cleanText.split('\n\n').length;
+    if (paragraphs > 3) return false;
+
+    // 3. Verificar palabras clave SQL
+    const sqlKeywords = /\b(SELECT|FROM|WHERE|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|JOIN|GROUP\s+BY|ORDER\s+BY)\b/i;
+
+    return sqlKeywords.test(cleanText);
+}
 function setDynamicHeight(messagesHistory) {
     const editVar = messagesHistory ? messagesHistory.length > 3 : true;
     // Selecciona el contenedor de referencia
