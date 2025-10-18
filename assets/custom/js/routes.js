@@ -135,6 +135,14 @@ window.routes.push(
         }
     },
     {
+        path: '/conversation1',
+        alias: ['/screens/conversation1','/screens/conversation1/:guid'],
+        componentUrl: './partials/screens/conversation_refactored.html',
+        options:{
+            reloadCurrent:true,
+        }
+    },
+    {
         path: '/coversations',
         alias: ['/screens/conversation-list','/screens/conversation-list/:guid'],
         componentUrl: './partials/screens/conversation-list.html',
