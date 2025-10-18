@@ -1,0 +1,1265 @@
+<template>
+    <div class="page no-tabbar no-sidebar" data-name="cart">
+        <!-- Navbar remains unchanged -->
+        <div id="conversation-navbar" class="navbar">
+            <div class="navbar-bg"></div>
+            <div class="navbar-inner">
+                <div class="left">
+                    <a href="#" class="link" @click="${openConversationsSidebar}">
+                        <i class="icon material-icons">chevron_right</i>
+                    </a>
+                </div>
+                <div class="title">${chat.title}</div>
+                <div class="right">
+                    <a href="#" data-tooltip="Reproducir conversaci�n" class="link tooltip-init icon-only"><i
+                            class="icon material-icons">play</i></a>
+                    <a href="#" @click="${startNewConversation}" data-tooltip="New conversation"
+                       class="link tooltip-init icon-only"><i class="icon material-icons">add</i></a>
+
+                    <a href="#" data-tooltip="Configuration" class="link tooltip-init icon-only"
+                       @click="${openPopupConfig}">
+                        <i class="icon material-icons">settings</i>
+                    </a>
+                    ${assistant ? $h`
+                    <a href="#" class="link icon-only popover-open tooltip-init" data-popover="#popover-assistants"
+                       data-tooltip="Change Assistant">
+                        <img class="shape-circle" width="40" src="${assistant.avatar}"/>
+
+                    </a>
+                    ` : ''}
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar messagebar messagebar-chat" style="${showBottomBar ? '' : 'display:none'}">
+            <div id="page-toolbar" class="toolbar-inner" style="min-height: 70px;">
+
+            </div>
+        </div>
+        <!-- Page content with messages and messagebar inside -->
+        <div class="page-content" id="conversationPage">
+            <div class="row justify-content-center no-gap padding-horizontal-half"
+                 style="--f7-card-margin-horizontal: 8px;">
+                <div id="message-area" class="col-100 medium-65 margin-bottom-half margin-top large-70 xlarge-65">
+                    <div style=""
+                         class="messages-content justify-content-center padding-top row">
+                        <div class="col-90 large-60 medium-75 messages xlarge-70" id="messages-space">
+
+                        </div>
+                        <!-- Centered messagebar component (only show when no messages) -->
+
+                        <div id="prompt-area"
+                             class="centered-messagebar-container">
+                            ${!showBottomBar ? $h`
+                            <div class="display-flex justify-content-center width-100">
+                                <img src="${assistant ? assistant.mainImage : ''}" width="300" class=""/>
+                            </div>
+
+                            <div class="block-title-large margin text-align-center">
+                                ${myDevice ?
+                                (assistant ? assistant.greeting : '') :
+                                (chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ?
+                                'Please select a device.' :
+                                (assistant ? assistant.greeting : ''))}
+                            </div>
+                            <!-- Remaining components unchanged -->
+
+                            ` : ''}
+                            <div id="messagebar-chat"
+                                 style=""
+                                 class="messagebar-chat centered-messagebar auto-height">
+
+                                <div class="messagebar-inner">
+                                    <div class="messagebar-area" style="overflow:visible; width: 100%;">
+                                        ${showAssistantChip ? $h`
+                                        <div class="chip bg-color-chrome margin-bottom-half">
+                                            <div class="chip-media"><img src="${assistant.avatar}"/></div>
+                                            <div class="chip-label">${assistant.name} will respond</div>
+                                            <a href="#" @click="${returnToOriginalAssistant}"  data-tooltip="Return to ${originalAssistant.name}" class="chip-delete tooltip-init"></a>
+                                        </div>
+                                        ` : ''}
+                                        <div class="file-dropzone invisible" id="file-dropzone">
+                                            <input type="file" id="file-upload" multiple class="file-upload-input"
+                                                   style="display:none;"/>
+                                        </div>
+                                        <textarea
+                                                style="${(chat && chat.mainAssistant && chat.mainAssistant.deviceSelector) ? (myDevice ? '' : 'display:none') : ''}"
+                                                id="prompt"
+                                                placeholder="${(chat && chat.mainAssistant && chat.mainAssistant.deviceSelector && !myDevice) ? 'Ask anything about one particular device (please select a device first)...' : (assistant ? assistant.placeholder : '')}"
+                                                @input="${handlePromptTextArea}"
+                                                @keydown="${handleKeyDown}"
+                                                class="input-with-value resizable keyboard-mode">
+                                    </textarea>
+                                        <div id="assistants-suggestions" class="assistants-suggestions"
+                                             style="display: none;">
+                                            <div class="assistants-suggestions-title">Available Assistants</div>
+                                            <div class="assistants-suggestions-list"></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="messagebar-buttons-bottom">
+                                    <div class="row align-items-center">
+                                        <div class="col-90">
+                                            <div id="device-list"
+                                                 class="block float-left margin-bottom-auto margin-horizontal-auto inset margin-vertical"
+                                                 style="">
+
+                                                ${(myDevice || (chat && chat.mainAssistant &&
+                                                chat.mainAssistant.deviceSelector === false)) ? $h`
+                                                ${chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ? $h`
+                                                <div data-tooltip="Select other device"
+                                                     class="tooltip-init bg-color-blue chip cursor-pointer"
+                                                     @click="${handleOpenDeviceSelection}">
+                                                    <div class="chip-label">${myDevice}</div>
+                                                </div>
+                                                ` : ''}
+
+
+                                                ${chat && chat.mainAssistant && chat.mainAssistant.activeDropzone !== false ? $h`
+                                                <a href="#" @click="${handleFileUploadClick}"
+                                                   style="height: 35px!important;" data-tooltip="Upload a document"
+                                                   class="tooltip-init link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray">
+                                                    <i class="fa fa-paperclip"></i>
+                                                </a>
+                                                ` : ''}
+                                                ${chat && chat.tools && chat.tools.length > 0 ? $h`
+                                                <a href="#" class="link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray popover-open tooltip-init"
+                                                   style="height: 35px!important;"
+                                                   data-tooltip="Manage tools"
+                                                   data-popover="#popover-tools">
+                                                    <i class="icon material-icons">tune</i>
+                                                </a>
+                                                ` : ''}
+                                                ${currentModelCategory === 'reasoning' ? $h`
+                                                <a href="#" @click="${toggleReasoning}"
+                                                   style="height: 35px!important;"
+                                                   data-tooltip="${isReasoningEnabled() ? 'Disable reasoning' : 'Enable reasoning'}"
+                                                   class="tooltip-init link button-outline float-left margin-right-half button border-color-chrome button-icon button-round ${isReasoningEnabled() ? 'color-blue' : 'color-gray'}">
+                                                    <i class="icon material-icons">${isReasoningEnabled() ? 'psychology' : 'psychology_alt'}</i>
+                                                </a>
+                                                ` : ''}
+                                                ${chat && chat.noSelectionInstructions &&
+                                                chat.noSelectionInstructions.length > 0 ? $h`
+                                                <div data-tooltip="Open shortcuts"
+                                                     class="tooltip-init bg-color-bluegray chip cursor-pointer"
+                                                     @click="${() => actionsCustomLayout.open()}">
+                                                    <div class="chip-media">
+                                                        <i class="fa fa-bookmark fa-icon"></i>
+                                                    </div>
+                                                    <div class="chip-label">${chat.noSelectionInstructions.length} shortcuts
+                                                    </div>
+                                                </div>
+                                                ` : ''}
+
+                                                ` : $h`
+                                                `}
+                                                ${chat && chat.mainAssistant && chat.mainAssistant.deviceSelector ?
+                                                devices.map((device, index) => $h`
+                                                <label style="${myDevice ? 'display:none' : ''}"
+                                                       class="chip-selectable">
+                                                    ${myDevice === device ? $h`
+                                                    <input type="radio" @change="${handleDeviceSelection}"
+                                                           name="chip-selectable-device" checked="checked"
+                                                           value="${device}"/>
+                                                    ` : $h`
+                                                    <input type="radio" @change="${handleDeviceSelection}"
+                                                           name="chip-selectable-device" value="${device}"/>
+                                                    `}
+                                                    <div class="chip">
+                                                        <div class="chip-label">${device}</div>
+                                                    </div>
+                                                </label>
+                                                `)
+                                                : ''}
+                                                ${Object.keys(highlights).length > 0 ? $h`
+                                                <a href="#" @click="${showHighlights}"
+                                                   style="height: 35px!important;"
+                                                   data-tooltip="Review selected text"
+                                                   class="tooltip-init link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray">
+                                                    <i class="fa fa-highlighter" style="color:yellow!important"></i>
+                                                </a>
+                                                ` : ''}
+                                            </div>
+                                        </div>
+                                        <div class="col-10 display-flex justify-content-right align-items-center">
+                                            ${(() => {
+                                            const voiceConfigData = configManager.getConfig();
+                                            const shouldShowVoiceButton = voiceConfigData.voiceEnabled && voiceSupported;
+                                            const shouldShowDisabledButton = !voiceConfigData.voiceEnabled && voiceConfigData.voiceShowButton;
+
+                                            return shouldShowVoiceButton ? $h`
+                                            <a href="#" @click="${handleVoiceButtonClick}"
+                                               style="margin-right: 8px;"
+                                               data-tooltip='${isRecording ? 'Stop recording' : isProcessingVoice ? 'Processing...' : 'Start voice recording'}'
+                                            class="link tooltip-init message-bar-icon ripple-color-gray ${isRecording ? 'recording-active' : isProcessingVoice ? 'processing-voice' : ''}">
+                                            <i class="fa fa-2x ${isRecording ? 'fa-stop-circle' : isProcessingVoice ? 'fa-spinner fa-spin' : 'fa-microphone'} fa-icon"
+                                               style="color: ${isRecording ? '#FF5252' : isProcessingVoice ? '#FF9800' : '#2196F3'};"></i>
+                                            </a>
+                                            ` : shouldShowDisabledButton ? $h`
+                                            <a href="#" @click="${showVoiceDisabledMessage}"
+                                               style="margin-right: 8px; opacity: 0.5;"
+                                               data-tooltip='Voice features disabled - Enable in settings'
+                                               class="link tooltip-init message-bar-icon">
+                                                <i class="fa fa-2x fa-microphone-slash fa-icon" style="color: #999;"></i>
+                                            </a>
+                                            ` : '';
+                                            })()}
+                                            ${isResponding ? $h`
+                                            <a href="#" @click="${stopStreaming}" style=""
+                                               data-tooltip='Stop response'
+                                               class="link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-stop-circle fa-icon" style="color: #FF5252;"></i>
+                                            </a>
+                                            ` : ((!prompt || !myDevice) && (chat && chat.mainAssistant &&
+                                            chat.mainAssistant.deviceSelector)) ? $h`
+                                            <a href="#" @click="${sendPrompt}" style=""
+                                               data-tooltip='Send message'
+                                               class="disabled link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-arrow-circle-up fa-icon"
+                                                   style="color: #ffffff;"></i>
+                                            </a>
+                                            ` : $h`
+                                            <a href="#" @click="${sendPrompt}" style=""
+                                               data-tooltip='Send message'
+                                               class="link tooltip-init margin-right float-right message-bar-icon ripple-color-gray">
+                                                <i class="fa fa-2x fa-arrow-circle-up fa-icon"
+                                                   style="color: #4CAF50;"></i>
+                                            </a>
+                                            `}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            ${quick_actions && quick_actions.length > 0 && !showBottomBar ? $h`
+                            <div class="quick-actions-container no-margin-top text-align-center"
+                                 style="max-width:650px!important">
+                                <div class="block float-left">
+                                    ${quick_actions.map((action, index) => $h`
+                                    <div data-tooltip="${action.description}"
+                                         style="background-color:${action.color} "
+                                         class="quick-action-chip link chip-outline tooltip-init padding chip cursor-pointer"
+                                         @click="${() => {
+                 // Primero crear la conversaci�n
+                 quick_actions = [];
+                 createConversation(assistant.guid).then(() => {
+                     // Luego ejecutar el c�digo de la acci�n
+                     if (action.code) {
+                         eval(action.code);
+                     }
+                 });
+             }}">
+                                        <div style="color:white" class="chip-media">
+                                            <i class="fa ${action.icon || 'fa-bolt'} fa-icon"
+                                               style="color:${action.color}"></i>
+                                        </div>
+                                        <div class="font-size-16 chip-label">${action.shortTitle}</div>
+                                    </div>
+                                    `)}
+                                </div>
+                            </div>
+                            ` : ''}
+                            <div id="legal-info" class="margin-bottom-half legal-info text-align-center">SIMBA may make
+                                mistakes. Consider verifying
+                                important information. See the <a href="/screens/terms/" class="link">disclaimer</a> for
+                                details.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="scrollToBottom" @click="${scrollToBottom}"
+                 class="fab fab-center-bottom hidden color-gray opacity-75">
+                <a href="#">
+                    <i class="fa fa-arrow-down"></i>
+                </a>
+            </div>
+            <div class="block-footer"></div>
+        </div>
+
+        <!-- Fixed bottom messagebar (only show when there are messages) -->
+        <!-- Fixed bottom messagebar (only show when there are messages) -->
+
+
+        <div id="dialog-choice-chip" class="dialog">
+            <div class="dialog-inner">
+                <div class="dialog-title">Choose te reason for your feedback</div>
+                <form name="dialog-choice-chip" action="#" method="POST" enctype="multipart/form-data"
+                      @submit="${(event) => event.preventDefault()}">
+                    <div class="block margin-top no-margin-bottom no-padding-horizontal">
+                        ${unlikeReasons.map((option, index) => $h`
+                        <label data-tooltip="${option.description}" class="tooltip-init chip-selectable">
+                            <input type="checkbox" name="interests" value="${option.value}"/>
+                            <div class="chip color-pink">
+                                <div class="chip-label">${option.reason}</div>
+                            </div>
+                        </label>
+                        `)}
+                        <textarea class="padding margin"
+                                  style="width:90%;height:200px;background-color:#333333!important"
+                                  placeholder="Please describe your feedback"></textarea>
+
+                    </div>
+                </form>
+            </div>
+            <div class="dialog-buttons">
+                <span class="dialog-button color-gray" @click="${closeDialogChoiceChip}">Cancel</span>
+                <span class="dialog-button" @click="${submitFormDialogChoiceChip}">OK</span>
+            </div>
+        </div>
+
+        <div id="popup-api-keys" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Required API Configuration</div>
+                        <!-- No bot�n de cerrar para forzar configuraci�n -->
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">API Keys Required</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">
+                                Please configure your API keys to continue using the application.
+                            </div>
+                        </div>
+                    </div>
+
+                    <form name="api-keys" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list inset margin-vertical">
+                            <ul>
+
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-title item-floating-label">mySim API Key</div>
+                                            <div class="item-input-wrap">
+                                                <input type="password" name="assistant_auth_token"
+                                                       placeholder="Your mySim API key" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-title item-floating-label">Completion API Key</div>
+                                            <div class="item-input-wrap">
+                                                <input type="password" name="completion_api_key"
+                                                       placeholder="Your completion API key" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <button type="submit" class="button button-fill button-large">
+                                                Save API Keys & Continue
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div id="popup-ticket" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">Confirm Support Ticket</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${() => closePopupTicket(false)}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+
+                    <div class="block block-strong inset margin-vertical">
+                        <div class="margin-top text-align-center">
+                            <div class="font-size-24 font-weight-bold">Confirm Support Ticket</div>
+                            <div class="font-size-16 margin-top-half text-color-gray">Please confirm the details of your
+                                support request.
+                            </div>
+                        </div>
+                    </div>
+                    <form name="ticket" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list inset margin-vertical">
+                            <ul class="padding-vertical-half">
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">devices</i>
+                                                </div>
+                                                <input type="text" value="${ticket.device}" name="device"
+                                                       placeholder="Device" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media">
+                                                    <i class="icon material-icons">title</i>
+                                                </div>
+                                                <input type="text" name="problem_title" value="${ticket.problem_title}"
+                                                       placeholder="Title" required/>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content item-input item-input-outline">
+                                        <div class="item-inner">
+                                            <div class="item-input-wrap">
+                                                <div class="item-media align-self-flex-start">
+                                                    <i class="icon material-icons">description</i>
+                                                </div>
+                                                <textarea name="problem_description" class="resizable"
+                                                          placeholder="Description" required style="min-height: 128px;">${ticket.problem_description}</textarea>
+                                                <span class="input-clear-button"></span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div class="item-content">
+                                        <div class="item-inner">
+                                            <button type="submit" class="button button-fill button-large">Confirm Ticket
+                                            </button>
+                                        </div>
+                                    </div>
+                                </li>
+                            </ul>
+                        </div>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+        <div id="actions-custom-layout" class="actions-modal">
+            <div class="actions-group text-align-center">
+                <a href="#" class="link shape-container shape-circle overflow-hidden ripple-color-gray"
+                   style="background-color: var(--f7-list-bg-color);" @click="${() => actionsCustomLayout.close()}">
+                    <i class="icon material-icons text-color-mono">close</i>
+                </a>
+            </div>
+            <div class="actions-group">
+                <div class="list media-list inset no-chevron no-hairlines-between no-margin">
+                    <ul>
+
+                        ${chat.instructions.map((option, index) => option.isSelection === 0 ? $h`
+                        <li>
+                            <a href="#" class="item-link" @click="${(e) => {
+                e.preventDefault();
+
+                if (option.code !== null && option.code !== undefined) {
+                   eval(option.code);
+                } else {
+                 setPrompt(option.prompt);
+                }
+                actionsCustomLayout.close()
+            }}">
+                                <div class="item-content">
+                                    <div class="item-media">
+<span style="background-color:${option.color}"
+      class="shape-container shape-auto size-40">
+    <i class="fa ${option.icon} font-size-20 color-white"></i>
+</span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${option.promptName}</div>
+                                        </div>
+                                        <div class="item-text tooltip-init" data-tooltip="${option.prompt}">${option.prompt.substring(0, 100)}</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ` : '')}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="popover-selection" class="popover">
+            <div class="popover-inner">
+                <div class="list no-chevron no-hairlines-between">
+                    <ul>
+                        <li>
+                            <div class="item-content item-input item-input-outline item-input-with-info">
+                                <div class="item-inner no-padding-bottom">
+                                    <div class="item-title item-floating-label">Ask to SIMBA</div>
+                                    <div class="item-input-wrap no-border">
+                                        <input type="text" @input="${handlePromptTextArea}" id="ask-simba" class=""/>
+                                        <span class="input-clear-button"></span>
+                                        <a href="#" class="link popover-close" @click="${() => setPrompt(prompt,1)}"><i
+                                                class="icon f7-icons">arrow_up</i></a></div>
+                                </div>
+                            </div>
+                        </li>
+
+                        <li>
+                            <a href="#" class="item-link" @click="${highlightForReporting}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-highlighter color-yellow"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Highlight for reporting</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ${chat.instructions.map((option, index) => option.isSelection === 1 ? $h`
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${() => setPrompt(option.prompt,1)}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+            <span style="background-color:${option.color}"
+                  class="shape-container shape-auto size-40">
+                <i class="fa ${option.icon} color-white"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title-row">
+                                            <div class="item-title">${option.promptName}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        ` : '')}
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="${copyToClipboard}">
+                                <div class="item-content" style="height:10px">
+                                    <div class="item-media">
+                                    <span style=""
+                                          class="shape-container shape-auto size-40">
+                <i class="fa fa-copy color-white"></i>
+            </span>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Copy to clipboard</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="popover-assistants" class="popover" style="min-width: 192px;">
+            <div class="popover-inner">
+                <div class="list links-list no-chevron no-hairlines no-hairlines-between">
+                    <ul>
+                        ${assistants.map((item, index) => $h`
+                        <li>
+                            <a href="#" class="popover-close" @click="${() => switchAssistant(item.guid)}">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <img class="shape-circle" width="40" height="40" src="${item.avatar}"/>
+
+                                    </div>
+                                    <div data-tooltip="${item.name}" class="tooltip-init item-inner">
+                                        <div class="item-title">${item.name}</div>
+                                        ${item.guid == assistant.guid && $h`
+                                        <i class="icon margin-left f7-icons color-primary">checkmark_alt_circle_fill</i>
+                                        `}
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        `)}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <input type="file" id="document-upload" style="display: none;" multiple/>
+        <div id="popup-config" class="popup">
+            <div class="page">
+                <div class="navbar">
+                    <div class="navbar-bg"></div>
+                    <div class="navbar-inner">
+                        <div class="title">API Configuration</div>
+                        <div class="right">
+                            <a class="link icon-only" @click="${closePopupConfig}">
+                                <i class="icon material-icons">cancel</i>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="page-content">
+                    <form name="config" action="#" method="POST" enctype="multipart/form-data">
+                        <div class="list accordion-list inset margin-vertical">
+                            <!-- API Configuration Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">api</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">API Configuration</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">mySim API URL</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">link</i>
+                                                            </div>
+                                                            <input type="text" value="${config.assistantApiUrl}" name="api_url"
+                                                                   placeholder="API URL" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Api Key</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">vpn_key</i>
+                                                            </div>
+                                                            <input type="password" name="token" value="${config.assistantAuthToken}"
+                                                                   placeholder="Authentication token" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Completion URL</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">cloud</i>
+                                                            </div>
+                                                            <input type="text" name="completion_url"
+                                                                   value="${config.completionsApiUrl}"
+                                                                   placeholder="Completion service URL" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">API Key</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">security</i>
+                                                            </div>
+                                                            <input type="password" name="api_key"
+                                                                   value="${config.completionsApiKey}"
+                                                                   placeholder="API Key for the service" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+
+                            <!-- Model Parameters Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">tune</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Model Parameters</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <!-- ✅ Contenedor dinámico para Model -->
+                                            <li id="model-field-container">
+                                                <!-- Se llenará dinámicamente -->
+                                            </li>
+
+                                            <!-- ✅ Contenedor dinámico para Summary Model -->
+                                            <li id="summary-model-field-container">
+                                                <!-- Se llenará dinámicamente -->
+                                            </li>
+                                            <li id="vision-model-field-container">
+                                                <!-- Se llenará dinámicamente -->
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Temperature</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">thermostat</i>
+                                                            </div>
+                                                            <input type="number" name="temperature" value="${config.temperature || DEFAULT_TEMPERATURE}"
+                                                                   placeholder="Temperature (0-2)" min="0" max="2" step="0.1" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Tool Temperature</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">build</i>
+                                                            </div>
+                                                            <input type="number" name="tool_temperature" value="${config.toolTemperature || 0.1}"
+                                                                   placeholder="Temperature for tool calls (0-2)" min="0" max="2" step="0.1" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Token Limits Section -->
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">format_list_numbered</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Token Limits</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Max Tokens</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">format_list_numbered</i>
+                                                            </div>
+                                                            <input type="number" name="max_tokens" value="${config.maxTokens || MAX_TOKENS}"
+                                                                   placeholder="Maximum tokens" min="100" max="100000" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Token Limit</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">storage</i>
+                                                            </div>
+                                                            <input type="number" name="token_limit" value="${config.tokenLimit || TOKEN_LIMIT}"
+                                                                   placeholder="Token limit for optimization" min="1000" max="20000" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="accordion-item">
+                                <div class="accordion-item-toggle">
+                                    <div class="item-content">
+                                        <div class="item-media">
+                                            <i class="icon material-icons">mic</i>
+                                        </div>
+                                        <div class="item-inner">
+                                            <div class="item-title">Voice & Audio Settings</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="accordion-item-content">
+                                    <div class="list">
+                                        <ul>
+                                            <!-- Enable/Disable Voice Features -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">record_voice_over</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Enable Voice Features</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="voice_enabled"
+                                                                       ${voiceConfig?.enabled ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Language Selection -->
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Speech Language</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">language</i>
+                                                            </div>
+                                                            <select name="voice_language" required>
+                                                                <option value="en-US" ${config.voiceLanguage === 'en-US' ? 'selected' : ''}>English (US)</option>
+                                                                <option value="en-GB" ${config.voiceLanguage === 'en-GB' ? 'selected' : ''}>English (UK)</option>
+                                                                <option value="es-ES" ${config.voiceLanguage === 'es-ES' ? 'selected' : ''}>Espa�ol (Espa�a)</option>
+                                                                <option value="es-MX" ${config.voiceLanguage === 'es-MX' ? 'selected' : ''}>Espa�ol (M�xico)</option>
+                                                                <option value="fr-FR" ${config.voiceLanguage === 'fr-FR' ? 'selected' : ''}>Fran�ais</option>
+                                                                <option value="de-DE" ${config.voiceLanguage === 'de-DE' ? 'selected' : ''}>Deutsch</option>
+                                                                <option value="it-IT" ${config.voiceLanguage === 'it-IT' ? 'selected' : ''}>Italiano</option>
+                                                                <option value="pt-BR" ${config.voiceLanguage === 'pt-BR' ? 'selected' : ''}>Portugu�s (Brasil)</option>
+                                                                <option value="ru-RU" ${config.voiceLanguage === 'ru-RU' ? 'selected' : ''}>???????</option>
+                                                                <option value="ja-JP" ${config.voiceLanguage === 'ja-JP' ? 'selected' : ''}>???</option>
+                                                                <option value="ko-KR" ${config.voiceLanguage === 'ko-KR' ? 'selected' : ''}>???</option>
+                                                                <option value="zh-CN" ${config.voiceLanguage === 'zh-CN' ? 'selected' : ''}>?? (??)</option>
+                                                            </select>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Max Recording Time -->
+                                            <li>
+                                                <div class="item-content item-input item-input-outline">
+                                                    <div class="item-inner">
+                                                        <div class="item-title item-floating-label">Max Recording Time (seconds)</div>
+                                                        <div class="item-input-wrap">
+                                                            <div class="item-media">
+                                                                <i class="icon material-icons">timer</i>
+                                                            </div>
+                                                            <input type="number" name="max_recording_time"
+                                                                   value="${config.maxRecordingTime || 30}"
+                                                                   placeholder="Maximum recording duration"
+                                                                   min="5" max="300" step="5" required/>
+                                                            <span class="input-clear-button"></span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Auto Send After Voice -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">send</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Auto-send after transcription</div>
+                                                        <div class="item-text">Automatically send message after voice transcription</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="voice_auto_send"
+                                                                       ${config.voiceAutoSend ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Show Voice Button -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">visibility</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Show voice button when disabled</div>
+                                                        <div class="item-text">Display microphone button even if voice is disabled</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="voice_show_button"
+                                                                       ${config.voiceShowButton !== false ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Continuous Listening -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">hearing</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Continuous listening</div>
+                                                        <div class="item-text">Keep listening for multiple sentences</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="voice_continuous"
+                                                                       ${config.voiceContinuous ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Audio Quality Settings -->
+                                            <li class="accordion-item-divider"></li>
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-inner">
+                                                        <div class="item-title text-color-gray">Audio Quality</div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Echo Cancellation -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">volume_off</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Echo cancellation</div>
+                                                        <div class="item-text">Remove echo from microphone input</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="echo_cancellation"
+                                                                       ${config.echoCancellation !== false ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Noise Suppression -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">noise_control_off</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Noise suppression</div>
+                                                        <div class="item-text">Reduce background noise</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="noise_suppression"
+                                                                       ${config.noiseSuppression !== false ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+
+                                            <!-- Auto Gain Control -->
+                                            <li>
+                                                <div class="item-content">
+                                                    <div class="item-media">
+                                                        <i class="icon material-icons">tune</i>
+                                                    </div>
+                                                    <div class="item-inner">
+                                                        <div class="item-title">Auto gain control</div>
+                                                        <div class="item-text">Automatically adjust microphone volume</div>
+                                                        <div class="item-after">
+                                                            <label class="toggle toggle-init">
+                                                                <input type="checkbox" name="auto_gain_control"
+                                                                       ${config.autoGainControl !== false ? 'checked' : ''}/>
+                                                                <span class="toggle-icon"></span>
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Save Button -->
+                            <div class="list inset margin-top">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-inner">
+                                                <button type="submit" class="button button-fill button-large">Save Configuration</button>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="popup popup-highlights" id="popup-highlights">
+            <div class="view">
+                <div class="page">
+                    <div class="navbar">
+                        <div class="navbar-bg"></div>
+                        <div class="navbar-inner">
+                            <div class="title">Highlighted Texts</div>
+                            <div class="right">
+                                <a href="#" class="link popup-close">Close</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="page-content">
+                        <div class="card margin-vertical no-shadow">
+                            <div class="card-header">
+                                <span>Highlights (${Object.keys(highlights).length})</span>
+                                <a href="#" class="link icon-only" @click="${toggleSortableDisable}">
+                                    <i class="icon material-icons">sort</i>
+                                </a>
+                            </div>
+                            <div class="card-content">
+                                <div id="sortable-highlights-list" class="list sortable no-safe-areas">
+                                    <ul>
+                                        ${Object.keys(highlights).length > 0 ? Object.keys(highlights).map((key, index) => $h`
+                                        <li data-highlight-id="${key}">
+                                            <div class="cursor-pointer item-content"
+                                                 @click="${() => scrollToHighlight(key)}">
+                                                <div class="item-inner">
+                                                    <div class="item-title"
+                                                         style="padding-right: 50px; word-wrap: break-word; overflow-wrap: break-word;">
+                                                        ${highlights[key].text}
+                                                    </div>
+                                                    <div class="item-after"
+                                                         style="position: absolute; right: 25px; top: 50%; transform: translateY(-50%); min-width: 30px;">
+                                                        <a href="#" class="link margin-right" data-highlight-id="${key}"
+                                                           @click="${(e) => removeHighlightFromPopup(e, key)}">
+                                                            <i class="fa fa-trash color-red"></i>
+                                                        </a>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="sortable-handler"></div>
+                                        </li>
+                                        `) : $h`
+                                        <li class="no-sorting">
+                                            <div class="item-content">
+                                                <div class="item-inner">
+                                                    <div class="item-title">No highlights found</div>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        `}
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <button class="button button-fill button-large" @click="${generalAction}">
+                                    <i class="fa fa-pencil margin-right"></i>
+                                    Create report
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="popover-tools" class="popover">
+            <div class="popover-inner">
+                <div class="list no-chevron no-hairlines-between">
+                    <ul>
+                        ${chat && chat.tools ? chat.tools.map((tool, index) => {
+                        const toolName = tool.function?.name || `tool_${index}`;
+
+                        // Inicializar si no existe
+                        if (activeTools[toolName] === undefined) {
+                        activeTools[toolName] = true;
+                        }
+
+                        const isActive = activeTools[toolName] === true;
+                        return $h`
+                        <li>
+                            <div class="item-content tooltip-init"
+                                 data-tooltip="${(tool.function?.description?.length > 100
+        ? tool.function.description.substring(0, 100) + '...'
+        : tool.function?.description || 'No description available')}">
+                                <div class="item-media">
+                                    <i style="color: ${isActive ? '#4CAF50' : '#757575'}" class="fa ${tool.function?.icon || 'fa-cog'} font-size-12 color-white"></i>
+                                </div>
+                                <div class="item-inner margin-left-half">
+                                    <div class="item-title-row">
+                                        <div class="item-text font-size-12" style="width:115px">${tool.function?.friendly_name || `Tool ${index + 1}`}</div>
+                                        <div class="item-after"  style="display: flex; align-items: center; justify-content: flex-end; min-width: 60px;">
+                                            <label class="toggle toggle-init" style="transform: scale(0.6);">
+                                                <input type="checkbox"
+                                                       checked="${isActive}"
+                                                       @change="${(e) => toggleTool(toolName, e.target.checked)}"/>
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </li>
+                        `;
+                        }) : []}
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div id="popover-text" class="popover">
+            <div class="popover-inner" style="max-height:200px!important">
+                ${myReference ? $h`
+                <div class="block-title align-items-center margin-top">
+                    ${currentReferenceGroup && currentReferenceGroup.length > 1 ? $h`
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <!-- Sin nombre cuando hay grupo -->
+                        </div>
+                        <div class="col-auto">
+                            <div class="segmented segmented-mini">
+                                <a href="#" id="prev-reference" class="button button-mini ${currentReferenceIndex === 0 ? 'disabled' : ''}">
+                                    <i class="f7-icons">chevron_left</i>
+                                </a>
+                                <a href="#" id="next-reference" class="button button-mini ${currentReferenceIndex === currentReferenceGroup.length - 1 ? 'disabled' : ''}">
+                                    <i class="f7-icons">chevron_right</i>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <span class="margin-left-half font-size-16 font-weight-normal text-color-gray">
+                ${currentReferenceIndex + 1}/${currentReferenceGroup.length}
+            </span>
+                    ` : $h`
+                    <span class="margin-left-half font-size-16 font-weight-normal text-color-gray">
+                Page: ${myReference.page} Section: ${myReference.section}
+            </span>
+                    `}
+                </div>
+                <div class="block margin-bottom">
+                    <strong>${myReference.name}</strong>
+                    <p>${myReference.content}</p>
+                </div>
+                ` : $h`
+                <div class="block text-align-center">
+                    <span key="preloader" class="preloader"></span>
+                </div>
+                `}
+            </div>
+            <div class="popover-footer padding">
+                <a href="#" id="view-source"
+                   class="button float-left margin-bottom button-small button-round color-white bg-color-chrome link popover-close">
+                    <i class="fa fa-file margin-right-half"></i>
+                    <span>View source</span>
+                </a>
+                <a href="#" id="view-document"
+                   class="margin-left-half float-left button margin-bottom button-small button-round color-white bg-color-chrome link popover-close">
+                    <i class="fa fa-eye margin-right-half"></i>
+                    <span>View document</span>
+                </a>
+            </div>
+        </div>
+        ${popupTask ? $h`
+        <div data-tooltip="There is a guide started" style="top:-100px" class="tooltip-init fab thinking-icon fab-left-bottom color-gray">
+            <a href="#" @click="${openTask}">
+                <i class="icon material-icons">check</i>
+            </a>
+        </div>
+        ` : $h``}
+
+        <!-- Popover del men� de opciones -->
+        <div class="popover" id="conversations-menu">
+            <div class="popover-inner">
+                <div class="list">
+                    <ul>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="exportAllConversations">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons">download</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Export All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="showConversationStats">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons">analytics</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Statistics</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#" class="item-link popover-close" @click="clearAllConversations">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons color-red">delete_sweep</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title color-red">Clear All</div>
+                                    </div>
+                                </div>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</template>
+<link rel="stylesheet" href="../../assets/custom/css/conversation_refactored.css">
+<script type="module">
+    import renderConversationPage from "../../assets/js/conversation_refactored.js";
+    export default renderConversationPage;
+</script>
