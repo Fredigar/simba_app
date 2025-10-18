@@ -1,0 +1,430 @@
+.thinking-container {
+    margin: 10px 0;
+    font-size: 12px !important;
+}
+
+.collapsible-container {
+    background-color: #3b3b3b;
+    border-radius: 8px !important;
+}
+
+.thinking-header {
+    display: flex;
+    align-items: center;
+    padding: 10px;
+    cursor: pointer;
+    transition: background 0.2s ease;
+}
+
+.thinking-header:hover {
+    background: rgba(66, 92, 141, 0.3);
+}
+
+.thinking-icon {
+    font-size: 20px;
+    margin-right: 8px;
+}
+
+.thinking-label {
+    flex: 1;
+}
+
+.toggle-thinking-content {
+    transition: transform 0.2s ease;
+}
+
+.thinking-content {
+    max-height: 400px;
+    overflow-y: auto;
+    background-color: rgba(255, 255, 255, 0.05);
+    line-height: 1.6;
+    display: block;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.thinking-content::-webkit-scrollbar {
+    width: 6px;
+}
+
+.thinking-content::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb {
+    background: rgba(138, 180, 248, 0.3);
+    border-radius: 3px;
+}
+
+.thinking-content::-webkit-scrollbar-thumb:hover {
+    background: rgba(138, 180, 248, 0.5);
+}
+
+.final-response {
+    margin-top: 15px;
+    padding-top: 15px;
+}
+
+.toggle-thinking-content i {
+    transition: transform 0.3s ease;
+}
+
+.button-icon.color-blue {
+    background-color: rgba(0, 122, 255, 0.1) !important;
+}
+
+.button-icon.color-blue:hover {
+    background-color: rgba(0, 122, 255, 0.2) !important;
+}
+
+.button-icon {
+    transition: all 0.3s ease;
+}
+
+.button-icon i {
+    transition: transform 0.2s ease;
+}
+
+.button-icon:active i {
+    transform: scale(0.9);
+}
+
+.word-page {
+    background: white;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    width: 21cm;
+    min-height: 29.7cm;
+    margin: 20px auto;
+    padding: 2.5cm 2cm;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    page-break-after: always;
+}
+
+.simba-suggestion {
+    display: block;
+    width: fit-content;
+    margin: 8px 0;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+    border: none;
+    color: gray;
+    margin-left: 100px;
+}
+
+.simba-suggestion:hover {
+    transform: translateX(4px);
+}
+
+.simba-suggestion:active {
+    transform: translateX(2px);
+}
+
+.simba-suggestion i {
+    transition: transform 0.2s ease;
+}
+
+.simba-suggestion:hover i {
+    transform: translateX(4px);
+}
+
+.message-text-header .file-item.image-card {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    display: inline-block;
+    margin: 5px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #e0e0e0;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.message-text-header .file-item.image-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #007aff;
+}
+
+.message-text-header .image-card-thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.message-text-header .image-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.message-text-header .file-item.image-card:hover .image-card-overlay {
+    opacity: 1;
+}
+
+.message-text-header .image-card-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.message-text-header .image-action-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+}
+
+.message-text-header .image-action-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.image-action-btn.view-image-btn:hover {
+    background: #007aff;
+    color: white;
+}
+
+.file-item.image-card {
+    position: relative;
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    overflow: hidden;
+    border: 2px solid #312d2d;
+    display: inline-block;
+    margin: 5px;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.file-item.image-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-color: #007aff;
+}
+
+.image-card-thumbnail {
+    width: 100% !important;
+    height: 100% !important;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.image-card-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.file-item.image-card:hover .image-card-overlay {
+    opacity: 1;
+}
+
+.image-card-actions {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+}
+
+.image-action-btn {
+    width: 32px;
+    height: 32px;
+    background: rgba(255, 255, 255, 0.9);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    color: #333;
+    font-size: 14px;
+}
+
+.image-action-btn:hover {
+    background: white;
+    transform: scale(1.1);
+}
+
+.image-action-btn.remove-btn:hover {
+    background: #ff4444;
+    color: white;
+}
+
+.image-action-btn.view-btn:hover {
+    background: #007aff;
+    color: white;
+}
+
+.image-action-btn.download-btn:hover {
+    background: #28a745;
+    color: white;
+}
+
+.file-item:not(.image-card) {
+}
+
+.image-action-btn.view-ocr-btn:hover {
+    background: #17a2b8;
+    color: white;
+}
+
+.conversation-item {
+    transition: background-color 0.3s ease;
+}
+
+.conversation-item.active {
+    background-color: var(--f7-list-item-selected-bg-color, rgba(0, 122, 255, 0.15));
+}
+
+.conversation-item .item-media img {
+    border: 2px solid var(--f7-bars-bg-color);
+}
+
+.conversation-item .item-after {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.conversation-item .time-badge {
+    font-size: 11px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    background-color: var(--f7-bars-bg-color);
+    color: var(--f7-bars-text-color);
+}
+
+.conversation-item .file-indicator {
+    color: var(--f7-text-color);
+    opacity: 0.6;
+    font-size: 14px;
+}
+
+.conversation-item .swipeout-actions-right a {
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 80px;
+}
+
+.conversation-item .swipeout-delete {
+    background-color: #ff3b30;
+}
+
+.conversation-item .swipeout-rename {
+    background-color: #007aff;
+}
+
+.conversation-item .item-text {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-height: 2.4em;
+    line-height: 1.2em;
+}
+
+.list-group-title {
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-top: 20px;
+}
+
+.list-group-title:first-child {
+    margin-top: 0;
+}
+
+#conversations-panel .searchbar {
+    margin-bottom: 0;
+}
+
+#conversations-panel .page-content {
+    padding-top: 0;
+}
+
+.conversation-assistant-badge {
+    font-size: 10px;
+    padding: 1px 4px;
+    border-radius: 6px;
+    background-color: var(--f7-button-fill-bg-color);
+    color: var(--f7-button-fill-text-color);
+    margin-left: 4px;
+}
+
+reference {
+    display: none !important;
+}
+
+.reference-group-main {
+    position: relative;
+}
+
+.reference-group-main::after {
+    content: attr(data-group-size);
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: var(--f7-color-blue, #007aff);
+    color: white;
+    border-radius: 50%;
+    width: 16px;
+    height: 16px;
+    font-size: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    z-index: 1;
+}
+
+.segmented-mini .button {
+    min-width: 32px;
+    height: 28px;
+    padding: 0 !important;
+}
+
+.segmented-mini .button.disabled {
+    opacity: 0.3;
+    pointer-events: none;
+}
+
+.badge.margin-horizontal {
+    margin: 0 8px;
+    font-size: 11px;
+    line-height: 1.2;
+}
+
+.segmented-mini {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
