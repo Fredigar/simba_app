@@ -130,6 +130,14 @@
                                                     <i class="icon material-icons">tune</i>
                                                 </a>
                                                 ` : ''}
+                                                ${window.proxyInfo && window.proxyInfo.services && window.proxyInfo.services.length > 0 && activeTools['retrieve_data_from_corporate_services'] === true && assistant?.activeProxy === true ? $h`
+                                                <a href="#" class="link button-outline float-left margin-right-half button border-color-chrome button-icon button-round color-gray popover-open tooltip-init"
+                                                   style="height: 35px!important;"
+                                                   data-tooltip="Manage proxy services"
+                                                   data-popover="#popover-proxy-services">
+                                                    <i class="icon material-icons text-color-lightgreen">cloud_sync</i>
+                                                </a>
+                                                ` : ''}
                                                 ${currentModelCategory === 'reasoning' ? $h`
                                                 <a href="#" @click="${toggleReasoning}"
                                                    style="height: 35px!important;"
@@ -1022,7 +1030,19 @@
                                     </div>
                                 </div>
                             </div>
+                            <div class="accordion-item">
+                            <a href="/screens/settings/" class="accordion-item-toggle item-link">
+                                <div class="item-content">
+                                    <div class="item-media">
+                                        <i class="icon material-icons text-color-lightgreen">cloud_sync</i>
+                                    </div>
+                                    <div class="item-inner">
+                                        <div class="item-title">Proxy Setup</div>
 
+                                    </div>
+                                </div>
+                            </a>
+                        </div>
                             <!-- Save Button -->
                             <div class="list inset margin-top">
                                 <ul>
@@ -1147,6 +1167,71 @@
                         }) : []}
                     </ul>
                 </div>
+            </div>
+        </div>
+        <div id="popover-proxy-services" class="popover">
+            <div class="popover-inner">
+                <div class="block-title margin-top-half margin-bottom-half">
+                    <div class="row align-items-center">
+                        <div class="col">
+                            <span style="vertical-align: middle;">Corporate Services</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="list no-chevron no-hairlines-between">
+                    <ul>
+                        ${window.proxyInfo && window.proxyInfo.services ? window.proxyInfo.services.map((service, index) => {
+                        const serviceName = service.name;
+
+                        // Inicializar si no existe
+                        if (window.activeServices === undefined) {
+                        window.activeServices = {};
+                        }
+                        if (window.activeServices[serviceName] === undefined) {
+                        window.activeServices[serviceName] = true;
+                        }
+
+                        const isActive = window.activeServices[serviceName] === true;
+
+                        // Icono según el tipo de servicio
+                        let serviceIcon = service.icon;
+
+                        return $h`
+                        <li>
+                            <div class="item-content tooltip-init"
+                                 data-tooltip="${service.description}">
+                                <div class="item-media">
+                                    <i style="color: ${isActive ? '#4CAF50' : '#757575'}"
+                                       class="fa ${serviceIcon} font-size-14"></i>
+                                </div>
+                                <div class="item-inner margin-left-half">
+                                            <div class="item-text font-size-13">${serviceName}</div>
+                                        <div class="item-after" style="display: flex; align-items: center; justify-content: flex-end; min-width: 60px;">
+                                            <label class="toggle toggle-init" style="transform: scale(0.6);">
+                                                <input type="checkbox"
+                                                       checked="${isActive}"
+                                                       @change="${(e) => toggleProxyService(serviceName, e.target.checked)}"/>
+                                                <span class="toggle-icon"></span>
+                                            </label>
+                                        </div>
+                                </div>
+                            </div>
+                        </li>
+                        `;
+                        }) : []}
+                    </ul>
+                </div>
+                ${window.proxyInfo && window.proxyInfo.services && window.proxyInfo.services.length > 0 ? $h`
+                <div class="block margin-top-half margin-bottom-half text-align-left" style="display: flex; justify-content: space-between; align-items: center;">
+                    <p class="text-color-gray font-size-12" style="margin: 0;">
+                        <i class="icon material-icons margin-right-half" style="font-size: 14px; vertical-align: middle;">info</i>
+                        ${Object.values(window.activeServices || {}).filter(v => v).length} of ${window.proxyInfo.services.length} services enabled
+                    </p>
+                    <a href="/screens/settings/" class="margin-left link">
+                        <i class="icon material-icons color-gray" style="font-size: 18px;">settings</i>
+                    </a>
+                </div>
+                ` : ''}
             </div>
         </div>
         <div id="popover-text" class="popover">
@@ -1364,35 +1449,35 @@
         position: relative;
         page-break-after: always;
     }
-   .simba-suggestion {
-    display: block;
-    width: fit-content;
-    margin: 8px 0;
-    padding: 10px 16px;
-    border-radius: 8px;
-    transition: all 0.2s ease;
-    border: none;
-    color:gray;
-    margin-left:100px;
-}
+    .simba-suggestion {
+        display: block;
+        width: fit-content;
+        margin: 8px 0;
+        padding: 10px 16px;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        border: none;
+        color:gray;
+        margin-left:100px;
+    }
 
-.simba-suggestion:hover {
+    .simba-suggestion:hover {
 
-    transform: translateX(4px);
+        transform: translateX(4px);
 
-}
+    }
 
-.simba-suggestion:active {
-    transform: translateX(2px);
-}
+    .simba-suggestion:active {
+        transform: translateX(2px);
+    }
 
-.simba-suggestion i {
-    transition: transform 0.2s ease;
-}
+    .simba-suggestion i {
+        transition: transform 0.2s ease;
+    }
 
-.simba-suggestion:hover i {
-    transform: translateX(4px);
-}
+    .simba-suggestion:hover i {
+        transform: translateX(4px);
+    }
     /* Estilos para las tarjetas de imagen en el header del mensaje */
     .message-text-header .file-item.image-card {
         position: relative;
@@ -1853,6 +1938,7 @@
 
         // UI Elements
         let activeTools = {}; // Para trackear qu� tools est�n activas
+        window.activeTools = activeTools;
         let popupTicket = null;
         let formTicketValidator = null;
         let popupConfig = null;
@@ -1959,9 +2045,107 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                 currentModelCategory = null;
             }
         };
-        /**
-         * Inicializa el estado de reasoning desde config
-         */
+        // ==========================================
+        // FUNCIONES PARA PROXY SERVICES
+        // ==========================================
+
+        let toggleProxyService = function(serviceName, isActive) {
+            if (!window.activeServices) {
+                window.activeServices = {};
+            }
+
+            window.activeServices[serviceName] = isActive;
+            console.log(`📡 Proxy service ${serviceName} ${isActive ? 'enabled' : 'disabled'}`);
+
+            // Actualizar el tool de retrieve_data_from_corporate_services
+            updateProxyTool();
+            updateTemplate();
+        };
+
+        let updateProxyTool = function() {
+            if (!window.proxyInfo || !chat || !chat.tools) return;
+
+            // Obtener servicios activos
+            const activeServicesList = window.proxyInfo.services
+                .filter(service => window.activeServices[service.name] === true)
+                .map(service => service.name);
+
+            if (activeServicesList.length === 0) {
+                console.log('⚠️ No active services - tool will be disabled');
+                // Opcional: podrías deshabilitar el tool aquí
+                return;
+            }
+
+            console.log('🔄 Updating proxy tool with active services:', activeServicesList);
+
+            // Recrear el tool con solo los servicios activos
+            const activeServicesInfo = window.proxyInfo.services.filter(
+                service => window.activeServices[service.name] === true
+            );
+
+            const serviceDescriptions = activeServicesInfo.map(service => {
+                return `- **${service.name}**: ${service.host} (auth: ${service.auth_type})`;
+            }).join('\n');
+
+            const serviceNames = activeServicesInfo.map(s => s.name).join(', ');
+
+            const updatedTool = {
+                type: "function",
+                function: {
+                    name: "retrieve_data_from_corporate_services",
+                    friendly_name: "Retrieve Corporate Data",
+                    description: `Search and retrieve data from corporate services through the proxy.
+
+**Available services:**
+${serviceDescriptions}
+
+Use this tool when the user asks for information that might be stored in corporate systems like Confluence, Jira, or other integrated services.
+
+**Usage guidelines:**
+- Select only the relevant services for the query (don't use all services for every query)
+- The 'term' parameter should be a clear search query
+- Multiple services can be specified as a comma-separated list
+- Available service names: ${serviceNames}`,
+                    parameters: {
+                        type: "object",
+                        properties: {
+                            term: {
+                                type: "string",
+                                description: "The search term or query to look up in the corporate services"
+                            },
+                            services: {
+                                type: "string",
+                                description: `Comma-separated list of services to search. Available: ${serviceNames}. Example: "${activeServicesList[0]}" or "${activeServicesList.slice(0, 2).join(',')}"`
+                            }
+                        },
+                        required: ["term", "services"]
+                    }
+                }
+            };
+
+            // Actualizar el tool en chat.tools
+            const toolIndex = chat.tools.findIndex(
+                t => t.function?.name === 'retrieve_data_from_corporate_services'
+            );
+
+            if (toolIndex >= 0) {
+                chat.tools[toolIndex] = updatedTool;
+                console.log('✅ Proxy tool updated');
+            }
+
+            // Actualizar también en activeTools
+            if (chat.activeTools) {
+                const activeIndex = chat.activeTools.findIndex(
+                    t => t.function?.name === 'retrieve_data_from_corporate_services'
+                );
+
+                if (activeIndex >= 0) {
+                    chat.activeTools[activeIndex] = updatedTool;
+                }
+            }
+        };
+
+        // FIN FUNCIONES PARA PROXY SERVICES
 
 
         /**
@@ -2624,6 +2808,9 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                     chat.tools = assistantData.tools || [];
                     chat.tools_setup = assistantData.tools_setup || {};
                     chat.activeTools = assistantData.tools || [];
+                    initializeProxyTool(chat,assistant).catch(error => {
+                        console.error('Error initializing proxy tool:', error);
+                    });
                     chat.instructions = assistantData.instructions || [];
                     chat.noSelectionInstructions = (assistantData.instructions || []).filter(
                         instruction => !instruction.isSelection
@@ -2682,7 +2869,6 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                 cssClass: 'color-blue'
             });
         };
-
         /**
          * Calls a tool using the tool manager
          */
@@ -2921,6 +3107,328 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                     });
                 }
             }
+
+            if (toolSetup.ask_for_execution && name === "action_confluence_context") {
+                const searchTerm = params.term || params.text || '';
+
+                // Limpiar sources temporales anteriores
+                sourceManager.setTempSources([]);
+
+                // Mostrar indicador de búsqueda
+                const humanReadableMessage = `<p><div class="call-execution shimmer-text-fast"><i class="fa-brands fa-confluence margin-right-half"></i>Searching in Confluence: <strong>${searchTerm}</strong></div></p>`;
+                $el.value.find('.message:last-child .message-text').html(humanReadableMessage);
+
+                // Inicializar ContextManager si no existe
+                if (!window.contextManager) {
+                    window.contextManager = new SIMBA.ContextManager({
+                        baseUrl: 'http://localhost:8000',   // 🔹 ahora claro que es el proxy
+                        serviceName: 'confluence1',          // 🔹 servicio por defecto
+                        defaultLimit: 5,
+
+                        // Estos ahora son más “contracto” con el backend, pero los seguimos respetando
+                        processAttachments: true,
+                        maxPagesPerDocument: 50,
+                        useSimbaDocumentTags: true,
+                        viewerStrategy: {
+                            pages: 'new_tab',
+                            attachments: 'iframe',
+                            pdfs: 'iframe',
+                            pdf: 'iframe',
+                            docx: 'iframe',
+                            doc: 'iframe',
+                            default: 'new_tab'
+                        }
+                    });
+
+                }
+
+                // Llamar a la función de búsqueda
+                return window.contextManager.search(searchTerm)
+                    .then(sourcesData => {
+                        console.log("Confluence search completed:", sourcesData);
+
+                        // ✅ Actualizar sources temporales
+                        sourceManager.setTempSources(sourcesData);
+
+                        if (sourcesData.length > 0 && sourcesData.some(source => source.text || source.references)) {
+                            // ✅ Construir prompt con las sources
+                            const simbaPrompt = sourceManager.buildSimbaPrompt(sourcesData);
+
+                            // ✅ Actualizar system message con el contexto
+                            messageManager.updateSystemMessage(
+                                messageManager.getHistory()[0].content +
+                                '\n\n\n\nPLEASE USE THIS RETRIEVED CONFLUENCE CONTEXT FOR ANSWERING:\n\n' +
+                                simbaPrompt
+                            );
+
+                            // Quitar indicador de procesamiento
+                            $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                            // ✅ Mostrar stats si hay attachments procesados
+                            const stats = window.contextManager.getLastStats();
+                            if (stats.totalProcessed > 0) {
+                                $f7.toast.show({
+                                    text: `📄 Processed ${stats.totalProcessed} documents (${stats.totalPages} pages, ${Math.round(stats.totalChars / 1000)}K chars)`,
+                                    position: 'center',
+                                    closeTimeout: 3000,
+                                    cssClass: 'color-blue'
+                                });
+                            }
+
+                            // Crear mensaje del asistente
+                            const finalResponseMsgId = window.SIMBA.Utils.generateUniqueId("assistant-confluence-response");
+
+                            messages.addMessage({
+                                attrs: {"data-id": finalResponseMsgId, "id": finalResponseMsgId},
+                                isTitle: false,
+                                text: '<p><span class="thinking-icon">' + (assistant?.thinkIcon || '🤔') + '</span></p>',
+                                name: assistant.name,
+                                cssClass: 'card no-margin-top padding-half',
+                                textFooter: footerTemplate,
+                                avatar: assistant.avatar,
+                                type: 'received',
+                            }, 'append', true);
+
+                            onMessageAdded($('#' + finalResponseMsgId));
+
+                            // Llamar a completion
+                            return callCompletion(false, finalResponseMsgId)
+                                .then(() => {
+                                    console.log("LLM response generated after Confluence search");
+                                    saveSourcesForMessage(finalResponseMsgId);
+                                    addSourcesToMessage($('#' + finalResponseMsgId));
+                                    addActionsToMessage($('#' + finalResponseMsgId));
+
+                                    return {
+                                        status: 'completed',
+                                        sourcesCount: sourcesData.length,
+                                        searchTerm: searchTerm,
+                                        stats: stats,
+                                        llmResponseGenerated: true
+                                    };
+                                })
+                                .catch(error => {
+                                    console.error("Error generating LLM response:", error);
+
+                                    const fallbackMessage = `<p><strong>Confluence search completed:</strong></p>
+                            <p><em>Search term:</em> ${searchTerm}</p>
+                            <p><em>Found ${sourcesData.length} results</em></p>
+                            <hr>
+                            <p><em>Error generating response: ${error.message}</em></p>`;
+                                    $('#' + finalResponseMsgId).find('.message-text').html(fallbackMessage);
+
+                                    return {
+                                        status: 'completed_with_errors',
+                                        sourcesCount: sourcesData.length,
+                                        searchTerm: searchTerm,
+                                        error: error.message
+                                    };
+                                });
+
+                        } else {
+                            // No se encontraron sources
+                            $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                            const noResultsMessage = `<p><strong>No results found in Confluence for:</strong> "${searchTerm}"</p>`;
+                            $el.value.find('.message:last-child .message-text').html(noResultsMessage);
+
+                            return {
+                                status: 'completed',
+                                sourcesCount: 0,
+                                searchTerm: searchTerm,
+                                message: 'No results found'
+                            };
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error searching in Confluence:", error);
+
+                        $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                        const errorMessage = `<p><strong>Error searching in Confluence:</strong> ${error.message}</p>`;
+                        $el.value.find('.message:last-child .message-text').html(errorMessage);
+
+                        return {
+                            status: 'error',
+                            error: error.message
+                        };
+                    });
+            }
+            if (name === "retrieve_data_from_corporate_services") {
+                const searchTerm = params.term || '';
+                const servicesParam = params.services || '';
+
+                if (!searchTerm) {
+                    return Promise.reject(new Error('Search term is required'));
+                }
+
+                if (!window.proxyInfo || !window.proxyInfo.baseUrl) {
+                    return Promise.reject(new Error('Proxy not available'));
+                }
+
+                console.log(`🔍 Retrieving data: "${searchTerm}" from services: ${servicesParam}`);
+
+                // Limpiar sources temporales anteriores
+                sourceManager.setTempSources([]);
+
+                // Mostrar indicador de búsqueda
+                const servicesDisplay = servicesParam.split(',').map(s => s.trim()).join(', ');
+                const humanReadableMessage = `<p><div class="call-execution shimmer-text-fast"><i class="fa fa-database margin-right-half"></i>Searching in ${servicesDisplay}: <strong>${searchTerm}</strong></div></p>`;
+                $el.value.find('.message:last-child .message-text').html(humanReadableMessage);
+
+                // Construir la URL de búsqueda
+                const queryParams = new URLSearchParams({
+                    q: searchTerm,
+                    services: servicesParam,
+                    limit: '3',
+                    include: 'content',
+                    normalize: 'simba_v1'
+                });
+
+                const searchUrl = `${window.proxyInfo.baseUrl}/_search?${queryParams.toString()}`;
+
+                console.log('🌐 Search URL:', searchUrl);
+
+                // Ejecutar búsqueda
+                return fetch(searchUrl, {
+                    method: 'GET',
+                    headers: { 'Accept': 'application/json' }
+                })
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        const results = data.results || [];
+                        const stats = data.stats || {};
+
+                        console.log(`✅ Found ${results.length} results`);
+                        console.log('📊 Stats:', stats);
+
+                        // Convertir resultados al formato sourcesData
+                        const sourcesData = results.map(result => ({
+                            id: result.id || result.name,
+                            name: result.name || result.id || 'Untitled',
+                            guid: result.guid || `${result.site}_${result.id}`,
+                            icon: result.icon || 'fa-file',
+                            text: result.text || '',
+                            references: result.references || null,
+                            url: result.url || '',
+                            source: result.source || '',
+                            summary: result.summary || '',
+                            site: result.site || 'Corporate',
+                            device: result.device || 'N/A',
+                            extra: result.extra || {}
+                        }));
+
+                        console.log('📋 Sources data prepared:', sourcesData.length, 'items');
+
+                        // ✅ Actualizar sources temporales
+                        sourceManager.setTempSources(sourcesData);
+
+                        if (sourcesData.length > 0 && sourcesData.some(source => source.text || source.references)) {
+                            // ✅ Construir prompt con las sources
+                            const simbaPrompt = sourceManager.buildSimbaPrompt(sourcesData);
+
+                            console.log('📝 SIMBA prompt built, length:', simbaPrompt.length);
+
+                            // ✅ Actualizar system message con el contexto
+                            messageManager.updateSystemMessage(
+                                messageManager.getHistory()[0].content +
+                                '\n\n\n\nPLEASE USE THIS RETRIEVED CORPORATE DATA FOR ANSWERING:\n\n' +
+                                simbaPrompt
+                            );
+
+                            // Quitar indicador de procesamiento
+                            $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                            // ✅ Mostrar stats
+                            const servicesProcessed = Object.keys(stats.services || {}).join(', ');
+                            if (servicesProcessed) {
+                                $f7.toast.show({
+                                    text: `📋 Found ${results.length} results from ${servicesProcessed}`,
+                                    position: 'center',
+                                    closeTimeout: 3000,
+                                    cssClass: 'color-blue'
+                                });
+                            }
+
+                            // Crear mensaje del asistente
+                            const finalResponseMsgId = window.SIMBA.Utils.generateUniqueId("assistant-corporate-response");
+
+                            console.log('💬 Creating assistant message with id:', finalResponseMsgId);
+
+                            messages.addMessage({
+                                attrs: {"data-id": finalResponseMsgId, "id": finalResponseMsgId},
+                                isTitle: false,
+                                text: '<p><span class="thinking-icon">' + (assistant?.thinkIcon || '🤔') + '</span></p>',
+                                name: assistant.name,
+                                cssClass: 'card no-margin-top padding-half',
+                                textFooter: footerTemplate,
+                                avatar: assistant.avatar,
+                                type: 'received',
+                            }, 'append', true);
+
+                            onMessageAdded($('#' + finalResponseMsgId));
+
+                            // ✅ Llamar a completion para generar la respuesta del LLM
+                            console.log('🤖 Calling LLM completion with corporate data context...');
+
+                            return callCompletion(false, finalResponseMsgId)
+                                .then(() => {
+                                    console.log("✅ LLM response generated after corporate data retrieval");
+
+                                    // ✅ Guardar sources para el mensaje
+                                    saveSourcesForMessage(finalResponseMsgId);
+
+                                    // ✅ Agregar sources visuales al mensaje
+                                    addSourcesToMessage($('#' + finalResponseMsgId));
+
+                                    // ✅ Agregar acciones al mensaje
+                                    addActionsToMessage($('#' + finalResponseMsgId));
+
+                                    return {
+                                        status: 'completed',
+                                        sourcesCount: sourcesData.length,
+                                        searchTerm: searchTerm,
+                                        services: servicesParam,
+                                        stats: stats
+                                    };
+                                })
+                                .catch(error => {
+                                    console.error("❌ Error generating LLM response:", error);
+                                    $('#' + finalResponseMsgId).find('.message-text').html(
+                                        `<p>Error generating response: ${error.message}</p>`
+                                    );
+                                    return Promise.reject(error);
+                                });
+                        } else {
+                            // No hay resultados con contenido útil
+                            $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+
+                            const noResultsMsg = `No relevant results found for "${searchTerm}" in ${servicesDisplay}`;
+                            console.log('⚠️', noResultsMsg);
+                            $el.value.find('.message:last-child .message-text').html(`<p>${noResultsMsg}</p>`);
+
+                            return {
+                                status: 'no_results',
+                                searchTerm: searchTerm,
+                                services: servicesParam
+                            };
+                        }
+                    })
+                    .catch(error => {
+                        console.error('❌ Error retrieving data:', error);
+                        $(".shimmer-text-fast").removeClass("shimmer-text-fast");
+                        $el.value.find('.message:last-child .message-text').html(
+                            `<p>Error: ${error.message}</p>`
+                        );
+                        return Promise.reject(error);
+                    });
+            }
+
             sourceManager.setTempSources([]);
 
             return toolManager.callTool(name, params, myDevice)
@@ -2980,7 +3488,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             onMessageAdded($('#' + noInfoMsgId));
             saveSourcesForMessage(noInfoMsgId);
 
-            messageManager.addMessage('assistant', "Sorry, no records were found. Please rephrase your question.",null,noInfoMsgId);
+            messageManager.addMessage('assistant', "Sorry, no records were found. Please rephrase your question.", null, noInfoMsgId);
             saveMessageToConversation('assistant', "Sorry, no records were found. Please rephrase your question.", noInfoMsgId);
             return callCompletion(false, noInfoMsgId)
                 .then(() => ({sourcesAdded: false, messageId: noInfoMsgId}));
@@ -3069,7 +3577,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                 console.log('Sources saved for message:', messageId);
             }
         };
-        let makeClickableReferences = function() {
+        let makeClickableReferences = function () {
             // Primero agrupamos las referencias consecutivas
             groupConsecutiveReferences();
 
@@ -3085,10 +3593,10 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                 }
             });
         }
-        let makeClickableSuggestions = function() {
-            $(".simba-suggestion").each(function() {
+        let makeClickableSuggestions = function () {
+            $(".simba-suggestion").each(function () {
                 $(this).off('click'); // Remover listeners anteriores
-                $(this).on("click", function(e) {
+                $(this).on("click", function (e) {
                     e.preventDefault();
                     e.stopPropagation();
 
@@ -3111,7 +3619,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                             textarea.focus();
 
                             // Opcional: enviar autom�ticamente
-                             sendPrompt();
+                            sendPrompt();
 
                             // O simplemente posicionar el cursor al final para que el usuario revise
                             //textarea.setSelectionRange(suggestionText.length, suggestionText.length);
@@ -3139,7 +3647,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             const referenceGroups = [];
             let currentGroup = [];
 
-            $(".reference").each(function(index) {
+            $(".reference").each(function (index) {
                 const $current = $(this);
                 const $next = $current.next('.reference');
 
@@ -3214,7 +3722,6 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             }
         };
 
-// 1. openPopoverForSingleReference - SIN isDropzoneFile
         function openPopoverForSingleReference(targetElement) {
             const guid = $(targetElement).attr('data-guid');
             const messageElement = $(targetElement).closest('.message');
@@ -3231,6 +3738,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             if (!result) {
                 myReference = {
                     name,
+                    guid:guid,
                     page: page || "",
                     section: section || "",
                     content: "..." + content + "...",
@@ -3238,19 +3746,21 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                     fileName: name
                 };
             } else {
-                const sourceUrl = result.sourceObject.source;
-                const finalSource = (sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://'))
+                // ✅ HACER DEFENSIVO: Verificar que source existe
+                const sourceUrl = result.sourceObject.source || result.sourceObject.url || '';
+                const finalSource = (sourceUrl && (sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://')))
                     ? sourceUrl
-                    : 'https://itc.simeng.es/' + sourceUrl;
+                    : (sourceUrl ? 'https://itc.simeng.es/' + sourceUrl : '#');
 
                 myReference = {
+                    guid: result.sourceObject.guid || "No guid",
                     name: result.sourceObject.id || result.sourceObject.name || "No name",
                     page: page || (result.sourceObject.extra && result.sourceObject.extra.page) || "",
                     section: section || (result.sourceObject.extra && result.sourceObject.extra.section) || "",
                     content: result.extractedText || "No content",
-                    source: finalSource + '#phrase=true&page=' + page + '&search=' + result.extractedText,
+                    source: finalSource,
                     searchText: content,
-                    fileName: name
+                    fileName: result.sourceObject.id || result.sourceObject.name || "No name",
                 };
             }
 
@@ -3279,6 +3789,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             if (!result) {
                 myReference = {
                     name,
+                    guid:guid,
                     page: page || "",
                     section: section || "",
                     content: "..." + content + "...",
@@ -3292,13 +3803,14 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                     : 'https://itc.simeng.es/' + sourceUrl;
 
                 myReference = {
+                    guid:result.sourceObject.guid || "No guid",
                     name: result.sourceObject.id || result.sourceObject.name || "No name",
                     page: page || (result.sourceObject.extra && result.sourceObject.extra.page) || "",
                     section: section || (result.sourceObject.extra && result.sourceObject.extra.section) || "",
                     content: result.extractedText || "No content",
                     source: finalSource + '#phrase=true&page=' + page + '&search=' + result.extractedText,
                     searchText: content,
-                    fileName: name
+                    fileName: result.sourceObject.id || result.sourceObject.name || "No name",
                 };
             }
 
@@ -3316,14 +3828,12 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                     $(".source[id='" + guid + "']").parent().addClass('bg-color-chrome');
                 });
                 $("#view-document").off('click');
+                $("#view-document").off('click');
                 $("#view-document").on('click', function () {
                     const fileName = myReference.fileName;
-
-                    // 🎯 SIMPLE: ¿Existe en loadedFiles?
                     const fileData = loadedFiles[fileName];
 
                     if (fileData) {
-                        // 📁 ES UN ARCHIVO DEL DROPZONE
                         const fileExtension = fileName.split('.').pop().toLowerCase();
 
                         const searchQuery = myReference.searchText || myReference.content;
@@ -3339,9 +3849,8 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                             });
 
                             if (window.myFileDropzone) {
-                                // 🎯 USAR LA NUEVA FUNCIÓN
                                 window.myFileDropzone.showPdfInSplitViewFromFile(
-                                    fileData.file,  // ✅ File object de loadedFiles
+                                    fileData.file,
                                     fileName,
                                     searchQuery,
                                     pageNumber
@@ -3355,7 +3864,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         if (fileExtension === 'docx' || fileExtension === 'doc') {
                             // 📝 ABRIR WORD
                             if (window.myFileDropzone) {
-                                window.myFileDropzone.showWordInSplitViewFromFile(fileData.file,fileName,searchQuery,pageNumber);
+                                window.myFileDropzone.showWordInSplitViewFromFile(fileData.file, fileName, searchQuery, pageNumber);
                             }
                             popoverText.close();
                             return;
@@ -3364,7 +3873,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         if (fileExtension === 'pptx' || fileExtension === 'ppt') {
                             // 📊 ABRIR POWERPOINT
                             if (window.myFileDropzone) {
-                                window.myFileDropzone.showPowerPointInSplitViewFromFile(fileData.file,fileName,searchQuery,pageNumber);
+                                window.myFileDropzone.showPowerPointInSplitViewFromFile(fileData.file, fileName, searchQuery, pageNumber);
                             }
                             popoverText.close();
                             return;
@@ -3379,40 +3888,83 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         });
 
                     } else {
-                        // 🌐 NO ESTÁ EN loadedFiles = FUENTE EXTERNA
                         console.log('🌐 Opening external source:', myReference.source);
-                    /*    if (myReference.source && myReference.source.includes('/js/viewer/web/viewer.html?file=')) {
-                            var realPdfUrl = myReference.source.replace('/js/viewer/web/viewer.html?file=', '');
 
-                            var searchQuery = myReference.searchText || myReference.content || '';
-                            var pageNumber = myReference.page ? parseInt(myReference.page) : 1;
-                            var displayName = myReference.fileName || 'Document.pdf';
+                        let sourceUrl = myReference.source || '';
+                        const urlLower = sourceUrl.toLowerCase();
 
-                            window.myFileDropzone.showPdfInSplitViewFromFile(
-                                realPdfUrl,  // ✅ URL limpia del PDF
-                                displayName,
-                                searchQuery,
-                                pageNumber
-                            );
+                        if (sourceUrl.includes(' ')) {
+                            sourceUrl = sourceUrl.replace(/ /g, '%20');
+                        }
 
+                        const searchQuery = myReference.searchText || myReference.content || '';
+                        const pageNumber = myReference.page ? parseInt(myReference.page) : 1;
+                        const displayName = myReference.fileName || myReference.name || 'Document';
+                        const guid = myReference.guid || 'No guid';
+
+                        // ✅ OBTENER ESTRATEGIA DE VISUALIZACIÓN
+                        // Buscar la fuente en sourceManager para obtener metadata
+                        const sources = JSON.parse(localStorage.getItem('sources') || '{}');
+                       // const messageId = $(this).closest('.message').attr('id');
+                        const sourceData = sources[guid] || [];
+                       // const sourceData = messageSources.find(s => s.guid === displayName || s.id === displayName);
+                        console.log(displayName, sourceData)
+                        const viewerStrategy = sourceData?.extra?.viewerStrategy || 'auto';
+
+                        console.log('📋 Viewer strategy:', viewerStrategy, 'for', displayName);
+
+                        // ✅ APLICAR ESTRATEGIA
+                        if (viewerStrategy === 'new_tab') {
+                            console.log('🌐 Opening in new tab (strategy: new_tab)');
+                            window.open(sourceUrl, '_blank');
                             popoverText.close();
                             return;
-                        }*/
+                        }
 
-                        // Para el resto, usar el viewer original
-                        viewDocument(myReference.source, myReference.name, true);
+                        // Para 'iframe' o 'auto', intentar abrir en split view
+                        if ( myReference.fileName.includes('.pdf') || myReference.fileName.includes('pdf')) { //@todo usar el mime
+                            console.log('📄 Opening PDF in split view');
+                            if (window.myFileDropzone) {
+                                window.myFileDropzone.showPdfInSplitViewFromFile(
+                                    sourceUrl,
+                                    displayName,
+                                    searchQuery,
+                                    pageNumber
+                                );
+                            }
+                            popoverText.close();
+                            return;
+                        }
+
+                        if (myReference.fileName.includes('.docx') || myReference.fileName.includes('.doc') || myReference.fileName.includes('word')) {
+                            console.log('📝 Opening Word in split view');
+                            if (window.myFileDropzone) {
+                                window.myFileDropzone.showWordInSplitViewFromFile(
+                                    sourceUrl,
+                                    displayName,
+                                    searchQuery,
+                                    pageNumber
+                                );
+                            }
+                            popoverText.close();
+                            return;
+                        }
+
+                        // Fallback: usar viewDocument con auto-detect
+                        console.log('📄 Opening with viewDocument (auto-detect)');
+                        viewDocument(sourceUrl, myReference.name, true);
                     }
                 });
 
                 // 🔄 Navegación de grupos
-                $("#prev-reference").on('click', function() {
+                $("#prev-reference").on('click', function () {
                     if (currentReferenceGroup && currentReferenceIndex > 0) {
                         currentReferenceIndex--;
                         openPopoverForGroupedReference();
                     }
                 });
 
-                $("#next-reference").on('click', function() {
+                $("#next-reference").on('click', function () {
                     if (currentReferenceGroup && currentReferenceIndex < currentReferenceGroup.length - 1) {
                         currentReferenceIndex++;
                         openPopoverForGroupedReference();
@@ -3422,8 +3974,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
         }
 
 
-
-        let callCompletion = function (withTool = true, messageId, stream = true, noInBackground=false) {
+        let callCompletion = function (withTool = true, messageId, stream = true, noInBackground = false) {
             messageId = messageId || window.SIMBA.Utils.generateUniqueId("assistant-thinking");
             isResponseInBackground = noInBackground ? false : (assistant && chat.mainAssistant.responseOnBackground === true);
             fullStreamingResponse = "";
@@ -3588,6 +4139,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         }
                     }
                 }
+
                 // Variables al inicio de callCompletion
                 let toolCallReady = false;  // ✅ Nueva flag
 
@@ -3809,7 +4361,6 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                                                 if (processToolCalls(delta)) {
                                                     continue;
                                                 }
-
 
 
                                                 if (delta.content) {
@@ -4691,7 +5242,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         hasImages = currentFiles.some(file => window.myFileDropzone._getFileType(file) === 'image');
 
                         // 4. Guardar im�genes en loadedImages
-                        currentFiles.forEach(function(file) {
+                        currentFiles.forEach(function (file) {
                             const fileType = window.myFileDropzone._getFileType(file);
                             if (fileType === 'image') {
                                 // Mantener lógica existente para imágenes
@@ -4770,7 +5321,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                             }
 
                             // Agregar descripciones de im�genes
-                            imageResults.forEach(function(result) {
+                            imageResults.forEach(function (result) {
                                 if (result.success && result.description) {
                                     userMessageContent += '<simba_image data-filename="' + result.file.name + '">\n';
                                     userMessageContent += result.description + '\n';
@@ -4863,8 +5414,8 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         debouncedAutoScroll();
                     }
 
-                    if ($("#"+userMsgId).find('.message-text-header').find('.file-item').length == 0){
-                        $("#"+userMsgId).find('.message-text-header').remove();
+                    if ($("#" + userMsgId).find('.message-text-header').find('.file-item').length == 0) {
+                        $("#" + userMsgId).find('.message-text-header').remove();
                     }
 
                     // Limpiar prompt
@@ -4874,7 +5425,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
                         textarea.value = '';
                         textarea.style.height = 'auto';
                         textarea.style.height = '';
-                        textarea.dispatchEvent(new Event('input', { bubbles: true }));
+                        textarea.dispatchEvent(new Event('input', {bubbles: true}));
                     }
                     updateTemplate();
 
@@ -5075,6 +5626,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
 
             return messageTextClone.innerHTML;
         }
+
         let openPopover2 = function (event) {
             const targetElement = event.target;
             const guid = $(targetElement).attr('data-guid');
@@ -5091,7 +5643,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             // Crear la clave para buscar la fuente espec�fica
             const sourceKey = `${guid}_${page}_${section}`;
             const sourceObject = allSources[sourceKey];
-            console.log(sourceObject,sourceKey)
+            console.log(sourceObject, sourceKey)
             let myReference;
 
             if (!sourceObject) {
@@ -5136,116 +5688,8 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             });
         };
 
-// FUNCI�N ALTERNATIVA si prefieres b�squeda m�s flexible
-        let openPopover2Flexible = function (event) {
-            const targetElement = event.target;
-            const guid = $(targetElement).attr('data-guid');
-            const page = parseInt($(targetElement).attr('data-page'), 10) || undefined;
-            const section = parseInt($(targetElement).attr('data-section'), 10) || undefined;
-            const name = $(targetElement).attr('data-filename') || 'Reference not found';
-            const content = $(targetElement).attr('data-content') || 'Could not find reference information.';
 
-            // Obtener todas las fuentes de localStorage
-            const allSources = JSON.parse(localStorage.getItem('sources') || '{}');
 
-            // Buscar la fuente de m�ltiples formas
-            let sourceObject = null;
-
-            // 1. B�squeda exacta por clave
-            if (page && section) {
-                const exactKey = `${guid}_${page}_${section}`;
-                sourceObject = allSources[exactKey];
-            }
-
-            // 2. Si no se encuentra, buscar por guid solamente
-            if (!sourceObject) {
-                const matchingKeys = Object.keys(allSources).filter(key => key.startsWith(guid + '_'));
-                if (matchingKeys.length > 0) {
-                    sourceObject = allSources[matchingKeys[0]];
-                }
-            }
-
-            let myReference;
-
-            if (!sourceObject) {
-                myReference = {
-                    name,
-                    page: page || "",
-                    section: section || "",
-                    content: "..." + content + "..."
-                };
-            } else {
-                myReference = {
-                    name: sourceObject.id || sourceObject.name || sourceObject.title || "No name",
-                    page: page || (sourceObject.extra && sourceObject.extra.page) || "",
-                    section: section || (sourceObject.extra && sourceObject.extra.section) || "",
-                    content: sourceObject.content || "No content",
-                    source: sourceObject.url || ('https://itc.simeng.es/' + (sourceObject.source || '') + '#phrase=true&page=' + (page || '') + '&search=' + encodeURIComponent(sourceObject.content || ''))
-                };
-            }
-
-            popoverText.open(targetElement);
-            updateTemplate();
-
-            $update(function () {
-                $("#view-source").on('click', function () {
-                    const messageElement = $(targetElement).closest('.message');
-                    const messageId = messageElement.attr('id');
-
-                    if (messageId) {
-                        openSourcePanel(messageId);
-                        $(".source").parent().removeClass('bg-color-chrome');
-                        $(".source[id='" + guid + "']").parent().addClass('bg-color-chrome');
-                    }
-                });
-
-                $("#view-document").on('click', function () {
-                    console.log(myReference.source);
-                    viewDocument(myReference.source, myReference.name, true);
-                });
-            });
-        };
-        /*let openPopoverText = function (event) {
-            const targetElement = event.target;
-            const guid = $(targetElement).attr('data-guid');
-            const messageElement = $(targetElement).closest('.message');
-            const messageId = messageElement.attr('id');
-
-            const page = parseInt($(targetElement).attr('data-page'), 10) || undefined;
-            const section = parseInt($(targetElement).attr('data-section'), 10) || undefined;
-            const name = $(targetElement).attr('data-filename') || 'Reference not found';
-            const content = $(targetElement).attr('data-content') || 'Could not find reference information.';
-
-            const sources = JSON.parse(localStorage.getItem('sources') || '{}');;//sourceManager.getByMessageId(messageId);
-            const result = getObjectAndTextByGuid(sources, guid, page, section);
-
-            if (!result) {
-                myReference = {name, page: page || "", section: section || "", content: "..." + content + "..."};
-            } else {
-                myReference = {
-                    name: result.sourceObject.id || result.sourceObject.name || "No name",
-                    page: page || (result.sourceObject.extra && result.sourceObject.extra.page) || "",
-                    section: section || (result.sourceObject.extra && result.sourceObject.extra.section) || "",
-                    content: result.extractedText || "No content",
-                    source: 'https://itc.simeng.es/' + result.sourceObject.source + '#phrase=true&page=' + page + '&search=' + result.extractedText
-                };
-            }
-
-            popoverText.open(targetElement);
-            updateTemplate();
-
-            $update(function () {
-                $("#view-source").on('click', function () {
-                    openSourcePanel(messageId);
-                    $(".source").parent().removeClass('bg-color-chrome');
-                    $(".source[id='" + guid + "']").parent().addClass('bg-color-chrome');
-                });
-                $("#view-document").on('click', function () {
-                    console.log(myReference.source);
-                    viewDocument(myReference.source, myReference.name, true);
-                });
-            });
-        };*/
 
         // ===========================================
         // HIGHLIGHT MANAGEMENT FUNCTIONS
@@ -5533,7 +5977,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             }
         }
 
-        let handleUserScroll = function() {
+        let handleUserScroll = function () {
             // Si el asistente est� respondiendo y el usuario hace scroll, desactivar auto-scroll
             if (isResponding) {
                 isUserScrolling = true;
@@ -5552,7 +5996,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             }
         };
 
-        let autoScrollToBottom = function() {
+        let autoScrollToBottom = function () {
             if (!pageContent || !autoScrollEnabled || isUserScrolling) {
                 return;
             }
@@ -5570,7 +6014,7 @@ MANDATORY: You MUST always start with [THINK] when reasoning mode is active. Nev
             }
         };
 
-        let createDebouncedAutoScroll = function() {
+        let createDebouncedAutoScroll = function () {
             return window.SIMBA.Utils.debounce(autoScrollToBottom, 50); // 50ms de debounce
         };
 
@@ -5896,7 +6340,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 parent.removeChild(el);
             });
         };
-        let clearAllFiles = function() {
+        let clearAllFiles = function () {
             // Limpiar imágenes
             Object.keys(loadedImages).forEach(imageName => {
                 if (loadedImages[imageName].url) {
@@ -5917,7 +6361,7 @@ Thank you for your patience. Our support team will review your request shortly.
         };
 
 // 6. OPCIONAL: Modificar clearAllImages existente para que llame a clearAllFiles
-        let clearAllImages = function() {
+        let clearAllImages = function () {
             clearAllFiles(); // Llama a la nueva función que limpia todo
         };
 
@@ -6010,7 +6454,7 @@ Thank you for your patience. Our support team will review your request shortly.
             popupConfig.close();
         };
 
-        let initializeConfigFormValidator = function() {
+        let initializeConfigFormValidator = function () {
             const formElement = $el.value.find('form[name=config]');
 
             if (!formElement.length) {
@@ -6022,31 +6466,31 @@ Thank you for your patience. Our support team will review your request shortly.
 
             formConfigValidator = jQuery(formElement).validate({
                 rules: {
-                    api_url: { required: true },
-                    token: { required: true, minlength: 10 },
-                    completion_url: { required: true },
-                    api_key: { required: true, minlength: 10 },
-                    model: { required: true },
-                    max_tokens: { required: true, min: 100, max: 100000 },
-                    token_limit: { required: true, min: 1000, max: 200000 },
-                    temperature: { required: true, min: 0, max: 2 },
-                    tool_temperature: { required: true, min: 0, max: 2 },
-                    summary_model: { required: true },
-                    voice_language: { required: true },
-                    max_recording_time: { required: true, min: 5, max: 300 }
+                    api_url: {required: true},
+                    token: {required: true, minlength: 10},
+                    completion_url: {required: true},
+                    api_key: {required: true, minlength: 10},
+                    model: {required: true},
+                    max_tokens: {required: true, min: 100, max: 100000},
+                    token_limit: {required: true, min: 1000, max: 200000},
+                    temperature: {required: true, min: 0, max: 2},
+                    tool_temperature: {required: true, min: 0, max: 2},
+                    summary_model: {required: true},
+                    voice_language: {required: true},
+                    max_recording_time: {required: true, min: 5, max: 300}
                 },
                 messages: {
-                    api_url: { required: 'Please enter the API URL.' },
+                    api_url: {required: 'Please enter the API URL.'},
                     token: {
                         required: 'Please enter the authentication token.',
                         minlength: 'Token seems too short.'
                     },
-                    completion_url: { required: 'Please enter the completion URL.' },
+                    completion_url: {required: 'Please enter the completion URL.'},
                     api_key: {
                         required: 'Please enter the API key.',
                         minlength: 'API key seems too short.'
                     },
-                    model: { required: 'Please enter the model name.' },
+                    model: {required: 'Please enter the model name.'},
                     max_tokens: {
                         required: 'Please enter max tokens.',
                         min: 'Minimum is 100 tokens.',
@@ -6067,15 +6511,15 @@ Thank you for your patience. Our support team will review your request shortly.
                         min: 'Minimum is 0.',
                         max: 'Maximum is 2.'
                     },
-                    summary_model: { required: 'Please enter summary model.' },
-                    voice_language: { required: 'Please select a voice language.' },
+                    summary_model: {required: 'Please enter summary model.'},
+                    voice_language: {required: 'Please select a voice language.'},
                     max_recording_time: {
                         required: 'Please enter max recording time.',
                         min: 'Minimum is 5 seconds.',
                         max: 'Maximum is 300 seconds (5 minutes).'
                     }
                 },
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     console.log('📝 Config form submitted');
 
                     const formData = $f7.form.convertToData(form);
@@ -6163,7 +6607,7 @@ Thank you for your patience. Our support team will review your request shortly.
             });
 
             // ✅ Event listener mejorado - sin llamar a submit()
-            formElement.on('submit', function(e) {
+            formElement.on('submit', function (e) {
                 e.preventDefault(); // Prevenir comportamiento por defecto
                 e.stopPropagation(); // Evitar que el evento se propague
 
@@ -6268,19 +6712,20 @@ Thank you for your patience. Our support team will review your request shortly.
             <div class="list media-list margin-top-auto">
                 <ul>
                     ${sources.map((item) => {
-                const finalSource = (item.source.startsWith('http://') || item.source.startsWith('https://'))
-                    ? item.source
-                    : 'https://itc.simeng.es/' + item.source;
+                const sourceUrl = item.source || item.url || '';
+                const finalSource = (sourceUrl && (sourceUrl.startsWith('http://') || sourceUrl.startsWith('https://')))
+                    ? sourceUrl
+                    : (sourceUrl ? 'https://itc.simeng.es/' + sourceUrl : '#');
 
                 return `
                         <li>
-                            <a href="#" onclick="viewDocument('${finalSource}','${item.name}')" id="${item.guid}" class="source color-white link icon-only">
+                            <a href="#" onclick="handleSourceClick('${item.guid}', '${finalSource}', '${item.name}')" id="${item.guid}" class="source color-white link icon-only">
                                 <div class="item-content">
-                                    <div class="item-media"><i class="${item.icon}"></i></div>
+                                    <div class="item-media"><i class="${item.icon || 'fa-file'}"></i></div>
                                     <div class="item-inner">
-                                        <div class="source-title item-title">${item.name}</div>
-                                        <div class="source-summary item-text">${item.summary}</div>
-                                        <div class="source-extra item-text">${item.site} - ${item.device} - ${item.id}</div>
+                                        <div class="source-title item-title">${item.name || 'Unnamed'}</div>
+                                        <div class="source-summary item-text">${item.summary || ''}</div>
+                                        <div class="source-extra item-text">${item.site || ''} - ${item.device || ''} - ${item.id || ''}</div>
                                     </div>
                                 </div>
                             </a>
@@ -6291,15 +6736,17 @@ Thank you for your patience. Our support team will review your request shortly.
             </div>
         </div>
     </div>
-`;
+    `;
         };
+
+
 
         let getObjectAndTextByGuid = function (sources, guid, page, section) {
             console.log(sources);
             if (!sources) return null;
 
             const foundObject = sources[guid];//.find(item => item.guid === guid);
-            console.log(getObjectAndTextByGuid,foundObject)
+            console.log(getObjectAndTextByGuid, guid,foundObject)
             if (!foundObject) return null;
 
             let extractedText = null;
@@ -6322,7 +6769,6 @@ Thank you for your patience. Our support team will review your request shortly.
                 extractedText: extractedText
             };
         };
-
 
 
         let likeMessage = function (messageId) {
@@ -6413,7 +6859,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 }
             });
         };
-        let initializeFileDropzone = function() {
+        let initializeFileDropzone = function () {
             if (chat && chat.mainAssistant && chat.mainAssistant.activeDropzone === false) {
                 console.log('File dropzone disabled for this assistant');
                 return null;
@@ -6471,7 +6917,7 @@ Thank you for your patience. Our support team will review your request shortly.
         /**
          * Actualiza el estado del dropzone seg�n activeDropzone
          */
-        let updateDropzoneState = function() {
+        let updateDropzoneState = function () {
             const isDropzoneActive = chat && chat.mainAssistant && chat.mainAssistant.activeDropzone !== false;
             const imageAnalysisType = getImageAnalysisType();
 
@@ -6513,7 +6959,7 @@ Thank you for your patience. Our support team will review your request shortly.
                         if (imageFiles.length > 0) {
                             console.log('Removing ' + imageFiles.length + ' images (not allowed by new assistant)');
 
-                            imageFiles.forEach(function(imageFile) {
+                            imageFiles.forEach(function (imageFile) {
                                 window.myFileDropzone.removeFile(imageFile.name);
                             });
 
@@ -6535,17 +6981,17 @@ Thank you for your patience. Our support team will review your request shortly.
         /**
          * Verifica si est� permitido subir archivos
          */
-        let isFileUploadAllowed = function() {
+        let isFileUploadAllowed = function () {
             return chat && chat.mainAssistant && chat.mainAssistant.activeDropzone !== false;
         };
-        let cleanupCharts = function() {
+        let cleanupCharts = function () {
             if (chartGenerator) {
                 chartGenerator.destroyAllCharts();
                 console.log('?? All charts cleaned up');
             }
         };
 
-        let initializeVoiceManager = function() {
+        let initializeVoiceManager = function () {
             try {
                 // Inicializar configuraci�n de voz
                 const voiceConfigData = initializeVoiceConfig();
@@ -6616,7 +7062,7 @@ Thank you for your patience. Our support team will review your request shortly.
             }
         };
 
-        let showVoiceDisabledMessage = function() {
+        let showVoiceDisabledMessage = function () {
             $f7.toast.show({
                 text: 'Voice features are disabled. Enable them in settings.',
                 position: 'center',
@@ -6626,8 +7072,7 @@ Thank you for your patience. Our support team will review your request shortly.
         };
 
 
-
-        let updateVoiceConfigByAssistant = function() {
+        let updateVoiceConfigByAssistant = function () {
             if (chat && chat.mainAssistant) {
                 const assistantVoiceEnabled = chat.mainAssistant.voiceEnabled !== false;
                 voiceConfig.enabled = assistantVoiceEnabled;
@@ -6640,7 +7085,7 @@ Thank you for your patience. Our support team will review your request shortly.
             }
         };
 
-        let handleVoiceButtonClick = function() {
+        let handleVoiceButtonClick = function () {
             if (!voiceManager || !voiceSupported) {
                 $f7.toast.show({
                     text: 'Voice recording is not supported in your browser',
@@ -6657,7 +7102,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 startVoiceRecording();
             }
         };
-        let toggleVoiceFeatures = function(enabled) {
+        let toggleVoiceFeatures = function (enabled) {
             const currentConfig = configManager.getConfig();
             currentConfig.voiceEnabled = enabled;
             configManager.updateConfig(currentConfig);
@@ -6681,7 +7126,7 @@ Thank you for your patience. Our support team will review your request shortly.
         };
 
 // 6. FUNCI�N PARA CAMBIAR IDIOMA DIN�MICAMENTE
-        let changeVoiceLanguage = function(languageCode) {
+        let changeVoiceLanguage = function (languageCode) {
             if (voiceManager) {
                 voiceManager.switchLanguage(languageCode)
                     .then(() => {
@@ -6703,7 +7148,7 @@ Thank you for your patience. Our support team will review your request shortly.
                     });
             }
         };
-        let startVoiceRecording = function() {
+        let startVoiceRecording = function () {
             if (!voiceManager) return;
 
             voiceManager.startRecording()
@@ -6718,7 +7163,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 });
         };
 
-        let stopVoiceRecording = function() {
+        let stopVoiceRecording = function () {
             if (!voiceManager) return;
 
             voiceManager.stopRecording()
@@ -6727,13 +7172,13 @@ Thank you for your patience. Our support team will review your request shortly.
                 });
         };
 
-        let checkMicrophonePermissions = function() {
+        let checkMicrophonePermissions = function () {
             if (navigator.permissions && navigator.permissions.query) {
-                navigator.permissions.query({ name: 'microphone' })
+                navigator.permissions.query({name: 'microphone'})
                     .then((permissionStatus) => {
                         console.log('?? Microphone permission status:', permissionStatus.state);
 
-                        permissionStatus.onchange = function() {
+                        permissionStatus.onchange = function () {
                             console.log('?? Microphone permission changed to:', this.state);
                             if (this.state === 'denied' && voiceManager) {
                                 voiceSupported = false;
@@ -6745,7 +7190,7 @@ Thank you for your patience. Our support team will review your request shortly.
             }
         };
 
-        let updateTextareaPlaceholder = function() {
+        let updateTextareaPlaceholder = function () {
             const textarea = document.getElementById('prompt');
             if (!textarea) return;
 
@@ -6760,7 +7205,7 @@ Thank you for your patience. Our support team will review your request shortly.
             }
         };
 
-        let handleTranscriptionResult = function(result, autoSend = false) {
+        let handleTranscriptionResult = function (result, autoSend = false) {
             console.log('?? Transcription result:', result);
 
             if (result.text && result.text.trim()) {
@@ -6777,7 +7222,7 @@ Thank you for your patience. Our support team will review your request shortly.
                     promptTextarea.setSelectionRange(newText.length, newText.length);
 
                     // Trigger input event para actualizar el estado
-                    promptTextarea.dispatchEvent(new Event('input', { bubbles: true }));
+                    promptTextarea.dispatchEvent(new Event('input', {bubbles: true}));
                 }
 
                 updateTemplate();
@@ -6814,7 +7259,7 @@ Thank you for your patience. Our support team will review your request shortly.
             }
         };
 
-        let handleVoiceError = function(error) {
+        let handleVoiceError = function (error) {
             console.error('?? Voice error:', error);
 
             isRecording = false;
@@ -6839,7 +7284,7 @@ Thank you for your patience. Our support team will review your request shortly.
             });
         };
 
-        let initializeVoiceConfig = function() {
+        let initializeVoiceConfig = function () {
             const defaultVoiceConfig = {
                 voiceEnabled: true,
                 voiceLanguage: 'en-US',
@@ -6854,7 +7299,7 @@ Thank you for your patience. Our support team will review your request shortly.
 
             // Obtener configuraci�n actual y hacer merge con defaults
             const currentConfig = configManager.getConfig();
-            const mergedConfig = { ...defaultVoiceConfig, ...currentConfig };
+            const mergedConfig = {...defaultVoiceConfig, ...currentConfig};
 
             // Actualizar solo si hay campos nuevos
             if (!currentConfig.voiceLanguage) {
@@ -6863,13 +7308,14 @@ Thank you for your patience. Our support team will review your request shortly.
 
             return mergedConfig;
         };
-        let openConversationsSidebar = function() {
+        let openConversationsSidebar = function () {
             // Cargar la p�gina del sidebar
             app.views.sidebar.router.navigate('/screens/conversation-list');
             // Abrir el sidebar
+
             app.panel.open('left');
         };
-        let renderExistingMessages = function(messagesArray) {
+        let renderExistingMessages = function (messagesArray) {
             const visibleMessages = messagesArray.filter(msg => msg.role !== 'system');
             const currentConfig = configManager.getConfig();
             const contextLocation = currentConfig.documentContextLocation || 'system';
@@ -6931,7 +7377,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 scrollToBottom();
             }, 500);
         };
-        let loadAssistantData = function(assistantGuid) {
+        let loadAssistantData = function (assistantGuid) {
             return new Promise((resolve, reject) => {
                 $f7.request({
                     url: `${window.config.api_methods.load_assistant}?assistant=${assistantGuid}`,
@@ -6950,7 +7396,7 @@ Thank you for your patience. Our support team will review your request shortly.
                 });
             });
         };
-        let loadExistingConversation = async function(conversationId) {
+        let loadExistingConversation = async function (conversationId) {
             try {
                 console.log('Loading existing conversation:', conversationId);
 
@@ -7011,6 +7457,9 @@ Thank you for your patience. Our support team will review your request shortly.
 
                 // Inicializar herramientas activas
                 initializeActiveTools();
+                initializeProxyTool(chat,assistant).catch(error => {
+                    console.error('Error initializing proxy tool:', error);
+                });
                 updateChatTools();
 
                 // Restaurar el estado completo
@@ -7053,13 +7502,13 @@ Thank you for your patience. Our support team will review your request shortly.
          * Verifica si las API keys est�n configuradas
          * @returns {Object} - Estado de las API keys
          */
-        let checkRequiredApiKeys = function() {
+        let checkRequiredApiKeys = function () {
             const config = configManager.getConfig();
 
             return {
                 hasAssistantApi: !!(config.assistantApiUrl && config.assistantAuthToken),
                 hasCompletionApi: !!(config.completionsApiUrl && config.completionsApiKey),
-                isComplete: function() {
+                isComplete: function () {
                     return this.hasAssistantApi && this.hasCompletionApi;
                 }
             };
@@ -7067,7 +7516,7 @@ Thank you for your patience. Our support team will review your request shortly.
         /**
          * Inicializa el popup de API keys
          */
-        let initializePopupApiKeys = function() {
+        let initializePopupApiKeys = function () {
             popupApiKeys = $f7.popup.create({
                 el: $el.value.find('#popup-api-keys'),
                 closeByBackdropClick: false,
@@ -7079,11 +7528,11 @@ Thank you for your patience. Our support team will review your request shortly.
         /**
          * Inicializa el validador del formulario de API keys
          */
-        let initializeApiKeysFormValidator = function() {
+        let initializeApiKeysFormValidator = function () {
             formApiKeysValidator = jQuery($el.value.find('form[name=api-keys]')).validate({
                 rules: {
-                    assistant_auth_token: { required: true, minlength: 10 },
-                    completion_api_key: { required: true, minlength: 10 }
+                    assistant_auth_token: {required: true, minlength: 10},
+                    completion_api_key: {required: true, minlength: 10}
                 },
                 messages: {
                     assistant_auth_token: {
@@ -7096,7 +7545,7 @@ Thank you for your patience. Our support team will review your request shortly.
                         minlength: 'API key seems too short.'
                     }
                 },
-                submitHandler: function(form) {
+                submitHandler: function (form) {
                     const formData = $f7.form.convertToData(form);
 
                     // Actualizar configuraci�n con las API keys
@@ -7131,24 +7580,27 @@ Thank you for your patience. Our support team will review your request shortly.
                 }
             });
         };
-        let processAndRenderMarkdown = function(text) {
-    let processedText = window.SIMBA.Utils.preprocessMarkdown(text);
-    let renderedHtml = md.render(processedText);
+        let processAndRenderMarkdown = function (text) {
+        let processAndRenderMarkdown = function (text) {
+            let processedText = window.SIMBA.Utils.preprocessMarkdown(text);
+            let renderedHtml = md.render(processedText);
+           // renderedHtml = window.SIMBA.Utils.processExternalLinks(renderedHtml);
+            // Restaurar los spans despu?s de markdown
+            renderedHtml = renderedHtml.replace(/\[\[SIMBA_SUGGESTION:([^\]]+)\]\]/g, function (match, encoded) {
+                return atob(encoded);
+            });
 
-    // Restaurar los spans despu?s de markdown
-    renderedHtml = renderedHtml.replace(/\[\[SIMBA_SUGGESTION:([^\]]+)\]\]/g, function(match, encoded) {
-        return atob(encoded);
-    });
 
-    return renderedHtml;
-};
 
-        let cleanSimbaAfterCompletion = function() {
+            return renderedHtml;
+        };
+
+        let cleanSimbaAfterCompletion = function () {
             console.log('?? Post-completion: Checking simba_document cleanup...');
 
             if (!messageManager) {
                 console.warn('?? MessageManager not available');
-                return { cleaned: false, reason: 'No messageManager' };
+                return {cleaned: false, reason: 'No messageManager'};
             }
 
             const totalTokens = messageManager.getTotalTokens();
@@ -7206,14 +7658,14 @@ Thank you for your patience. Our support team will review your request shortly.
             } else {
                 const reason = simbaDocumentCount === 0 ? 'No simba_document found' : 'Usage below threshold';
                 console.log(`?? No cleanup needed: ${reason}`);
-                return { cleaned: false, reason };
+                return {cleaned: false, reason};
             }
         };
         /**
          * Obtiene el estado actual de reasoning directamente desde config
          * @returns {boolean}
          */
-        let isReasoningEnabled = function() {
+        let isReasoningEnabled = function () {
             const currentConfig = configManager.getConfig();
             // Si no existe en config, default es true
             return currentConfig.reasoningEnabled !== false;
@@ -7235,7 +7687,9 @@ Thank you for your patience. Our support team will review your request shortly.
             initializePopupApiKeys();
             initializeApiKeysFormValidator();
         });
-
+        $on('pageBeforeRemove', function () {
+            stopProxyMonitoring()
+        });
         $on('pageBeforeOut', function () {
             // Resetear variables
             originalAssistant = null;
@@ -7272,7 +7726,6 @@ Thank you for your patience. Our support team will review your request shortly.
                 console.log('✅ Models loaded on page init');
 
 
-
                 // 3. Luego actualizar categoría (que ya tiene los modelos cargados)
                 updateCurrentModelCategory();
 
@@ -7285,7 +7738,7 @@ Thank you for your patience. Our support team will review your request shortly.
 
             conversationManager = new SIMBA.ConversationManager(
                 new SIMBA.LocalStorageProvider(),
-                { autoSave: true, autoSaveInterval: 30000 }
+                {autoSave: true, autoSaveInterval: 30000}
             );
 
             loadAssistants().then(myAssistant => {
@@ -7418,12 +7871,15 @@ Thank you for your patience. Our support team will review your request shortly.
             initializeConfigFormValidator();
             initializePopoverTools();
 
-            window.addEventListener('storage', function(e) {
+            window.addEventListener('storage', function (e) {
                 if (e.key === 'walkthroughProgress' && e.newValue === null) {
                     popupTask = null;
                     $update();
                     console.log('walkthroughProgress fue eliminada');
                 }
+            });
+            window.addEventListener('proxy-status-changed', function() {
+                updateTemplate();
             });
         });
 

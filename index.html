@@ -499,6 +499,17 @@ window.addEventListener('DOMContentLoaded', function () {
         }
 
         document.addEventListener('deviceready', function () {
+            try {
+                if (window.nodejs) {
+                    console.log('🚀 Iniciando servidor Node.js embebido...');
+                    window.nodejs.start('proxy.js'); //
+                } else {
+                    console.warn('⚠️ No se encontró nodejs runtime (cordova-plugin-nodejs no está activo)');
+                }
+            } catch (err) {
+                console.error('❌ No se pudo iniciar el proxy Node.js:', err);
+            }
+
             window.plugins.webViewChecker.isAndroidWebViewEnabled()
                 .then(function (isEnabled) {
                     if (isEnabled) {

@@ -12,6 +12,7 @@
         function FileDropzone(options) {
             // Default options
             this.options = {
+                downloadedDocsCache:{},
                 dropzoneId: 'file-dropzone',
                 fileInputId: 'file-upload',
                 textareaId: 'prompt',
@@ -54,7 +55,8 @@
                     lineThreshold: 20,      // Líneas mínimas
                     wordThreshold: 200,     // Palabras mínimas
                     filenamePrefix: 'pasted_text_'
-                }
+                },
+
             };
 
             // Combine user options with default options
@@ -1374,6 +1376,65 @@
 
             reader.readAsArrayBuffer(pptFile);
         };
+
+        FileDropzone.prototype.downloadWithProgress = function(url, fileName) {
+            var self = this;
+            return new Promise(function(resolve, reject) {
+                // 🔄 Mostrar diálogo de progreso
+                var progressDialog = app.dialog.progress('Downloading ' + fileName + '...', 0);
+
+                fetch(url)
+                    .then(function(response) {
+                        if (!response.ok) {
+                            throw new Error('Download failed: ' + response.status);
+                        }
+
+                        var contentLength = response.headers.get('content-length');
+                        var total = parseInt(contentLength, 10);
+
+                        var loaded = 0;
+                        var chunks = [];
+
+                        var reader = response.body.getReader();
+
+                        function read() {
+                            reader.read().then(function(result) {
+                                if (result.done) {
+                                    // ✅ Cerrar diálogo
+                                    progressDialog.close();
+
+                                    // 🎉 Combinar chunks en Blob
+                                    var blob = new Blob(chunks);
+                                    resolve(blob);
+                                    return;
+                                }
+
+                                chunks.push(result.value);
+                                loaded += result.value.length;
+
+                                // ✅ Actualizar progreso
+                                if (total) {
+                                    var progress = Math.round((loaded / total) * 100);
+                                    progressDialog.setText('Downloading ' + fileName + '... ' + progress + '%');
+                                    progressDialog.setProgress(progress);
+                                }
+
+                                read();
+                            }).catch(function(error) {
+                                progressDialog.close();
+                                reject(error);
+                            });
+                        }
+
+                        read();
+                    })
+                    .catch(function(error) {
+                        progressDialog.close();
+                        reject(error);
+                    });
+            });
+        };
+
         /**
          * Muestra archivo PDF desde File object O desde URL
          * @param {File|string} fileOrUrl - File object o URL del PDF
@@ -1406,45 +1467,123 @@
                 }
             }
         };
-
         /**
-         * Muestra PDF desde URL directa
-         * @private
+         * ✅ Abre el PDF en split view
          */
-        FileDropzone.prototype._showPdfFromUrl = function(pdfUrl, fileName, searchQuery, page) {
+        FileDropzone.prototype._openPdfInSplitView = function(viewerUrl, fileName, originalUrl, blob) {
             var self = this;
 
-            console.log('📥 Fetching PDF from URL:', pdfUrl);
+            // 📱 Abrir en split view
+            var iframeId = 'pdf-viewer-split-' + Date.now();
+            var html = '<iframe id="' + iframeId + '" src="' + viewerUrl + '" style="width:100%; height:98vh; border:none;" class="document-viewer-split"></iframe>';
 
-            // 🔥 HACER FETCH DEL PDF Y CONVERTIRLO A FILE
-            fetch(pdfUrl)
-                .then(function(response) {
-                    if (!response.ok) {
-                        throw new Error('HTTP error ' + response.status);
+            $("#close-secundary").unbind('click').bind('click', function() {
+                app.splitView.close();
+                if (blob) {
+                    URL.revokeObjectURL(viewerUrl); // ✅ Limpiar blob URL
+                }
+                setTimeout(function() {
+                    if (typeof setDynamicHeight === 'function') {
+                        setDynamicHeight();
                     }
-                    return response.blob();
-                })
+                }, 500);
+            });
+
+            $("#secundary-title").find('.title').text(fileName);
+            app.splitView.open(html, { isHtml: true, pageTitle: fileName });
+
+            // 💾 Botón de guardar
+            $("#save-secundary").unbind('click').bind('click', function() {
+                window.open(originalUrl, "_blank");
+            });
+
+            // 🖨️ Botón de imprimir
+            $("#print-btn").unbind('click').bind('click', function() {
+                try {
+                    var iframe = document.getElementById(iframeId);
+                    if (iframe && iframe.contentWindow) {
+                        iframe.contentWindow.focus();
+                        iframe.contentWindow.print();
+                    }
+                } catch (error) {
+                    console.log('No se pudo imprimir directamente');
+                    window.open(originalUrl, "_blank");
+                }
+            });
+        };
+        FileDropzone.prototype._showPdfFromUrl = function(url, fileName, searchQuery, page) {
+            var self = this;
+
+            console.log('📄 Opening PDF from URL:', url);
+
+            // ✅ VERIFICAR SI YA ESTÁ EN CACHÉ
+            if (this.options.downloadedDocsCache[fileName]) {
+                console.log('✅ Using cached PDF:', fileName);
+                const cached = this.options.downloadedDocsCache[fileName];
+
+                // Construir URL del viewer con el blob cacheado
+                let viewerUrl = '/assets/vendor/pdfjs/web/viewer.html?file=' + encodeURIComponent(cached.blobUrl);
+
+                if (searchQuery && searchQuery.trim()) {
+                    viewerUrl += '&search=' + encodeURIComponent(searchQuery.trim());
+                }
+
+                if (page && page > 1) {
+                    viewerUrl += '#page=' + page;
+                }
+
+                // Abrir con blob cacheado
+                this._openPdfInSplitView(viewerUrl, fileName, url, cached.blob, searchQuery, page);
+                return;
+            }
+
+            // ✅ NO ESTÁ EN CACHÉ: Descargar
+            console.log('⬇️ Downloading PDF (not in cache):', fileName);
+
+            this.downloadWithProgress(url, fileName)
                 .then(function(blob) {
-                    console.log('✅ PDF blob received:', blob.size, 'bytes');
+                    console.log('✅ PDF downloaded, size:', blob.size);
 
-                    // 🔥 CONVERTIR BLOB A FILE OBJECT
-                    var file = new File([blob], fileName, { type: 'application/pdf' });
+                    // Crear blob URL
+                    const blobUrl = URL.createObjectURL(blob);
 
-                    console.log('✅ Converted to File object, now using standard viewer');
+                    // ✅ GUARDAR EN CACHÉ
+                    self.options.downloadedDocsCache[fileName] = {
+                        blob: blob,
+                        blobUrl: blobUrl,
+                        originalUrl: url,
+                        timestamp: Date.now()
+                    };
+                    console.log('💾 PDF saved to cache:', fileName);
 
-                    // 🎯 USAR EL MÉTODO QUE YA FUNCIONA CON FILE OBJECTS
-                    self._showPdfFromFileObject(file, fileName, searchQuery, page);
+                    // Construir URL del viewer
+                    let viewerUrl = '/assets/vendor/pdfjs/web/viewer.html?file=' + encodeURIComponent(blobUrl);
+
+                    if (searchQuery && searchQuery.trim()) {
+                        viewerUrl += '&search=' + encodeURIComponent(searchQuery.trim());
+                    }
+
+                    if (page && page > 1) {
+                        viewerUrl += '#page=' + page;
+                    }
+
+                    // Abrir en split view
+                    self._openPdfInSplitView(viewerUrl, fileName, url, blob, searchQuery, page);
                 })
                 .catch(function(error) {
-                    console.error('❌ Error fetching PDF:', error);
+                    console.error('❌ Error downloading PDF:', error);
 
                     if (self.options.framework7) {
                         self.options.framework7.toast.show({
-                            text: 'Error loading PDF: ' + error.message,
-                            cssClass: 'color-red',
-                            closeTimeout: 4000
+                            text: 'Error downloading PDF: ' + error.message,
+                            position: 'center',
+                            closeTimeout: 4000,
+                            cssClass: 'color-red'
                         });
                     }
+
+                    // Fallback
+                    window.open(url, '_blank');
                 });
         };
 
@@ -2466,16 +2605,24 @@
 
             this.showPowerPointInSplitViewFromFile(pptFile, fileName, searchQuery, slide);
         };
-        /**
-         * Versión simplificada desde uploadedFiles
-         */
-        FileDropzone.prototype.showWordInSplitViewFromFile = function(file, fileName, searchQuery, page) {
+        FileDropzone.prototype.showWordInSplitViewFromFile = function(fileOrUrl, fileName, searchQuery, page) {
+            var self = this;
+
+            // ✅ VERIFICAR CACHÉ
+            if (typeof fileOrUrl === 'string' && this.options.downloadedDocsCache[fileName]) {
+                console.log('✅ Using cached Word:', fileName);
+                const cached = this.options.downloadedDocsCache[fileName];
+
+                // Usar blob cacheado para renderizar
+                this._renderWordDocument(cached.blob, fileName, searchQuery, pageNumber);
+                return;
+            }
             searchQuery = searchQuery || "";
             page = page || 1;
             var self = this;
 
-            if (!file) {
-                console.error('❌ No file provided');
+            if (!fileOrUrl) {
+                console.error('❌ No file or URL provided');
                 if (this.options.framework7) {
                     this.options.framework7.toast.show({
                         text: 'File not found',
@@ -2498,50 +2645,51 @@
                 return;
             }
 
-            var reader = new FileReader();
+            // 🔥 DETECTAR SI ES URL O FILE
+            var processFile = function(file) {
+                var reader = new FileReader();
 
-            reader.onload = function(e) {
-                var arrayBuffer = e.target.result;
-                var blob = new Blob([arrayBuffer], {
-                    type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                });
+                reader.onload = function(e) {
+                    var arrayBuffer = e.target.result;
+                    var blob = new Blob([arrayBuffer], {
+                        type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                    });
 
-                var viewerId = 'word-viewer-' + Date.now();
-                var html = `
-             <style>
-        #${viewerId}-container {
-            width: 100%;
-            height: 98vh;
-            overflow: auto;
-            background: #525659;
-            position: relative;
-        }
-        
-        /* Resaltado de búsqueda - ESTILO PDF.js */
-        .word-highlight {
-            background-color: rgba(180, 220, 255, 0.4) !important;
-            padding: 2px 4px;
-            border-radius: 2px;
-            display: inline;
-            box-shadow: 0 0 3px rgba(180, 220, 255, 0.8);
-        }
-        
-        .word-highlight.current {
-            background-color: rgba(255, 150, 0, 0.6) !important;
-            font-weight: bold;
-            box-shadow: 0 0 8px rgba(255, 152, 0, 0.9);
-        }
-        
-        .word-loader {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            text-align: center;
-            color: white;
-            z-index: 1000;
-        }
-    </style>
+                    var viewerId = 'word-viewer-' + Date.now();
+                    var html = `
+            <style>
+                #${viewerId}-container {
+                    width: 100%;
+                    height: 98vh;
+                    overflow: auto;
+                    background: #525659;
+                    position: relative;
+                }
+                
+                .word-highlight {
+                    background-color: rgba(180, 220, 255, 0.4) !important;
+                    padding: 2px 4px;
+                    border-radius: 2px;
+                    display: inline;
+                    box-shadow: 0 0 3px rgba(180, 220, 255, 0.8);
+                }
+                
+                .word-highlight.current {
+                    background-color: rgba(255, 150, 0, 0.6) !important;
+                    font-weight: bold;
+                    box-shadow: 0 0 8px rgba(255, 152, 0, 0.9);
+                }
+                
+                .word-loader {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    transform: translate(-50%, -50%);
+                    text-align: center;
+                    color: white;
+                    z-index: 1000;
+                }
+            </style>
             
             <div id="${viewerId}-container">
                 <div class="word-loader">
@@ -2549,573 +2697,369 @@
                     <p style="margin-top: 20px;">Loading document...</p>
                 </div>
             </div>
-        `;
+            `;
 
-                $("#close-secundary").unbind('click').bind('click', function() {
-                    app.splitView.close();
-                    setTimeout(function() {
-                        if (typeof setDynamicHeight === 'function') {
-                            setDynamicHeight();
-                        }
-                    }, 500);
-                });
+                    $("#close-secundary").unbind('click').bind('click', function() {
+                        app.splitView.close();
+                        setTimeout(function() {
+                            if (typeof setDynamicHeight === 'function') {
+                                setDynamicHeight();
+                            }
+                        }, 500);
+                    });
 
-                $("#secundary-title").find('.title').text(fileName);
-                app.splitView.open(html, {isHtml: true, pageTitle: fileName,
-                    onRendered: function() {
-                        var container = document.getElementById(viewerId + '-container');
-                        if (!container) {
-                            return;
-                        }
+                    $("#secundary-title").find('.title').text(fileName);
+                    app.splitView.open(html, {
+                        isHtml: true,
+                        pageTitle: fileName,
+                        onRendered: function() {
+                            var container = document.getElementById(viewerId + '-container');
+                            if (!container) return;
 
-// Ahora sí, usar container sabiendo que existe
-                        var loader = container.querySelector('.word-loader');
+                            var loader = container.querySelector('.word-loader');
 
-                        try {
-                            docx.renderAsync(blob, container, null, {
-                                className: "docx",
-                                inWrapper: true,
-                                ignoreWidth: false,
-                                ignoreHeight: false,
-                                ignoreFonts: false,
-                                breakPages: true,
-                                ignoreLastRenderedPageBreak: false,
-                                experimental: true,
-                                trimXmlDeclaration: true,
-                                useBase64URL: false,
-                                renderChanges: false,
-                                renderHeaders: true,
-                                renderFooters: true,
-                                renderFootnotes: true,
-                                renderEndnotes: true,
-                                debug: false
-                            }).then(function(result) {
-                                console.log('✅ Word document rendered successfully', result);
+                            try {
+                                docx.renderAsync(blob, container, null, {
+                                    className: "docx",
+                                    inWrapper: true,
+                                    ignoreWidth: false,
+                                    ignoreHeight: false,
+                                    ignoreFonts: false,
+                                    breakPages: true,
+                                    ignoreLastRenderedPageBreak: false,
+                                    experimental: true,
+                                    trimXmlDeclaration: true,
+                                    useBase64URL: false,
+                                    renderChanges: false,
+                                    renderHeaders: true,
+                                    renderFooters: true,
+                                    renderFootnotes: true,
+                                    renderEndnotes: true,
+                                    debug: false
+                                }).then(function(result) {
+                                    console.log('✅ Word document rendered successfully', result);
 
-                                if (loader) loader.remove();
+                                    if (loader) loader.remove();
 
-                                var pages = container.querySelectorAll('section[class*="page"]');
-                                console.log(`📄 Found ${pages.length} page sections`);
+                                    var pages = container.querySelectorAll('section[class*="page"]');
+                                    console.log('📄 Found ' + pages.length + ' page sections');
 
-                                if (page > 1 && pages.length > 0) {
-                                    setTimeout(function() {
-                                        var targetPage = pages[page - 1];
-                                        if (targetPage) {
-                                            targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                            console.log(`📍 Navigated to page ${page}`);
-                                        } else {
-                                            var scrollPosition = (page - 1) * 1056;
-                                            container.scrollTop = scrollPosition;
-                                            console.log(`📍 Scrolled to approximate page ${page}`);
-                                        }
-                                    }, 300);
-                                }
+                                    if (page > 1 && pages.length > 0) {
+                                        setTimeout(function() {
+                                            var targetPage = pages[page - 1];
+                                            if (targetPage) {
+                                                targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                                console.log('📍 Navigated to page ' + page);
+                                            } else {
+                                                var scrollPosition = (page - 1) * 1056;
+                                                container.scrollTop = scrollPosition;
+                                                console.log('📍 Scrolled to approximate page ' + page);
+                                            }
+                                        }, 300);
+                                    }
 
-                                if (searchQuery && searchQuery.trim() !== '') {
-                                    setTimeout(function() {
-                                        performSearch(searchQuery,page);
-                                    }, 500);
-                                }
+                                    if (searchQuery && searchQuery.trim() !== '') {
+                                        setTimeout(function() {
+                                            performSearch(searchQuery, page);
+                                        }, 500);
+                                    }
 
-                            }).catch(function(error) {
-                                console.error('❌ Error rendering Word:', error);
+                                }).catch(function(error) {
+                                    console.error('❌ Error rendering Word:', error);
+                                    if (loader) {
+                                        loader.innerHTML =
+                                            '<i class="fa fa-exclamation-triangle" style="font-size:48px; color:#f44336;"></i>' +
+                                            '<p style="color:#f44336; margin-top:20px;">Error: ' + error.message + '</p>';
+                                    }
+                                });
+
+                            } catch (error) {
+                                console.error('❌ Exception:', error);
                                 if (loader) {
                                     loader.innerHTML =
                                         '<i class="fa fa-exclamation-triangle" style="font-size:48px; color:#f44336;"></i>' +
                                         '<p style="color:#f44336; margin-top:20px;">Error: ' + error.message + '</p>';
                                 }
-                            });
-
-                        } catch (error) {
-                            console.error('❌ Exception:', error);
-                            if (loader) {
-                                loader.innerHTML =
-                                    '<i class="fa fa-exclamation-triangle" style="font-size:48px; color:#f44336;"></i>' +
-                                    '<p style="color:#f44336; margin-top:20px;">Error: ' + error.message + '</p>';
                             }
-                        }
-                }
-                });
-
-
-                function performSearch(query, pageNumber) {
-                    if (!query || !query.trim()) return;
-
-                    console.log('🔍 ========== SEARCH DEBUG START ==========');
-                    console.log('Query:', query);
-                    console.log('Query length:', query.length);
-
-                    const container = document.getElementById(viewerId + '-container');
-                    if (!container) {
-                        console.error('❌ Container not found for search');
-                        return;
-                    }
-
-                    const root = container.querySelector('.docx-wrapper') || container;
-                    console.log('Root element:', root);
-
-                    // Limpiar resaltados previos
-                    Array.from(root.querySelectorAll('.word-highlight')).forEach(el => {
-                        const parent = el.parentNode;
-                        while (el.firstChild) parent.insertBefore(el.firstChild, el);
-                        parent.removeChild(el);
-                        parent.normalize();
-                    });
-
-                    console.log('🔨 Building text index...');
-                    const { fullTextNorm, map } = buildTextIndex(root);
-
-                    console.log('📊 Normalized text length:', fullTextNorm.length);
-                    console.log('📊 First 500 chars:', fullTextNorm.substring(0, 500));
-                    console.log('📊 Map entries:', map.length);
-
-                    // 🔥 BÚSQUEDA MANUAL para debug
-                    const queryLower = query.toLowerCase();
-                    const textLower = fullTextNorm.toLowerCase();
-                    const manualIndex = textLower.indexOf(queryLower);
-
-                    console.log('🔍 Manual search result:');
-                    console.log('  - Query (lowercase):', queryLower);
-                    console.log('  - Found at index:', manualIndex);
-                    if (manualIndex >= 0) {
-                        console.log('  - Context:', textLower.substring(Math.max(0, manualIndex - 20), manualIndex + queryLower.length + 20));
-                    }
-
-                    console.log('🔨 Running regex search...');
-                    const matches = findMatches(fullTextNorm, query);
-
-                    console.log('✅ Regex matches found:', matches.length);
-                    matches.forEach((match, i) => {
-                        console.log(`  Match ${i + 1}:`, match);
-                        console.log(`    Text: "${fullTextNorm.substring(match.start, match.end)}"`);
-                    });
-
-                    const createdHighlights = [];
-
-                    matches.forEach(({ start, end }, matchIndex) => {
-                        console.log(`\n🎯 Processing match ${matchIndex + 1}: [${start}, ${end}]`);
-                        const highlights = highlightMatchAcrossNodes(map, start, end, root);
-                        console.log(`  Created ${highlights.length} highlight spans`);
-                        createdHighlights.push(...highlights);
-                    });
-
-                    console.log(`\n✅ Total highlights created: ${createdHighlights.length}`);
-                    console.log('🔍 ========== SEARCH DEBUG END ==========\n');
-
-                    // Scroll al primer match
-                    if (createdHighlights.length > 0) {
-                        createdHighlights[0].classList.add('current');
-                        setTimeout(() => {
-                            createdHighlights[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center',
-                                inline: 'nearest'
-                            });
-                        }, 150);
-                    } else {
-                        console.warn('⚠️ No highlights created for query:', query);
-
-                        // Fallback: scroll a la página
-                        if (pageNumber && pageNumber > 0) {
-                            const pages = container.querySelectorAll('section[class*="page"]');
-                            if (pages.length > 0) {
-                                const targetPage = pages[pageNumber - 1];
-                                if (targetPage) {
-                                    targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                                }
-                            }
-                        }
-                    }
-                }
-
-// También añadir logging a buildTextIndex
-                function buildTextIndex(rootEl) {
-                    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
-                        acceptNode(n) {
-                            const t = n.textContent;
-                            if (!t || !t.trim()) return NodeFilter.FILTER_SKIP;
-                            return NodeFilter.FILTER_ACCEPT;
                         }
                     });
 
-                    const map = [];
-                    let fullTextNorm = '';
-                    let prevNode = null;
-                    let prevEndedWithSpace = true;
-                    let nodeCount = 0;
+                    // === FUNCIONES DE BÚSQUEDA ===
+                    function performSearch(query, pageNumber) {
+                        if (!query || !query.trim()) return;
 
-                    let current;
-                    while ((current = walker.nextNode())) {
-                        nodeCount++;
-                        const raw = current.textContent;
-                        const cleaned = raw.replace(/\u00AD/g, '').replace(/\u00A0/g, ' ');
+                        console.log('🔍 ========== SEARCH DEBUG START ==========');
+                        console.log('Query:', query);
 
-                        console.log(`  Node ${nodeCount}: "${raw}" → "${cleaned}"`);
-
-                        const beginsWithSpace = /^\s/.test(cleaned);
-
-                        if (!prevEndedWithSpace && !beginsWithSpace && prevNode) {
-                            if (shouldAddSyntheticSpace(prevNode, current)) {
-                                console.log(`    → Adding synthetic space`);
-                                fullTextNorm += ' ';
-                                map.push({ node: null, offset: 0, synthetic: true });
-                            }
+                        var container = document.getElementById(viewerId + '-container');
+                        if (!container) {
+                            console.error('❌ Container not found for search');
+                            return;
                         }
 
-                        let i = 0;
-                        while (i < cleaned.length) {
-                            if (/\s/.test(cleaned[i])) {
-                                if (fullTextNorm.length === 0 || fullTextNorm[fullTextNorm.length - 1] !== ' ') {
-                                    fullTextNorm += ' ';
-                                    map.push({ node: current, offset: i });
-                                }
-                                while (i < cleaned.length && /\s/.test(cleaned[i])) i++;
-                                continue;
-                            }
-                            fullTextNorm += cleaned[i];
-                            map.push({ node: current, offset: i });
-                            i++;
-                        }
+                        var root = container.querySelector('.docx-wrapper') || container;
 
-                        prevNode = current;
-                        prevEndedWithSpace = fullTextNorm.length === 0 ? true : (fullTextNorm[fullTextNorm.length - 1] === ' ');
-                    }
+                        // Limpiar resaltados previos
+                        Array.from(root.querySelectorAll('.word-highlight')).forEach(function(el) {
+                            var parent = el.parentNode;
+                            while (el.firstChild) parent.insertBefore(el.firstChild, el);
+                            parent.removeChild(el);
+                            parent.normalize();
+                        });
 
-                    console.log(`📊 Processed ${nodeCount} text nodes`);
+                        var textData = buildTextIndex(root);
+                        var fullTextNorm = textData.fullTextNorm;
+                        var map = textData.map;
 
-                    if (fullTextNorm.endsWith(' ')) {
-                        fullTextNorm = fullTextNorm.slice(0, -1);
-                        if (map.length && (map[map.length - 1].node === null)) {
-                            map.pop();
-                        }
-                    }
+                        console.log('📊 Normalized text length:', fullTextNorm.length);
 
-                    return { fullTextNorm, map };
-                }
+                        var matches = findMatches(fullTextNorm, query);
+                        console.log('✅ Regex matches found:', matches.length);
 
-// 🔥 NUEVA FUNCIÓN: Resalta un match agrupando nodos contiguos
-                function highlightMatchAcrossNodes(map, start, end, root) {
-                    const highlights = [];
+                        var createdHighlights = [];
 
-                    // Obtener todos los nodos involucrados en el match
-                    const nodesInMatch = [];
+                        matches.forEach(function(match) {
+                            var highlights = highlightMatchAcrossNodes(map, match.start, match.end, root);
+                            createdHighlights.push.apply(createdHighlights, highlights);
+                        });
 
-                    for (let i = start; i < end && i < map.length; i++) {
-                        const entry = map[i];
-                        if (entry && entry.node && !entry.synthetic) {
-                            // Verificar si este nodo ya está en la lista
-                            const lastNode = nodesInMatch[nodesInMatch.length - 1];
-                            if (!lastNode || lastNode.node !== entry.node) {
-                                nodesInMatch.push({
-                                    node: entry.node,
-                                    startOffset: entry.offset,
-                                    endOffset: entry.offset + 1
+                        console.log('✅ Total highlights created:', createdHighlights.length);
+                        console.log('🔍 ========== SEARCH DEBUG END ==========');
+
+                        // Scroll al primer match
+                        if (createdHighlights.length > 0) {
+                            createdHighlights[0].classList.add('current');
+                            setTimeout(function() {
+                                createdHighlights[0].scrollIntoView({
+                                    behavior: 'smooth',
+                                    block: 'center',
+                                    inline: 'nearest'
                                 });
-                            } else {
-                                // Extender el rango del nodo actual
-                                lastNode.endOffset = entry.offset + 1;
-                            }
-                        }
-                    }
+                            }, 150);
+                        } else {
+                            console.warn('⚠️ No highlights created for query:', query);
 
-                    console.log(`📍 Match spans ${nodesInMatch.length} text nodes`);
-
-                    // Resaltar cada nodo individualmente
-                    nodesInMatch.forEach(({ node, startOffset, endOffset }) => {
-                        try {
-                            const range = document.createRange();
-
-                            // Ajustar offsets para no exceder el contenido del nodo
-                            const maxOffset = node.textContent.length;
-                            const safeStart = Math.min(startOffset, maxOffset);
-                            const safeEnd = Math.min(endOffset, maxOffset);
-
-                            if (safeStart >= safeEnd) return; // Skip si no hay contenido
-
-                            range.setStart(node, safeStart);
-                            range.setEnd(node, safeEnd);
-
-                            if (range.collapsed) return; // Skip si está vacío
-
-                            const span = document.createElement('span');
-                            span.className = 'word-highlight';
-
-                            const fragment = range.extractContents();
-                            span.appendChild(fragment);
-                            range.insertNode(span);
-
-                            highlights.push(span);
-
-                            console.log(`✅ Highlighted in node: "${node.textContent.substring(safeStart, safeEnd)}"`);
-                        } catch (error) {
-                            console.warn(`⚠️ Could not highlight node:`, error);
-                        }
-                    });
-
-                    return highlights;
-                }
-
-                function performSearch(query, pageNumber) {
-                    if (!query || !query.trim()) return;
-
-                    console.log('🔍 ========== SEARCH DEBUG START ==========');
-                    console.log('Query:', query);
-                    console.log('Query length:', query.length);
-
-                    const container = document.getElementById(viewerId + '-container');
-                    if (!container) {
-                        console.error('❌ Container not found for search');
-                        return;
-                    }
-
-                    const root = container.querySelector('.docx-wrapper') || container;
-                    console.log('Root element:', root);
-
-                    // Limpiar resaltados previos
-                    Array.from(root.querySelectorAll('.word-highlight')).forEach(el => {
-                        const parent = el.parentNode;
-                        while (el.firstChild) parent.insertBefore(el.firstChild, el);
-                        parent.removeChild(el);
-                        parent.normalize();
-                    });
-
-                    console.log('🔨 Building text index...');
-                    const { fullTextNorm, map } = buildTextIndex(root);
-
-                    console.log('📊 Normalized text length:', fullTextNorm.length);
-                    console.log('📊 First 500 chars:', fullTextNorm.substring(0, 500));
-                    console.log('📊 Map entries:', map.length);
-
-                    // 🔥 BÚSQUEDA MANUAL para debug
-                    const queryLower = query.toLowerCase();
-                    const textLower = fullTextNorm.toLowerCase();
-                    const manualIndex = textLower.indexOf(queryLower);
-
-                    console.log('🔍 Manual search result:');
-                    console.log('  - Query (lowercase):', queryLower);
-                    console.log('  - Found at index:', manualIndex);
-                    if (manualIndex >= 0) {
-                        console.log('  - Context:', textLower.substring(Math.max(0, manualIndex - 20), manualIndex + queryLower.length + 20));
-                    }
-
-                    console.log('🔨 Running regex search...');
-                    const matches = findMatches(fullTextNorm, query);
-
-                    console.log('✅ Regex matches found:', matches.length);
-                    matches.forEach((match, i) => {
-                        console.log(`  Match ${i + 1}:`, match);
-                        console.log(`    Text: "${fullTextNorm.substring(match.start, match.end)}"`);
-                    });
-
-                    const createdHighlights = [];
-
-                    matches.forEach(({ start, end }, matchIndex) => {
-                        console.log(`\n🎯 Processing match ${matchIndex + 1}: [${start}, ${end}]`);
-                        const highlights = highlightMatchAcrossNodes(map, start, end, root);
-                        console.log(`  Created ${highlights.length} highlight spans`);
-                        createdHighlights.push(...highlights);
-                    });
-
-                    console.log(`\n✅ Total highlights created: ${createdHighlights.length}`);
-                    console.log('🔍 ========== SEARCH DEBUG END ==========\n');
-
-                    // Scroll al primer match
-                    if (createdHighlights.length > 0) {
-                        createdHighlights[0].classList.add('current');
-                        setTimeout(() => {
-                            createdHighlights[0].scrollIntoView({
-                                behavior: 'smooth',
-                                block: 'center',
-                                inline: 'nearest'
-                            });
-                        }, 150);
-                    } else {
-                        console.warn('⚠️ No highlights created for query:', query);
-
-                        // Fallback: scroll a la página
-                        if (pageNumber && pageNumber > 0) {
-                            const pages = container.querySelectorAll('section[class*="page"]');
-                            if (pages.length > 0) {
-                                const targetPage = pages[pageNumber - 1];
-                                if (targetPage) {
-                                    targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            if (pageNumber && pageNumber > 0) {
+                                var pages = container.querySelectorAll('section[class*="page"]');
+                                if (pages.length > 0) {
+                                    var targetPage = pages[pageNumber - 1];
+                                    if (targetPage) {
+                                        targetPage.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                    }
                                 }
                             }
                         }
                     }
-                }
 
-// También añadir logging a buildTextIndex
-                function buildTextIndex(rootEl) {
-                    const walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
-                        acceptNode(n) {
-                            const t = n.textContent;
-                            if (!t) return NodeFilter.FILTER_SKIP;
-                            // 🔥 Aceptar también nodos con solo espacios
-                            return NodeFilter.FILTER_ACCEPT;
-                        }
-                    });
-
-                    const map = [];
-                    let fullTextNorm = '';
-                    let prevNode = null;
-                    let prevEndedWithSpace = true;
-                    let nodeCount = 0;
-
-                    let current;
-                    while ((current = walker.nextNode())) {
-                        nodeCount++;
-                        const raw = current.textContent;
-                        const cleaned = raw.replace(/\u00AD/g, '').replace(/\u00A0/g, ' ');
-
-                        console.log(`  Node ${nodeCount}: "${raw}" → "${cleaned}"`);
-
-                        const beginsWithSpace = /^\s/.test(cleaned);
-
-                        if (!prevEndedWithSpace && !beginsWithSpace && prevNode) {
-                            if (shouldAddSyntheticSpace(prevNode, current)) {
-                                console.log(`    → Adding synthetic space`);
-                                fullTextNorm += ' ';
-                                map.push({ node: null, offset: 0, synthetic: true });
+                    function buildTextIndex(rootEl) {
+                        var walker = document.createTreeWalker(rootEl, NodeFilter.SHOW_TEXT, {
+                            acceptNode: function(n) {
+                                var t = n.textContent;
+                                if (!t) return NodeFilter.FILTER_SKIP;
+                                return NodeFilter.FILTER_ACCEPT;
                             }
-                        }
+                        });
 
-                        let i = 0;
-                        while (i < cleaned.length) {
-                            if (/\s/.test(cleaned[i])) {
-                                if (fullTextNorm.length === 0 || fullTextNorm[fullTextNorm.length - 1] !== ' ') {
+                        var map = [];
+                        var fullTextNorm = '';
+                        var prevNode = null;
+                        var prevEndedWithSpace = true;
+
+                        var current;
+                        while ((current = walker.nextNode())) {
+                            var raw = current.textContent;
+                            var cleaned = raw.replace(/\u00AD/g, '').replace(/\u00A0/g, ' ');
+                            var beginsWithSpace = /^\s/.test(cleaned);
+
+                            if (!prevEndedWithSpace && !beginsWithSpace && prevNode) {
+                                if (shouldAddSyntheticSpace(prevNode, current)) {
                                     fullTextNorm += ' ';
-                                    map.push({ node: current, offset: i });
+                                    map.push({ node: null, offset: 0, synthetic: true });
                                 }
-                                while (i < cleaned.length && /\s/.test(cleaned[i])) i++;
-                                continue;
                             }
-                            fullTextNorm += cleaned[i];
-                            map.push({ node: current, offset: i });
-                            i++;
+
+                            var i = 0;
+                            while (i < cleaned.length) {
+                                if (/\s/.test(cleaned[i])) {
+                                    if (fullTextNorm.length === 0 || fullTextNorm[fullTextNorm.length - 1] !== ' ') {
+                                        fullTextNorm += ' ';
+                                        map.push({ node: current, offset: i });
+                                    }
+                                    while (i < cleaned.length && /\s/.test(cleaned[i])) i++;
+                                    continue;
+                                }
+                                fullTextNorm += cleaned[i];
+                                map.push({ node: current, offset: i });
+                                i++;
+                            }
+
+                            prevNode = current;
+                            prevEndedWithSpace = fullTextNorm.length === 0 ? true : (fullTextNorm[fullTextNorm.length - 1] === ' ');
                         }
 
-                        prevNode = current;
-                        prevEndedWithSpace = fullTextNorm.length === 0 ? true : (fullTextNorm[fullTextNorm.length - 1] === ' ');
-                    }
-
-                    console.log(`📊 Processed ${nodeCount} text nodes`);
-
-                    if (fullTextNorm.endsWith(' ')) {
-                        fullTextNorm = fullTextNorm.slice(0, -1);
-                        if (map.length && (map[map.length - 1].node === null)) {
-                            map.pop();
-                        }
-                    }
-
-                    return { fullTextNorm, map };
-                }
-
-                function shouldAddSyntheticSpace(prevNode, currentNode) {
-                    if (!prevNode || !currentNode) return false;
-
-                    const currentText = currentNode.textContent;
-
-                    // 🔥 No añadir espacio si el nodo actual empieza con puntuación
-                    if (currentText && /^[\s:;,.\-—–!?¿¡()[\]{}"""''«»]/.test(currentText)) {
-                        return false;
-                    }
-
-                    const prevParent = prevNode.parentElement;
-                    const currentParent = currentNode.parentElement;
-
-                    // 🔥 Si tienen el mismo padre (hermanos)
-                    if (prevParent === currentParent) {
-                        let nextSibling = prevNode.nextSibling;
-
-                        // Saltar nodos vacíos/whitespace
-                        while (nextSibling && nextSibling.nodeType === Node.TEXT_NODE && !nextSibling.textContent.trim()) {
-                            nextSibling = nextSibling.nextSibling;
+                        if (fullTextNorm.endsWith(' ')) {
+                            fullTextNorm = fullTextNorm.slice(0, -1);
+                            if (map.length && (map[map.length - 1].node === null)) {
+                                map.pop();
+                            }
                         }
 
-                        // Si son hermanos consecutivos, NO añadir espacio
-                        if (nextSibling === currentNode || nextSibling === currentParent) {
+                        return { fullTextNorm: fullTextNorm, map: map };
+                    }
+
+                    function highlightMatchAcrossNodes(map, start, end, root) {
+                        var highlights = [];
+                        var nodesInMatch = [];
+
+                        for (var i = start; i < end && i < map.length; i++) {
+                            var entry = map[i];
+                            if (entry && entry.node && !entry.synthetic) {
+                                var lastNode = nodesInMatch[nodesInMatch.length - 1];
+                                if (!lastNode || lastNode.node !== entry.node) {
+                                    nodesInMatch.push({
+                                        node: entry.node,
+                                        startOffset: entry.offset,
+                                        endOffset: entry.offset + 1
+                                    });
+                                } else {
+                                    lastNode.endOffset = entry.offset + 1;
+                                }
+                            }
+                        }
+
+                        nodesInMatch.forEach(function(nodeData) {
+                            try {
+                                var range = document.createRange();
+                                var maxOffset = nodeData.node.textContent.length;
+                                var safeStart = Math.min(nodeData.startOffset, maxOffset);
+                                var safeEnd = Math.min(nodeData.endOffset, maxOffset);
+
+                                if (safeStart >= safeEnd) return;
+
+                                range.setStart(nodeData.node, safeStart);
+                                range.setEnd(nodeData.node, safeEnd);
+
+                                if (range.collapsed) return;
+
+                                var span = document.createElement('span');
+                                span.className = 'word-highlight';
+
+                                var fragment = range.extractContents();
+                                span.appendChild(fragment);
+                                range.insertNode(span);
+
+                                highlights.push(span);
+                            } catch (error) {
+                                console.warn('⚠️ Could not highlight node:', error);
+                            }
+                        });
+
+                        return highlights;
+                    }
+
+                    function shouldAddSyntheticSpace(prevNode, currentNode) {
+                        if (!prevNode || !currentNode) return false;
+
+                        var currentText = currentNode.textContent;
+
+                        if (currentText && /^[\s:;,.\-—–!?¿¡()[\]{}"""''«»]/.test(currentText)) {
                             return false;
                         }
 
-                        // 🔥 NUEVA REGLA: Si el nodo actual es muy corto (1-2 chars),
-                        // probablemente es parte de una palabra (como "3" en "TASMO3")
-                        if (currentText && currentText.trim().length <= 2 && !/^\s/.test(currentText)) {
-                            return false;
+                        var prevParent = prevNode.parentElement;
+                        var currentParent = currentNode.parentElement;
+
+                        if (prevParent === currentParent) {
+                            var nextSibling = prevNode.nextSibling;
+
+                            while (nextSibling && nextSibling.nodeType === Node.TEXT_NODE && !nextSibling.textContent.trim()) {
+                                nextSibling = nextSibling.nextSibling;
+                            }
+
+                            if (nextSibling === currentNode || nextSibling === currentParent) {
+                                return false;
+                            }
+
+                            if (currentText && currentText.trim().length <= 2 && !/^\s/.test(currentText)) {
+                                return false;
+                            }
                         }
-                    }
 
-                    // Lista de elementos de bloque
-                    const blockElements = ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'TD', 'TH', 'SECTION', 'ARTICLE'];
+                        var blockElements = ['P', 'DIV', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'LI', 'TD', 'TH', 'SECTION', 'ARTICLE'];
 
-                    if (blockElements.includes(prevParent?.tagName) || blockElements.includes(currentParent?.tagName)) {
+                        if (blockElements.includes(prevParent?.tagName) || blockElements.includes(currentParent?.tagName)) {
+                            return prevParent !== currentParent;
+                        }
+
                         return prevParent !== currentParent;
                     }
 
-                    return prevParent !== currentParent;
-                }
-
-                function findMatches(fullTextNorm, query) {
-                    const pattern = escapeRegex(query).replace(/\s+/g, '\\s+');
-                    const re = new RegExp(pattern, 'gi');
-                    const matches = [];
-                    let m;
-                    while ((m = re.exec(fullTextNorm)) !== null) {
-                        matches.push({ start: m.index, end: m.index + m[0].length });
-                        if (m.index === re.lastIndex) re.lastIndex++;
-                    }
-                    return matches;
-                }
-
-                function wrapHighlightRange(startPoint, endPoint, highlightClass) {
-                    if (!startPoint?.node || !endPoint?.node) return null;
-
-                    const range = document.createRange();
-                    try {
-                        range.setStart(startPoint.node, startPoint.offset);
-                        range.setEnd(endPoint.node, endPoint.offset);
-                    } catch (e) {
-                        return null;
+                    function findMatches(fullTextNorm, query) {
+                        var pattern = escapeRegex(query).replace(/\s+/g, '\\s+');
+                        var re = new RegExp(pattern, 'gi');
+                        var matches = [];
+                        var m;
+                        while ((m = re.exec(fullTextNorm)) !== null) {
+                            matches.push({ start: m.index, end: m.index + m[0].length });
+                            if (m.index === re.lastIndex) re.lastIndex++;
+                        }
+                        return matches;
                     }
 
-                    if (range.collapsed) return null;
-
-                    const span = document.createElement('span');
-                    span.className = highlightClass;
-
-                    const frag = range.extractContents();
-                    span.appendChild(frag);
-                    range.insertNode(span);
-                    range.detach();
-                    return span;
-                }
-
-                function toRealPoint(map, normIndex, forward) {
-                    let i = normIndex;
-                    while (i >= 0 && i < map.length) {
-                        const entry = map[i];
-                        if (entry && entry.node) return { node: entry.node, offset: entry.offset };
-                        i += forward ? 1 : -1;
+                    function escapeRegex(str) {
+                        return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                     }
-                    return null;
-                }
+                };
 
-                function escapeRegex(str) {
-                    return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-                }
+                reader.onerror = function() {
+                    console.error('❌ Error reading Word file');
+                    if (self.options.framework7) {
+                        self.options.framework7.toast.show({
+                            text: 'Error reading file',
+                            cssClass: 'color-red'
+                        });
+                    }
+                };
+
+                reader.readAsArrayBuffer(file);
             };
 
-            reader.onerror = function() {
-                console.error('❌ Error reading Word file');
-                if (self.options.framework7) {
-                    self.options.framework7.toast.show({
-                        text: 'Error reading file',
-                        cssClass: 'color-red'
+            // 🔥 DETECTAR TIPO Y PROCESAR
+            if (typeof fileOrUrl === 'string') {
+                // 🌐 ES UNA URL - Descargar con progreso
+                console.log('⬇️ Downloading Word from URL:', fileOrUrl);
+
+                var url = fileOrUrl;
+                if (url.includes(' ')) {
+                    url = url.replace(/ /g, '%20');
+                }
+
+                self.downloadWithProgress(url, fileName)
+                    .then(function(blob) {
+                        console.log('✅ Word downloaded, size:', blob.size);
+                        // Convertir Blob a File
+                        var file = new File([blob], fileName, {
+                            type: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                        });
+                        processFile(file);
+                    })
+                    .catch(function(error) {
+                        console.error('❌ Error downloading Word:', error);
+                        if (self.options.framework7) {
+                            self.options.framework7.toast.show({
+                                text: 'Error downloading Word: ' + error.message,
+                                position: 'center',
+                                closeTimeout: 4000,
+                                cssClass: 'color-red'
+                            });
+                        }
+                        // Fallback: abrir en nueva ventana
+                        window.open(fileOrUrl, '_blank');
                     });
-                }
-            };
-
-            reader.readAsArrayBuffer(file);
+            } else {
+                // 📁 ES UN FILE OBJECT
+                processFile(fileOrUrl);
+            }
         };
 
         /**

@@ -90,65 +90,214 @@ const sqlLog = function(...args) {
         originalConsole.log('🗄️ SQL:', ...args);
     }
 };
+// === Helpers ===
+function addTimestamp(url) {
+    const t = Date.now();
+    const sep = url.includes('?') ? '&' : '?';
+    return `${url}${sep}t=${t}`;
+}
+
+/**
+ * Intenta cargar la URL en el iframe y, si está bloqueado por frame-ancestors
+ * o X-Frame-Options, abre una pestaña nueva como fallback.
+ *
+ * @param {HTMLIFrameElement} iframe
+ * @param {string} url
+ * @param {object} opts
+ *   - timeoutMs: número de ms a esperar antes del fallback (por defecto 1500)
+ *   - onBlocked: callback si detectamos bloqueo (opcional)
+ *   - onLoaded: callback si cargó bien (opcional)
+ */
+function setIframeSrcWithFallback(iframe, url, opts = {}) {
+    const timeoutMs = opts.timeoutMs || 8000;
+    let resolved = false;
+    let cspBlocked = false; // ✅ NUEVO: Flag para CSP
+
+    const finalUrl = addTimestamp(url);
+
+    // ✅ DETECTAR ERRORES DE CSP EN LA CONSOLA
+    const originalConsoleError = console.error;
+    const cspErrorDetector = function(...args) {
+        const message = args.join(' ');
+        if (message.includes('frame-ancestors') ||
+            message.includes('X-Frame-Options') ||
+            message.includes('refused to connect') ||
+            message.includes('CSP')) {
+            console.warn('🚫 CSP/Frame blocking detected');
+            cspBlocked = true;
+        }
+        originalConsoleError.apply(console, args);
+    };
+    console.error = cspErrorDetector;
+
+    function cleanup() {
+        console.error = originalConsoleError; // ✅ Restaurar console.error
+        iframe.removeEventListener('load', onLoad);
+        iframe.removeEventListener('error', onError);
+    }
+
+    function onError(e) {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+        clearTimeout(timer);
+
+        console.error('❌ Iframe error event:', e);
+        if (typeof opts.onError === 'function') {
+            opts.onError(new Error('Iframe failed to load'));
+        }
+        if (typeof opts.onBlocked === 'function') opts.onBlocked();
+        window.open(url, '_blank');
+    }
+
+    function onLoad() {
+        if (resolved) return;
+
+        // ✅ ESPERAR UN POCO para que CSP error se detecte
+        setTimeout(() => {
+            if (resolved) return;
+
+            let isBlank = false;
+
+            // ✅ PRIMERO: Verificar si CSP bloqueó
+            if (cspBlocked) {
+                console.warn('🚫 CSP blocking confirmed');
+                isBlank = true;
+            } else {
+                // ✅ SEGUNDO: Verificar contenido del iframe
+                try {
+                    if (!iframe.contentWindow) {
+                        isBlank = true;
+                    } else {
+                        const href = iframe.contentWindow.location && iframe.contentWindow.location.href;
+                        if (!href || href === 'about:blank') {
+                            isBlank = true;
+                        } else {
+                            // Verificar si el documento está vacío
+                            const doc = iframe.contentDocument;
+                            if (doc && doc.body && doc.body.innerHTML.trim() === '') {
+                                isBlank = true;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // ✅ CROSS-ORIGIN: Puede ser legítimo O puede ser CSP
+                    // Si detectamos CSP, es bloqueado
+                    if (cspBlocked) {
+                        isBlank = true;
+                    } else {
+                        // Asumimos que cargó bien (cross-origin legítimo)
+                        isBlank = false;
+                    }
+                }
+            }
+
+            resolved = true;
+            cleanup();
+
+            if (isBlank) {
+                console.log('❌ Documento bloqueado o vacío');
+                if (typeof opts.onBlocked === 'function') opts.onBlocked();
+                window.open(url, '_blank');
+            } else {
+                console.log('✅ Documento cargado correctamente');
+                if (typeof opts.onLoaded === 'function') opts.onLoaded();
+            }
+        }, 300); // ✅ Esperar 300ms para que CSP error se registre
+    }
+
+    const timer = setTimeout(() => {
+        if (resolved) return;
+        resolved = true;
+        cleanup();
+
+        console.warn('⏱️ Timeout loading iframe');
+        if (typeof opts.onBlocked === 'function') opts.onBlocked();
+        window.open(url, '_blank');
+    }, timeoutMs);
+
+    iframe.addEventListener('load', () => {
+        clearTimeout(timer);
+        onLoad();
+    });
+
+    iframe.addEventListener('error', onError);
+
+    // Dispara la navegación
+    iframe.src = finalUrl;
+}
+function handleSourceClick(guid, sourceUrl, name) {
+    const sources = JSON.parse(localStorage.getItem('sources') || '{}');
+    const sourceData = sources[guid] || {};
+    const viewerStrategy = sourceData?.extra?.viewerStrategy || 'auto';
+
+    console.log('📋 Opening source with strategy:', viewerStrategy, 'for', name);
+
+    if (viewerStrategy === 'new_tab') {
+        console.log('🌐 Opening in new tab');
+        window.open(sourceUrl, '_blank');
+    } else {
+        // iframe o auto → usar viewDocument
+        console.log('📄 Opening with viewDocument');
+        viewDocument(sourceUrl, name);
+    }
+}
+// === Tu función con fallback integrado ===
 function viewDocument(url, title, openInSplitView = false) {
     title = title || '';
 
     if (openInSplitView) {
-        // NUEVO: Abrir en split view (como editContent)
-
-        // Generar un ID único para el iframe
         const iframeId = 'document-viewer-split-' + Date.now();
-
-        // Crear el HTML del iframe para el split view
         const html = `<iframe id="${iframeId}" src="about:blank" style="width:100%; height:98vh; border:none;" class="document-viewer-split"></iframe>`;
 
-        // Configurar el botón de cerrar del split view
-        $("#close-secundary").unbind('click');
-        $("#close-secundary").bind('click', function() {
+        $("#close-secundary").unbind('click').bind('click', function() {
             app.splitView.close();
             setTimeout(function(){
                 setDynamicHeight();
             }, 500);
         });
 
-        // Establecer el título en el split view
         $("#secundary-title").find('.title').text(title);
-
-        // Abrir el split view
         app.splitView.open(html, {isHtml: true, pageTitle: title});
 
-        // Cargar el documento en el iframe después de un pequeño delay
         setTimeout(function() {
-            const timestamp = new Date().getTime();
-            const separator = url.includes('?') ? '&' : '?';
-            const newUrl = `${url}${separator}t=${timestamp}`;
+            const iframe = document.getElementById(iframeId);
 
-            // Establecer la URL del documento en el iframe del split view
-            $(`#${iframeId}`).attr('src', newUrl);
-
-            // Esperar a que se cargue el iframe para poder comunicarse con él
-            waitForIframeLoad(iframeId, function(iframe) {
-                console.log('Iframe cargado, ahora puedes comunicarte con él');
-
-                // Almacenar el ID del iframe para uso posterior
-                window.currentIframeId = iframeId;
-
-                // Ejemplo: puedes llamar funciones del iframe aquí
-                // callIframeFunction(iframeId, 'inicializar');
+            setIframeSrcWithFallback(iframe, url, {
+                timeoutMs: 8000, // ✅ Aumentado a 8 segundos
+                onBlocked: () => {
+                    console.log('❌ Bloqueado por CSP/X-Frame-Options. Abriendo en nueva pestaña...');
+                    app.splitView.close();
+                    app.toast.show({
+                        text: 'Documento abierto en nueva pestaña',
+                        closeTimeout: 2000,
+                        cssClass: 'color-blue'
+                    });
+                },
+                onLoaded: () => {
+                    console.log('✅ Documento cargado correctamente en split view');
+                    window.currentIframeId = iframeId;
+                    waitForIframeLoad(iframeId, function(iframeEl) {
+                        // callIframeFunction(iframeId, 'inicializar');
+                    });
+                },
+                onError: (error) => { // ✅ NUEVO
+                    console.error('❌ Error cargando documento:', error);
+                    app.splitView.close();
+                    app.toast.show({
+                        text: 'Error cargando documento. Abierto en nueva pestaña.',
+                        closeTimeout: 2000,
+                        cssClass: 'color-orange'
+                    });
+                }
             });
-
         }, 100);
 
-        // Configurar el botón de guardar (opcional, para abrir en nueva ventana)
-        $("#save-secundary").unbind('click');
-        $("#save-secundary").bind('click', function() {
+        $("#save-secundary").unbind('click').bind('click', function() {
             window.open(url, "_blank");
         });
 
-        // Configurar el botón de imprimir
-        $("#print-btn").unbind('click');
-        $("#print-btn").bind('click', function() {
-            // Intentar imprimir el contenido del iframe
+        $("#print-btn").unbind('click').bind('click', function() {
             try {
                 const iframe = document.getElementById(iframeId);
                 if (iframe && iframe.contentWindow) {
@@ -162,38 +311,53 @@ function viewDocument(url, title, openInSplitView = false) {
         });
 
     } else {
-        // COMPORTAMIENTO ORIGINAL: Abrir en popup
-
-        // Primero limpia el iframe estableciendo src a about:blank
+        // Popup mode
         $("#document-viewer").attr('src', 'about:blank');
 
-        // Usa setTimeout para asegurar que el iframe se limpie antes de cargar la nueva URL
         setTimeout(function() {
-            // Agrega un parámetro de timestamp para evitar caché
-            const timestamp = new Date().getTime();
-            const separator = url.includes('?') ? '&' : '?';
-            const newUrl = `${url}${separator}t=${timestamp}`;
+            const iframe = document.getElementById('document-viewer');
 
-            // Establece la nueva URL con el timestamp
-            $("#document-viewer").attr('src', newUrl);
+            setIframeSrcWithFallback(iframe, url, {
+                timeoutMs: 8000,
+                onBlocked: () => {
+                    console.log('❌ Bloqueado. Abriendo en nueva pestaña...');
+                    try { app.popup.close('#viewer-popup'); } catch(_) {}
+                    app.toast.show({
+                        text: 'Documento abierto en nueva pestaña',
+                        closeTimeout: 2000,
+                        cssClass: 'color-blue'
+                    });
+                },
+                onLoaded: () => {
+                    console.log('✅ Documento cargado en popup');
+                    $("#viewer-popup").find('.title').text(title);
 
-            // El resto de tu código original
-            $("#viewer-popup").find('.title').text(title);
-            $("#btn-document-maximize").unbind('click');
-            $("#btn-document-maximize").bind('click', function() {
-                window.open(url, "_blank");
+                    $("#btn-document-maximize").unbind('click').bind('click', function() {
+                        window.open(url, "_blank");
+                    });
+                    $("#close-sources").bind('click', function() {
+                        app.panel.close("#sources-panel");
+                    });
+                    $("#close-viewer").unbind('click').bind('click', function() {
+                        app.popup.close('#viewer-popup');
+                    });
+
+                    app.popup.open('#viewer-popup');
+                },
+                onError: (error) => {
+                    console.error('❌ Error cargando documento:', error);
+                    try { app.popup.close('#viewer-popup'); } catch(_) {}
+                    app.toast.show({
+                        text: 'Error cargando documento. Abierto en nueva pestaña.',
+                        closeTimeout: 2000,
+                        cssClass: 'color-orange'
+                    });
+                }
             });
-            $("#close-sources").bind('click', function() {
-                app.panel.close("#sources-panel");
-            });
-            $("#close-viewer").unbind('click');
-            $("#close-viewer").bind('click', function() {
-                app.popup.close('#viewer-popup');
-            });
-            app.popup.open('#viewer-popup');
-        }, 50); // Un pequeño retraso de 50ms
+        }, 50);
     }
 }
+
 function waitForIframeLoad(iframeId, callback) {
     const iframe = document.getElementById(iframeId);
 
@@ -1014,3 +1178,399 @@ function setDynamicHeight(messagesHistory) {
 
 
 }
+
+/**
+ * ==========================================
+ * DETECCIÓN DE PROXY Y TOOL DINÁMICO
+ * ==========================================
+ * Este código debe insertarse en conversation.html después de cargar los tools del asistente
+ * Específicamente después de: chat.tools = assistantData.tools || [];
+ */
+
+/**
+ * Detecta si el proxy está disponible y obtiene la lista de servicios
+ */
+async function detectProxyAndServices() {
+    try {
+        const proxyBaseUrl = 'http://localhost:8000';
+
+        // 1. Verificar si el proxy está disponible
+        console.log('🔍 Checking proxy availability...');
+        const healthResponse = await fetch(`${proxyBaseUrl}/_health`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!healthResponse.ok) {
+            console.log('⚠️ Proxy not available');
+            return null;
+        }
+
+        console.log('✅ Proxy is available');
+
+        // 2. Obtener lista de servicios disponibles
+        const servicesResponse = await fetch(`${proxyBaseUrl}/_services`, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!servicesResponse.ok) {
+            console.error('❌ Failed to fetch services');
+            return null;
+        }
+
+        const servicesData = await servicesResponse.json();
+        const services = servicesData.services || [];
+
+        console.log('📋 Available services:', services);
+
+        return {
+            available: true,
+            baseUrl: proxyBaseUrl,
+            services: services
+        };
+
+    } catch (error) {
+        console.log('⚠️ Proxy detection failed:', error.message);
+        return null;
+    }
+}
+
+/**
+ * Crea el tool dinámico basado en los servicios disponibles
+ */
+function createRetrieveDataTool(proxyInfo) {
+    if (!proxyInfo || !proxyInfo.services || proxyInfo.services.length === 0) {
+        return null;
+    }
+
+    // Construir la descripción con los servicios disponibles
+    const serviceDescriptions = proxyInfo.services.map(service => {
+        return `- **${service.name}**: ${service.description}`;
+    }).join('\n');
+
+    const serviceNames = proxyInfo.services.map(s => s.name).join(', ');
+
+    const tool = {
+        type: "function",
+        function: {
+            ask_for_execution:true,
+            in_progress_message : "Searching in internal data source",
+            name: "retrieve_data_from_corporate_services",
+            friendly_name: "Retrieve Corporate Data",
+            description: `Search and retrieve data from corporate services through the proxy.
+
+**Available services:**
+${serviceDescriptions}
+
+Use this tool when the user asks for information that might be stored in corporate systems like Confluence, Jira, or other integrated services.
+
+**Usage guidelines:**
+- Select only the relevant services for the query (don't use all services for every query)
+- The 'term' parameter should be a clear search query
+- Multiple services can be specified as a semicolon-separated list
+- Available service names: ${serviceNames}`,
+            parameters: {
+                type: "object",
+                properties: {
+                    term: {
+                        type: "string",
+                        description: "The search term or query to look up in the corporate services"
+                    },
+                    services: {
+                        type: "string",
+                        description: `Semicolon-separated list of services to search. Available: ${serviceNames}. Example: "confluence" or "confluence;jira"`
+                    }
+                },
+                required: ["term", "services"]
+            }
+        }
+    };
+
+    return tool;
+}
+
+/**
+ * Función principal para inicializar el tool del proxy
+ * Esta función debe llamarse después de cargar chat.tools
+ */
+async function initializeProxyTool(chat,assistant) {
+
+    console.log(assistant)
+    console.log('🚀 Initializing proxy tool detection...');
+
+    if (!assistant || !assistant.activeProxy) {
+        console.log('⚠️ Assistant does not have proxy enabled');
+        return false;
+    }
+    const proxyInfo = await detectProxyAndServices();
+
+    if (!proxyInfo) {
+        console.log('ℹ️ Proxy tool not available - continuing without it');
+        return false;
+    }
+    window.activeServices = {};
+    proxyInfo.services.forEach(service => {
+        window.activeServices[service.name] = true;
+    });
+    console.log('🎯 Active services initialized:', Object.keys(window.activeServices));
+
+    const retrieveDataTool = createRetrieveDataTool(proxyInfo);
+
+    if (!retrieveDataTool) {
+        console.log('⚠️ Could not create retrieve data tool');
+        return false;
+    }
+
+    // Verificar si el tool ya existe para no duplicarlo
+    const existingToolIndex = chat.tools.findIndex(
+        t => t.function?.name === 'retrieve_data_from_corporate_services'
+    );
+
+    if (existingToolIndex >= 0) {
+        // Actualizar el tool existente
+        chat.tools[existingToolIndex] = retrieveDataTool;
+        console.log('🔄 Updated existing retrieve_data_from_corporate_services tool');
+    } else {
+        // Agregar el nuevo tool
+
+        chat.tools.push(retrieveDataTool);
+        console.log('✅ Added retrieve_data_from_corporate_services tool');
+        window.activeTools['retrieve_data_from_corporate_services'] = true;
+    }
+
+    // También agregarlo a activeTools si existe
+    if (chat.activeTools) {
+        const activeIndex = chat.activeTools.findIndex(
+            t => t.function?.name === 'retrieve_data_from_corporate_services'
+        );
+
+        if (activeIndex >= 0) {
+            chat.activeTools[activeIndex] = retrieveDataTool;
+        } else {
+            chat.activeTools.push(retrieveDataTool);
+        }
+    }
+
+    // Guardar la información del proxy para uso posterior
+    window.proxyInfo = proxyInfo;
+
+    console.log('📊 Current tools:', chat.tools.map(t => t.function?.name));
+
+    // Iniciar monitoreo en tiempo real
+    startProxyMonitoring(chat);
+
+    return true;
+}
+async function startProxyMonitoring(chat) {
+    async function checkProxy() {
+        try {
+            const response = await fetch('http://localhost:8000/_health', {
+                method: 'GET',
+                signal: AbortSignal.timeout(2000)
+            });
+
+            if (response.ok) {
+                if (!window.proxyInfo) {
+                    console.log('✅ Proxy came back online, re-detecting...');
+
+                    // Re-detectar servicios
+                    const proxyInfo = await detectProxyAndServices();
+
+                    if (proxyInfo) {
+                        // Recrear tool
+                        const retrieveDataTool = createRetrieveDataTool(proxyInfo);
+
+                        if (retrieveDataTool && chat && chat.tools) {
+                            const existingIndex = chat.tools.findIndex(
+                                t => t.function?.name === 'retrieve_data_from_corporate_services'
+                            );
+
+                            if (existingIndex >= 0) {
+                                chat.tools[existingIndex] = retrieveDataTool;
+                            } else {
+                                chat.tools.push(retrieveDataTool);
+                                window.activeTools['retrieve_data_from_corporate_services'] = true;
+                            }
+
+                            if (chat.activeTools) {
+                                const activeIndex = chat.activeTools.findIndex(
+                                    t => t.function?.name === 'retrieve_data_from_corporate_services'
+                                );
+                                if (activeIndex >= 0) {
+                                    chat.activeTools[activeIndex] = retrieveDataTool;
+                                } else {
+                                    chat.activeTools.push(retrieveDataTool);
+                                }
+                            }
+
+                            window.proxyInfo = proxyInfo;
+
+                            // Inicializar servicios activos
+                            window.activeServices = {};
+                            proxyInfo.services.forEach(service => {
+                                window.activeServices[service.name] = true;
+                            });
+
+                            console.log('✅ Proxy tool restored');
+                            window.dispatchEvent(new CustomEvent('proxy-status-changed'));
+                        }
+                    }
+                }
+            } else {
+                throw new Error('Proxy offline');
+            }
+        } catch (error) {
+            if (window.proxyInfo) {
+                console.log('❌ Proxy went offline');
+                window.proxyInfo = null;
+
+                // ELIMINAR EL TOOL
+                if (chat && chat.tools) {
+                    const toolIndex = chat.tools.findIndex(
+                        t => t.function?.name === 'retrieve_data_from_corporate_services'
+                    );
+                    if (toolIndex >= 0) {
+                        chat.tools.splice(toolIndex, 1);
+                        console.log('🗑️ Removed retrieve_data_from_corporate_services tool');
+                    }
+                }
+
+                // ELIMINAR DE ACTIVE TOOLS
+                if (chat && chat.activeTools) {
+                    const activeIndex = chat.activeTools.findIndex(
+                        t => t.function?.name === 'retrieve_data_from_corporate_services'
+                    );
+                    if (activeIndex >= 0) {
+                        chat.activeTools.splice(activeIndex, 1);
+                    }
+                }
+
+                window.dispatchEvent(new CustomEvent('proxy-status-changed'));
+            }
+        }
+
+        setTimeout(checkProxy, 5000);
+    }
+
+    checkProxy();
+}
+
+// Función para detener el monitoreo
+function stopProxyMonitoring() {
+    if (window.proxyEventSource) {
+        window.proxyEventSource.close();
+        window.proxyEventSource = null;
+        console.log('⏹️ Proxy monitoring stopped');
+    }
+}
+
+/**
+ * Handler para ejecutar el tool retrieve_data_from_corporate_services
+ * Este código debe insertarse en la función callTool()
+ */
+async function handleRetrieveDataTool(params) {
+    const searchTerm = params.term || '';
+    const servicesParam = params.services || '';
+
+    if (!searchTerm) {
+        throw new Error('Search term is required');
+    }
+
+    if (!window.proxyInfo || !window.proxyInfo.baseUrl) {
+        throw new Error('Proxy not available');
+    }
+
+    console.log(`🔍 Retrieving data: "${searchTerm}" from services: ${servicesParam}`);
+
+    try {
+        // Construir la URL de búsqueda
+        const queryParams = new URLSearchParams({
+            q: searchTerm,
+            services: servicesParam,
+            limit: '10',
+            include: 'content',
+            normalize: 'simba_v1'
+        });
+
+        const searchUrl = `${window.proxyInfo.baseUrl}/_search?${queryParams.toString()}`;
+
+        console.log('🌐 Search URL:', searchUrl);
+
+        const response = await fetch(searchUrl, {
+            method: 'GET',
+            headers: {
+                'Accept': 'application/json'
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Search failed: ${response.status} ${response.statusText}`);
+        }
+
+        const data = await response.json();
+        const results = data.results || [];
+        const stats = data.stats || {};
+
+        console.log(`✅ Found ${results.length} results`);
+        console.log('📊 Stats:', stats);
+
+        // Formatear los resultados para el LLM
+        if (results.length === 0) {
+            return {
+                success: true,
+                message: `No results found for "${searchTerm}" in services: ${servicesParam}`,
+                results: [],
+                stats: stats
+            };
+        }
+
+        // Construir el contexto para el LLM
+        const formattedResults = results.map((result, index) => {
+            const text = result.text || '';
+            const references = result.references || [];
+
+            let content = '';
+            if (text) {
+                content = text;
+            } else if (references.length > 0) {
+                content = references.map(ref => ref.text || '').join('\n\n');
+            }
+
+            return {
+                index: index + 1,
+                title: result.name || result.id || 'Untitled',
+                url: result.url || '',
+                site: result.site || 'Unknown',
+                summary: result.summary || '',
+                content: content.substring(0, 2000), // Limitar contenido
+                type: result.extra?.type || 'document'
+            };
+        });
+
+        return {
+            success: true,
+            message: `Found ${results.length} results for "${searchTerm}"`,
+            results: formattedResults,
+            stats: stats
+        };
+
+    } catch (error) {
+        console.error('❌ Error retrieving data:', error);
+        return {
+            success: false,
+            error: error.message,
+            results: []
+        };
+    }
+}
+
+// ==========================================
+// EXPORT PARA USO EN CONVERSATION.HTML
+// ==========================================
+window.initializeProxyTool = initializeProxyTool;
+window.handleRetrieveDataTool = handleRetrieveDataTool;

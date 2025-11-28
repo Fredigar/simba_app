@@ -2707,7 +2707,1092 @@ SIMBA.Utils = class {
         }
     }
 };
+// SIMBA.ContextManager genérico para el proxy corporativo
+SIMBA.ContextManager = class {
+    /**
+     * @param {Object} config
+     *  - baseUrl: URL base del proxy (ej: "http://localhost:8000")
+     *  - serviceName: servicio por defecto (ej: "confluence", "jira"...)
+     *  - defaultLimit: límite por defecto para /_search
+     *  - defaultNormalize: perfil de normalización (ej: "simba_v1")
+     *  - requestTimeoutMs: timeout para fetch (solo navegadores modernos si usas AbortController)
+     */
+    constructor(config = {}) {
+        this.config = {
+            baseUrl: config.baseUrl || config.confluenceBaseUrl || "http://localhost:8000",
+            serviceName: config.serviceName || "confluence",
+            defaultLimit: config.defaultLimit || 5,
+            defaultNormalize: config.defaultNormalize || "simba_v1",
+            requestTimeoutMs: config.requestTimeoutMs || 30_000,
 
+            // para compatibilidad con cosas de SIMBA
+            useSimbaDocumentTags: config.useSimbaDocumentTags !== false,
+
+            ...config
+        };
+
+        // stats del último /_search o /_query
+        this.lastStats = null;
+    }
+
+    // =========================================================
+    // 🔧 Helpers internos
+    // =========================================================
+
+    /**
+     * Construye una URL absoluta contra el proxy.
+     */
+    buildUrl(path = "/", queryParams = {}) {
+        const base = this.config.baseUrl.replace(/\/+$/, "");
+        const cleanPath = path.startsWith("/") ? path : `/${path}`;
+        const url = new URL(base + cleanPath);
+
+        Object.entries(queryParams).forEach(([key, value]) => {
+            if (value === undefined || value === null) return;
+            if (Array.isArray(value)) {
+                url.searchParams.set(key, value.join(";"));
+            } else {
+                url.searchParams.set(key, String(value));
+            }
+        });
+
+        return url.toString();
+    }
+
+    /**
+     * Determina si una ruta es "interna" del proxy (no requiere X-Service).
+     */
+    isInternalPath(path) {
+        const p = path.startsWith("/") ? path : `/${path}`;
+        return p.startsWith("/_");
+    }
+
+    /**
+     * Construye headers para el proxy.
+     * - Para rutas internas (/_) por defecto NO añade X-Service.
+     * - Para rutas de servicio sí añade X-Service, a menos que se desactive.
+     */
+    buildHeaders({ serviceName, internal = false, extraHeaders = {} } = {}) {
+        const headers = { ...(extraHeaders || {}) };
+
+        if (!internal) {
+            headers["X-Service"] = serviceName || this.config.serviceName || "confluence";
+        }
+
+        return headers;
+    }
+
+    /**
+     * Wrapper genérico de fetch contra el proxy.
+     *
+     * @param {Object} opts
+     *  - path: ruta ("/_search", "/rest/api/search", etc.)
+     *  - method: GET/POST/...
+     *  - serviceName: nombre del servicio (confluence, jira, etc.)
+     *  - query: query params (objeto)
+     *  - body: body para POST/PUT (objeto → JSON)
+     *  - internal: si true, NO manda X-Service
+     *  - headers: headers extra
+     */
+    async request(opts = {}) {
+        const {
+            path = "/",
+            method = "GET",
+            serviceName = this.config.serviceName,
+            query = undefined,
+            body = undefined,
+            internal = false,
+            headers = {}
+        } = opts;
+
+        const url = this.buildUrl(path, query || {});
+        const finalHeaders = this.buildHeaders({
+            serviceName,
+            internal: internal || this.isInternalPath(path),
+            extraHeaders: headers
+        });
+
+        const init = {
+            method,
+            headers: {
+                "Content-Type": body ? "application/json" : "application/json",
+                ...finalHeaders
+            }
+        };
+
+        if (body !== undefined && body !== null) {
+            init.body = typeof body === "string" ? body : JSON.stringify(body);
+        }
+
+        const response = await fetch(url, init);
+
+        // Podrías añadir lógica de timeout con AbortController si te interesa
+
+        if (!response.ok) {
+            let msg = "";
+            try {
+                msg = await response.text();
+            } catch (_) {
+                // ignore
+            }
+            const error = new Error(`Proxy request failed: ${response.status} ${response.statusText}`);
+            error.status = response.status;
+            error.rawBody = msg;
+            throw error;
+        }
+
+        // Intenta parsear JSON; si no, devuelve el Response tal cual
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+            return response.json();
+        }
+        return response;
+    }
+
+    // =========================================================
+    // 🩺 Endpoints internos del proxy
+    // =========================================================
+
+    /**
+     * GET /_health
+     */
+    async getHealth() {
+        return this.request({
+            path: "/_health",
+            method: "GET",
+            internal: true
+        });
+    }
+
+    /**
+     * GET /_services
+     * Devuelve lista de servicios configurados en el proxy.
+     */
+    async listServices() {
+        const json = await this.request({
+            path: "/_services",
+            method: "GET",
+            internal: true
+        });
+        // asumimos { services: [...] }
+        return json.services || [];
+    }
+
+    /**
+     * Helper: obtiene un servicio concreto por nombre a partir de /_services
+     */
+    async getServiceInfo(name) {
+        const services = await this.listServices();
+        return services.find(s => s.name === name) || null;
+    }
+
+    // =========================================================
+    // 🔍 Búsqueda unificada (/_search, /_query)
+    // =========================================================
+
+    /**
+     * Búsqueda tipo "search" (query de texto simple).
+     *
+     * @param {string} term - término de búsqueda
+     * @param {Object} options
+     *  - services: string o array de servicios ("confluence", "jira"; "*" para todos)
+     *  - limit: límite de resultados
+     *  - includeContent: si true, pide expansión de contenido (content)
+     *  - normalize: perfil de normalización (simba_v1, mcp_v1, etc.)
+     *  - extraInclude: lista de flags extra (['refs', 'meta', etc.])
+     */
+    async search(term, options = {}) {
+        if (!term || !term.trim()) {
+            throw new Error("Search term is required");
+        }
+
+        const {
+            services = this.config.serviceName,  // string o array
+            limit = this.config.defaultLimit,
+            includeContent = true,
+            normalize = this.config.defaultNormalize || "simba_v1",
+            extraInclude = []
+        } = options;
+
+        const includeParts = [];
+        if (includeContent) includeParts.push("content");
+        if (Array.isArray(extraInclude)) {
+            extraInclude.forEach(x => includeParts.push(x));
+        }
+
+        const query = {
+            q: term,
+            normalize,
+            limit,
+        };
+
+        if (services && services !== "*") {
+            if (Array.isArray(services)) {
+                query.services = services.join(";");
+            } else {
+                query.services = services;
+            }
+        }
+        if (includeParts.length > 0) {
+            query.include = includeParts.join(",");
+        }
+
+        const json = await this.request({
+            path: "/_search",
+            method: "GET",
+            query,
+            internal: true   // /_search es endpoint interno del proxy
+        });
+
+        // guardamos stats por si el LLM/UX quiere mostrarlos
+        this.lastStats = json.stats || null;
+
+        // en perfil simba_v1, json.results ya es lista de "SimbaItem"
+        return json.results || [];
+    }
+
+    /**
+     * Búsqueda/consulta estructurada (/_query).
+     *
+     * @param {Object} payload
+     *  - q: término de búsqueda (opcional, según el perfil)
+     *  - services: string o array
+     *  - limit, normalize, include, filters, etc.
+     */
+    async query(payload = {}) {
+        const body = { ...payload };
+
+        if (!body.normalize) {
+            body.normalize = this.config.defaultNormalize || "simba_v1";
+        }
+        if (!body.services) {
+            body.services = this.config.serviceName;
+        }
+        if (!body.limit) {
+            body.limit = this.config.defaultLimit;
+        }
+
+        const json = await this.request({
+            path: "/_query",
+            method: "POST",
+            body,
+            internal: true
+        });
+
+        this.lastStats = json.stats || null;
+        return json.results || json.items || json;
+    }
+
+    // =========================================================
+    // 🌐 Llamadas genéricas a un servicio (passthrough)
+    // =========================================================
+
+    /**
+     * Llama a una ruta de un servicio concreto pasando por el proxy.
+     * Útil si quieres que el LLM o tu UI acceda a APIs "crudas" del servicio.
+     *
+     * @param {string} path - ruta en el servicio (ej. "/rest/api/search")
+     * @param {Object} opts
+     *  - method, serviceName, query, body, headers
+     */
+    async callService(path, opts = {}) {
+        const {
+            method = "GET",
+            serviceName = this.config.serviceName,
+            query = undefined,
+            body = undefined,
+            headers = {}
+        } = opts;
+
+        return this.request({
+            path,
+            method,
+            serviceName,
+            query,
+            body,
+            headers,
+            internal: false   // esto sí va contra un servicio concreto
+        });
+    }
+
+    // =========================================================
+    // 🧩 Helpers tipo SIMBA (opcional)
+    // =========================================================
+
+    /**
+     * Formatea un item (con references) en <simba_document> por página,
+     * igual que lo hacías antes. Útil para el LLM o para un visor.
+     *
+     * Espera items con esta forma (simba_v1):
+     *  - name / title
+     *  - text (opcional)
+     *  - references: [{ page, section, text }]
+     */
+    formatAsSimbaDocument(item) {
+        const filename = item.title || item.name || "document";
+        const text = item.text || "";
+
+        if (!this.config.useSimbaDocumentTags) {
+            if (item.references && item.references.length > 0) {
+                let plainText = "";
+                item.references.forEach(ref => {
+                    plainText += `--- Página ${ref.page} ---\n\n${ref.text}\n\n`;
+                });
+                return plainText.trim();
+            }
+            return text;
+        }
+
+        if (item.references && item.references.length > 0) {
+            let result = "";
+            item.references.forEach(ref => {
+                result += `<simba_document data-filename="${filename}" data-page="${ref.page}">\n`;
+                result += ref.text;
+                result += "\n</simba_document>\n\n";
+            });
+            return result.trim();
+        } else {
+            return `<simba_document data-filename="${filename}" data-page="1">\n${text}\n</simba_document>`;
+        }
+    }
+
+    /**
+     * Devuelve los stats de la última búsqueda /_search o /_query.
+     */
+    getLastStats() {
+        return this.lastStats;
+    }
+
+    /**
+     * Actualizar configuración
+     */
+    updateConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        console.log("✅ ContextManager config updated:", this.config);
+    }
+};
+
+/**
+ * Gestiona contextos externos (Confluence, etc.)
+ */
+/**
+ * SIMBA Context Manager
+ * Maneja búsqueda y procesamiento de contenido desde Confluence
+ * Versión: 2.0 - Compatible con FileDropzone format
+ */
+
+SIMBA.ContextManagerOld = class {
+    constructor(config = {}) {
+        this.config = {
+            // URLs y configuración base
+            confluenceBaseUrl: config.confluenceBaseUrl || 'http://localhost:8000',
+            confluenceRealUrl: 'https://confluence.intra.airbusds.corp',
+            serviceName: config.serviceName || 'confluence',
+            defaultLimit: config.defaultLimit || 5,
+
+            // Configuración de referencias
+            maxRefsPerPage: config.maxRefsPerPage || 5,
+            refSnippetChars: config.refSnippetChars || 300,
+
+            // Procesamiento de attachments
+            processAttachments: config.processAttachments !== false,
+            supportedAttachmentTypes: config.supportedAttachmentTypes || ['pdf', 'docx', 'doc'],
+
+            // Formato (igual que FileDropzone)
+            useSimbaDocumentTags: config.useSimbaDocumentTags !== false,
+
+            // Límites de procesamiento
+            maxAttachmentSize: config.maxAttachmentSize || 50 * 1024 * 1024, // 50MB
+            maxPagesPerDocument: config.maxPagesPerDocument || 100,
+            viewerStrategy: {
+                pages: 'new_tab',           // Páginas de Confluence
+                attachments: 'iframe',      // Attachments procesados
+                pdfs: 'iframe',            // PDFs específicamente
+                docx: 'iframe',            // Word específicamente
+                default: 'new_tab',           // Otros tipos
+                ...(config.viewerStrategy || {})  // Override del usuario
+            },
+
+            ...config
+        };
+
+        this.processingStats = {
+            totalProcessed: 0,
+            totalFailed: 0,
+            totalPages: 0,
+            totalChars: 0
+        };
+    }
+    /**
+     * ✅ Headers para el proxy (X-Service)
+     */
+    getProxyHeaders(extra = {}) {
+        return {
+            'X-Service': this.config.serviceName || 'confluence',
+            ...extra
+        };
+    }
+
+    /**
+     * ✅ Wrapper de fetch que añade X-Service
+     */
+    async proxyFetch(url, init = {}) {
+        const merged = {
+            ...init,
+            headers: {
+                ...(init.headers || {}),
+                ...this.getProxyHeaders()
+            }
+        };
+        return fetch(url, merged);
+    }
+    /**
+     * ✅ Determina la estrategia de visualización para un tipo de contenido
+     */
+    getViewerStrategy(contentType, fileExtension) {
+        const strategy = this.config.viewerStrategy;
+
+        // Buscar por extensión específica primero
+        if (fileExtension) {
+            const ext = fileExtension.toLowerCase().replace('.', '');
+            if (strategy[ext]) {
+                return strategy[ext];
+            }
+        }
+
+        // Buscar por tipo de contenido
+        if (strategy[contentType]) {
+            return strategy[contentType];
+        }
+
+        // Fallback al default
+        return strategy.default || 'new_tab';
+    }
+    /**
+     * ✅ Convierte cualquier URL de Confluence al proxy
+     */
+    toProxyUrl(url) {
+        if (!url) return this.config.confluenceBaseUrl;
+
+        // Si ya es localhost:8000, devolver tal cual
+        if (url.includes('localhost:8000')) {
+            return url;
+        }
+
+        // Extraer solo la parte relativa (después del dominio)
+        try {
+            const urlObj = new URL(url);
+            const relativePath = urlObj.pathname + urlObj.search + urlObj.hash;
+            return `${this.config.confluenceBaseUrl}${relativePath}`;
+        } catch (e) {
+            // Si no es una URL válida, asumir que es relativa
+            const cleanPath = url.startsWith('/') ? url : '/' + url;
+            return `${this.config.confluenceBaseUrl}${cleanPath}`;
+        }
+    }
+
+    /**
+     * ✅ Convierte highlights de Confluence a texto limpio
+     */
+    convertConfluenceHighlights(text) {
+        if (!text) return text;
+
+        // Remover marcadores de highlight de Confluence
+        let result = text
+            .replace(/@@@hl@@@/g, '')
+            .replace(/@@@endhl@@@/g, '');
+
+        // Limpiar cualquier otro marcador @@@
+        result = result.replace(/@@@[^@]+@@@/g, '');
+
+        return result;
+    }
+
+    /**
+     * ✅ Parsea preview URL para obtener IDs
+     */
+    parsePreviewParts(previewOrUrl) {
+        if (!previewOrUrl) return null;
+
+        let preview = previewOrUrl;
+        try {
+            const u = new URL(previewOrUrl, this.config.confluenceBaseUrl);
+            const p = u.searchParams.get('preview');
+            if (p) preview = decodeURIComponent(p);
+        } catch (_) { /* puede ya ser preview puro */ }
+
+        if (!preview.startsWith('/')) preview = '/' + preview;
+
+        const parts = preview.split('/').filter(Boolean);
+        if (parts.length < 3) return null;
+
+        const pageId = parts[0];
+        const attachmentId = parts[1];
+        const filename = parts.slice(2).join('/');
+
+        return { pageId, attachmentId, filename };
+    }
+
+    /**
+     * ✅ Construye URL de descarga directa
+     */
+    buildAttachmentDownloadUrl(previewOrUrl) {
+        const info = this.parsePreviewParts(previewOrUrl);
+        if (!info) return null;
+
+        const { pageId, filename } = info;
+        const path = `/download/attachments/${encodeURIComponent(pageId)}/${filename}`;
+        return this.toProxyUrl(path);
+    }
+
+    /**
+     * ✅ Verifica si un attachment debe procesarse
+     */
+    shouldProcessAttachment(filename) {
+        if (!this.config.processAttachments) return false;
+
+        const ext = filename.split('.').pop().toLowerCase();
+        return this.config.supportedAttachmentTypes.includes(ext);
+    }
+
+    /**
+     * ✅ Descarga y procesa un attachment (PDF o DOCX)
+     */
+    async processAttachment(downloadUrl, filename) {
+        try {
+            console.log(`📄 Processing attachment: ${filename}`);
+
+            // Verificar tamaño antes de descargar (si es posible)
+            const headResponse = await this.proxyFetch(downloadUrl, { method: 'HEAD' });
+            if (headResponse.ok) {
+                const contentLength = headResponse.headers.get('content-length');
+                if (contentLength && parseInt(contentLength) > this.config.maxAttachmentSize) {
+                    console.warn(`⚠️ File too large: ${filename} (${contentLength} bytes)`);
+                    return {
+                        error: 'File too large',
+                        maxSize: this.config.maxAttachmentSize
+                    };
+                }
+            }
+
+            // Descargar el archivo
+            const response = await this.proxyFetch(downloadUrl);
+            if (!response.ok) {
+                throw new Error(`Failed to download: ${response.status}`);
+            }
+
+            const blob = await response.blob();
+            const arrayBuffer = await blob.arrayBuffer();
+
+            const ext = filename.split('.').pop().toLowerCase();
+
+            // Procesar según tipo
+            let result;
+            if (ext === 'pdf') {
+                result = await this.extractTextFromPDF(arrayBuffer, filename);
+            } else if (ext === 'docx' || ext === 'doc') {
+                result = await this.extractTextFromDOCX(arrayBuffer, filename);
+            }
+
+            if (result) {
+                this.processingStats.totalProcessed++;
+                this.processingStats.totalPages += result.pageCount || 1;
+                this.processingStats.totalChars += result.text.length;
+
+                console.log(`✅ Processed ${filename}: ${result.text.length} chars, ${result.pageCount || 1} pages`);
+            }
+
+            return result;
+
+        } catch (error) {
+            console.error(`❌ Error processing attachment ${filename}:`, error);
+            this.processingStats.totalFailed++;
+            return {
+                error: error.message,
+                filename: filename
+            };
+        }
+    }
+
+    /**
+     * ✅ Extrae texto de PDF usando pdf.js
+     */
+    async extractTextFromPDF(arrayBuffer, filename) {
+        try {
+            if (typeof pdfjsLib === 'undefined') {
+                console.warn('⚠️ PDF.js not loaded');
+                return {
+                    error: 'PDF.js library not available',
+                    text: '',
+                    references: []
+                };
+            }
+
+            const loadingTask = pdfjsLib.getDocument({ data: arrayBuffer });
+            const pdf = await loadingTask.promise;
+
+            const maxPages = Math.min(pdf.numPages, this.config.maxPagesPerDocument);
+            if (pdf.numPages > maxPages) {
+                console.warn(`⚠️ PDF has ${pdf.numPages} pages, limiting to ${maxPages}`);
+            }
+
+            let fullText = '';
+            const references = [];
+
+            // Extraer texto de cada página
+            for (let pageNum = 1; pageNum <= maxPages; pageNum++) {
+                const page = await pdf.getPage(pageNum);
+                const textContent = await page.getTextContent();
+
+                const pageText = textContent.items
+                    .map(item => item.str)
+                    .join(' ')
+                    .replace(/\s+/g, ' ')
+                    .trim();
+
+                if (pageText) {
+                    fullText += pageText + '\n\n';
+
+                    // Crear referencia por página
+                    references.push({
+                        page: pageNum,
+                        section: 1,
+                        text: pageText
+                    });
+                }
+            }
+
+            console.log(`✅ Extracted ${fullText.length} chars from ${maxPages} pages of PDF: ${filename}`);
+
+            return {
+                text: fullText.trim(),
+                references: references,
+                pageCount: maxPages,
+                totalPages: pdf.numPages
+            };
+
+        } catch (error) {
+            console.error(`❌ Error extracting PDF text:`, error);
+            return {
+                error: error.message,
+                text: '',
+                references: []
+            };
+        }
+    }
+
+    /**
+     * ✅ Extrae texto de DOCX usando mammoth
+     */
+    async extractTextFromDOCX(arrayBuffer, filename) {
+        try {
+            if (typeof mammoth === 'undefined') {
+                console.warn('⚠️ Mammoth not loaded');
+                return {
+                    error: 'Mammoth library not available',
+                    text: '',
+                    references: []
+                };
+            }
+
+            const result = await mammoth.extractRawText({ arrayBuffer: arrayBuffer });
+            const text = result.value.trim();
+
+            if (!text) {
+                console.warn(`⚠️ No text extracted from ${filename}`);
+                return {
+                    text: '',
+                    references: [],
+                    pageCount: 0
+                };
+            }
+
+            console.log(`✅ Extracted ${text.length} chars from DOCX: ${filename}`);
+
+            // Crear referencias por secciones (~2000 caracteres cada una)
+            const references = this.createReferences(text, 20, 2000);
+
+            return {
+                text: text,
+                references: references.map((ref, idx) => ({
+                    page: idx + 1,
+                    section: 1,
+                    text: ref.text
+                })),
+                pageCount: references.length
+            };
+
+        } catch (error) {
+            console.error(`❌ Error extracting DOCX text:`, error);
+            return {
+                error: error.message,
+                text: '',
+                references: []
+            };
+        }
+    }
+
+    /**
+     * ✅ Formatea EXACTAMENTE igual que FileDropzone._formatText()
+     * Cada página es un <simba_document> separado con data-page
+     */
+    formatAsSimbaDocument(item) {
+        const filename = item.title;
+        const text = item.text || '';
+
+        // Modo sin tags (formato plano)
+        if (!this.config.useSimbaDocumentTags) {
+            if (item.references && item.references.length > 0) {
+                let plainText = "";
+                item.references.forEach(ref => {
+                    plainText += `--- Página ${ref.page} ---\n\n${ref.text}\n\n`;
+                });
+                return plainText.trim();
+            }
+            return text;
+        }
+
+        // ✅ Modo CON TAGS (igual que FileDropzone)
+        if (item.references && item.references.length > 0) {
+            // ⚡ CRÍTICO: Cada página es un <simba_document> SEPARADO
+            let result = "";
+            item.references.forEach(ref => {
+                result += `<simba_document data-filename="${filename}" data-page="${ref.page}">\n`;
+                result += ref.text;
+                result += '\n</simba_document>\n\n';
+            });
+            return result.trim();
+        } else {
+            // Sin páginas múltiples (documento pequeño)
+            return `<simba_document data-filename="${filename}" data-page="1">\n${text}\n</simba_document>`;
+        }
+    }
+
+    /**
+     * ✅ Crea referencias (fragmentos) de un texto largo
+     */
+    createReferences(text, maxRefs, snippetChars) {
+        if (!text || text.length <= snippetChars) {
+            return [{
+                section: 1,
+                page: 1,
+                text: text
+            }];
+        }
+
+        const references = [];
+        const words = text.split(' ');
+        let currentRef = [];
+        let currentLength = 0;
+        let sectionNumber = 1;
+
+        for (let i = 0; i < words.length && references.length < maxRefs; i++) {
+            const word = words[i];
+            currentRef.push(word);
+            currentLength += word.length + 1;
+
+            if (currentLength >= snippetChars || i === words.length - 1) {
+                references.push({
+                    section: sectionNumber,
+                    page: sectionNumber,
+                    text: currentRef.join(' ').trim()
+                });
+
+                currentRef = [];
+                currentLength = 0;
+                sectionNumber++;
+            }
+        }
+
+        return references;
+    }
+
+    /**
+     * ✅ Busca en Confluence y devuelve sourcesData
+     */
+    async searchInConfluence(term) {
+        if (!term || !term.trim()) {
+            throw new Error('Search term is required');
+        }
+
+        try {
+            console.log(`🔍 Searching Confluence for: "${term}"`);
+
+            // Reset stats
+            this.processingStats = {
+                totalProcessed: 0,
+                totalFailed: 0,
+                totalPages: 0,
+                totalChars: 0
+            };
+
+            // Construir query CQL
+            const cqlQuery = `siteSearch ~ "${term}" AND type in ("space","user","attachment","page","blogpost")`;
+            const encodedCql = encodeURIComponent(cqlQuery);
+            const url = `${this.config.confluenceBaseUrl}/rest/api/search?cql=${encodedCql}&limit=${this.config.defaultLimit}`;
+
+            console.log('📡 CQL Query:', cqlQuery);
+            console.log('🌐 Proxy URL:', url);
+
+            // Realizar búsqueda
+            const response = await this.proxyFetch(url);
+
+            if (!response.ok) {
+                throw new Error(`Confluence search failed: ${response.status} ${response.statusText}`);
+            }
+
+            const searchJson = await response.json();
+
+            // Extraer contexto con referencias
+            const contextArray = await this.extractConfluenceContextWithRefs(
+                searchJson,
+                this.config.defaultLimit,
+                {
+                    maxRefsPerPage: this.config.maxRefsPerPage,
+                    refSnippetChars: this.config.refSnippetChars
+                }
+            );
+
+            // Convertir a formato sourcesData
+            const sourcesData = this.convertToSourcesData(contextArray);
+
+            console.log(`✅ Found ${sourcesData.length} Confluence results`);
+            console.log('📊 Processing stats:', this.processingStats);
+
+            return sourcesData;
+
+        } catch (error) {
+            console.error('❌ Error searching Confluence:', error);
+            throw error;
+        }
+    }
+
+    /**
+     * ✅ Extrae contexto de resultados de búsqueda con procesamiento de attachments
+     */
+    async extractConfluenceContextWithRefs(searchJson, limit, options = {}) {
+        if (!searchJson || !Array.isArray(searchJson.results)) {
+            console.error("El JSON de búsqueda no tiene resultados válidos.");
+            return [];
+        }
+
+        const maxResults = (typeof limit === "number" && limit > 0)
+            ? Math.min(limit, searchJson.results.length)
+            : searchJson.results.length;
+
+        const maxRefsPerPage = options.maxRefsPerPage || 5;
+        const refSnippetChars = options.refSnippetChars || 300;
+
+        const items = searchJson.results.slice(0, maxResults);
+        const pages = items.filter(r => r.content && r.content.type === "page");
+        const attachments = items.filter(r => r.content && r.content.type === "attachment");
+
+        const contextArray = [];
+
+        // ---- PROCESAR PÁGINAS ----
+        for (let i = 0; i < pages.length; i++) {
+            const page = pages[i];
+            const id = page.content.id;
+            const title = this.convertConfluenceHighlights(page.title || "(no title)");
+            const webui = (page.url || (page._links && page._links.webui)) || "";
+            const baseUrl = this.config.confluenceRealUrl || this.config.confluenceBaseUrl;
+            const fullUrl = webui.startsWith('http') ? webui : baseUrl + webui;
+
+
+            try {
+                const contentUrl = `${this.config.confluenceBaseUrl}/rest/api/content/${id}?expand=body.storage`;
+
+                const resp = await this.proxyFetch(contentUrl, { method: "GET" });
+
+                if (!resp.ok) {
+                    console.warn(`No se pudo obtener contenido de ID ${id}`);
+                    continue;
+                }
+
+                const data = await resp.json();
+                const html = data.body && data.body.storage ? data.body.storage.value : "";
+
+                let cleanText = this.convertConfluenceHighlights(html);
+                cleanText = cleanText.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+                const references = this.createReferences(cleanText, maxRefsPerPage, refSnippetChars);
+
+                contextArray.push({
+                    id: id,
+                    type: "page",
+                    title: title,
+                    url: fullUrl,
+                    text: cleanText,
+                    references: references,
+                    space: data.space ? data.space.name : null,
+                    version: data.version ? data.version.number : null,
+                    extra: {}
+                });
+            } catch (err) {
+                console.error(`❌ Error al procesar página ${id}:`, err);
+            }
+        }
+
+        // ---- PROCESAR ATTACHMENTS ----
+        for (let j = 0; j < attachments.length; j++) {
+            const att = attachments[j];
+            const id = att.content.id;
+            const title = this.convertConfluenceHighlights(att.title || "(attachment)");
+            const previewUrlRel = att.url || (att._links && att._links.webui) || "";
+
+            const previewUrl = this.toProxyUrl(previewUrlRel);
+            const downloadUrl = this.buildAttachmentDownloadUrl(previewUrlRel);
+
+            // Excerpt básico
+            let excerptText = this.convertConfluenceHighlights(att.excerpt || "");
+            excerptText = excerptText.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim();
+
+            const primaryUrl = downloadUrl || previewUrl;
+
+            // ✅ Procesar archivo si es PDF o DOCX
+            let processedContent = null;
+            if (downloadUrl && this.shouldProcessAttachment(title)) {
+                console.log(`🔄 Processing attachment: ${title}`);
+                processedContent = await this.processAttachment(downloadUrl, title);
+
+                // Si hubo error en el procesamiento, guardar el error
+                if (processedContent && processedContent.error) {
+                    console.warn(`⚠️ Could not process ${title}:`, processedContent.error);
+                }
+            }
+
+            // Usar contenido procesado o excerpt
+            const finalText = (processedContent && !processedContent.error)
+                ? processedContent.text
+                : excerptText;
+
+            const finalReferences = (processedContent && !processedContent.error && processedContent.references)
+                ? processedContent.references
+                : (excerptText ? this.createReferences(excerptText, 1, refSnippetChars) : undefined);
+
+            contextArray.push({
+                id: id,
+                type: "attachment",
+                title: title,
+                url: primaryUrl,
+                text: finalText || "",
+                references: finalReferences,
+                space: (att.resultGlobalContainer && att.resultGlobalContainer.title) || null,
+                version: null,
+                extra: {
+                    previewUrl: previewUrl+"?service="+this.config.serviceName,
+                    downloadUrl: downloadUrl+"?service="+this.config.serviceName,
+                    iconCssClass: att.iconCssClass || null,
+                    lastModified: att.lastModified || null,
+                    processed: !!(processedContent && !processedContent.error),
+                    pageCount: processedContent?.pageCount,
+                    totalPages: processedContent?.totalPages,
+                    processingError: processedContent?.error
+                }
+            });
+        }
+
+        return contextArray;
+    }
+
+    /**
+     * ✅ Convierte array de contexto a formato sourcesData compatible con sourceManager
+     */
+    convertToSourcesData(contextArray) {
+        return contextArray.map(item => {
+            const fileExtension = item.title.split('.').pop();
+            const contentType = item.type || 'page';
+
+            // ✅ Obtener estrategia de visualización
+            const viewerStrategy = this.getViewerStrategy(contentType, fileExtension);
+
+            // Si es attachment procesado (PDF/DOCX)
+            if (item.extra?.processed && item.references && item.references.length > 0) {
+                return {
+                    id: item.title,
+                    name: item.title,
+                    guid: `confluence_${item.id}`,
+                    icon: fileExtension === 'pdf'
+                        ? 'fa-file-pdf'
+                        : (fileExtension === 'docx' || fileExtension === 'doc')
+                            ? 'fa-file-word'
+                            : 'fa-brands fa-confluence',
+                    text: undefined,
+                    references: item.references.map(ref => ({
+                        page: ref.page,
+                        section: ref.section || 1,
+                        text: ref.text
+                    })),
+                    url: item.url,
+                    source: item.url+'?service='+this.config.serviceName || '',
+                    summary: `Processed ${item.extra.pageCount || 1} pages from Confluence attachment`,
+                    site: 'Confluence',
+                    device: 'N/A',
+                    extra: {
+                        ...item.extra,
+                        type: item.type || 'attachment',
+                        space: item.space,
+                        isProcessedAttachment: true,
+                        viewerStrategy: viewerStrategy  // ✅ Añadir estrategia
+                    }
+                };
+            }
+
+            // Páginas normales o attachments sin procesar
+            return {
+                id: item.title,
+                name: item.title,
+                guid: `confluence_${item.id}`,
+                icon: 'fa-brands fa-confluence',
+                text: item.references && item.references.length > 0 ? undefined : item.text,
+                references: item.references ? item.references.map(ref => ({
+                    page: ref.page,
+                    section: ref.section || 1,
+                    text: ref.text
+                })) : undefined,
+                url: item.url,
+                source: item.url+'?service='+this.config.serviceName || '',
+                summary: item.text ? item.text.substring(0, 200) + '...' : '',
+                site: 'Confluence',
+                device: 'N/A',
+                extra: {
+                    ...item.extra,
+                    type: item.type || 'page',
+                    space: item.space,
+                    version: item.version,
+                    viewerStrategy: viewerStrategy  // ✅ Añadir estrategia
+                }
+            };
+        });
+    }
+
+    /**
+     * ✅ Obtiene estadísticas de procesamiento
+     */
+    getProcessingStats() {
+        return { ...this.processingStats };
+    }
+
+    /**
+     * ✅ Resetea estadísticas
+     */
+    resetStats() {
+        this.processingStats = {
+            totalProcessed: 0,
+            totalFailed: 0,
+            totalPages: 0,
+            totalChars: 0
+        };
+    }
+
+    /**
+     * ✅ Actualizar configuración
+     */
+    updateConfig(newConfig) {
+        this.config = { ...this.config, ...newConfig };
+        console.log('✅ ContextManager config updated:', this.config);
+    }
+};
 // Inicialización automática si está en el navegador
 if (typeof window !== 'undefined') {
     console.log('SIMBA.js loaded successfully');

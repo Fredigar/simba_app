@@ -24,6 +24,13 @@
           </mappings>
         </serverdata>
       </paths>
+      <paths name="simbaProxy">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
     </serverData>
   </component>
 </project>

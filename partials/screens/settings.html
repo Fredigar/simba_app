@@ -1,5 +1,5 @@
 <template>
-    <div class="page" data-name="settings">
+    <div class="page" data-name="admin">
 
         <div class="navbar">
             <div class="navbar-bg"></div>
@@ -10,309 +10,167 @@
                         <span class="if-not-md">Back</span>
                     </a>
                 </div>
-                <div class="title">Settings</div>
+                <div class="title">Proxy Admin</div>
+                <div class="right">
+                    <a href="#" class="link" @click="${saveConfig}">
+                        <i class="icon material-icons">save</i>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="toolbar toolbar-bottom tabbar">
+            <div class="toolbar-inner">
+                <a href="#tab-overview" class="tab-link tab-link-active">
+                    <i class="icon material-icons">dashboard</i>
+                    <span class="tabbar-label">Overview</span>
+                </a>
+                <a href="#tab-services" class="tab-link">
+                    <i class="icon material-icons">dns</i>
+                    <span class="tabbar-label">Services</span>
+                </a>
+                <a href="#tab-proxy" class="tab-link">
+                    <i class="icon material-icons">router</i>
+                    <span class="tabbar-label">Proxy</span>
+                </a>
+                <a href="#tab-security" class="tab-link">
+                    <i class="icon material-icons">security</i>
+                    <span class="tabbar-label">Security</span>
+                </a>
             </div>
         </div>
 
         <div class="page-content">
-
             <div class="row justify-content-center">
-                <div class="col-100 medium-75 large-60 xlarge-50">
+                <div class="col-100 medium-90 large-80">
 
-                    <div class="list media-list inset chevron-center margin-vertical no-hairlines-between">
-                        <ul>
-                            <li>
-                                <a href="#" class="item-link">
-                                    <div class="item-content">
-                                        <div class="item-media">
-                                            <img class="shape-auto elevation-12" src="https://source.unsplash.com/5vg_SarQimA/96x96" height="56" width="56" alt="" />
-                                        </div>
-                                        <div class="item-inner align-self-center">
-                                            <div class="item-title-row">
-                                                <div class="item-title">Richmond Spencer</div>
+                    <div class="tabs">
+                        <!-- Tab Overview -->
+                        <div id="tab-overview" class="tab tab-active">
+                            <div class="block-title margin-vertical">System Status</div>
+                            <div class="list inset margin-vertical">
+                                <ul>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-40 bg-color-green">
+                                                    <i class="icon material-icons color-white">power_settings_new</i>
+                                                </span>
                                             </div>
-                                            <div class="item-text">Croatia</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
-                    ${$f7.config.theming.enabled && $h`
-                    <div class="block-title margin-vertical">Appearance</div>
-                    <div class="list inset margin-vertical">
-                        <ul>
-                            <li id="theme-color-selector">
-                                <a href="#" class="item-link" @click="${() => themeColorPicker.open()}">
-                                    <div class="item-content">
-                                        <div class="item-media">
-                                            <i class="shape-container shape-circle size-40" style="background-color: ${$store.getters.themeColor.value};"></i>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Theme Color</div>
-                                            <div class="item-after text-uppercase">${$store.getters.themeColor.value}</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <div class="item-content">
-                                    <div class="item-media">
-                                        ${$store.getters.themeMode.value == 'light' && $h`
-                                        <span class="shape-container shape-auto size-40 bg-color-amber">
-                                            <i class="icon material-icons color-white">light_mode</i>
-                                        </span>
-                                        `}
-                                        ${$store.getters.themeMode.value == 'dark' && $h`
-                                        <span class="shape-container shape-auto size-40 bg-color-mono">
-                                            <i class="icon material-icons color-mono-invert">dark_mode</i>
-                                        </span>
-                                        `}
-                                        ${$store.getters.themeMode.value == 'system' && $h`
-                                        <span class="shape-container shape-auto size-40 bg-color-bluegray">
-                                            <i class="icon material-icons color-white">brightness_4</i>
-                                        </span>
-                                        `}
-                                    </div>
-                                    <div class="item-inner">
-                                        <div class="item-title">Mode</div>
-                                        <div class="item-after">
-                                            <div class="segmented segmented-strong color-gray">
-                                                <button class="button button-small color-amber ${$store.getters.themeMode.value == 'light' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('light')}">Light</button>
-                                                <button class="button button-small color-black ${$store.getters.themeMode.value == 'dark' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('dark')}">Dark</button>
-                                                <button class="button button-small color-bluegray ${$store.getters.themeMode.value == 'system' ? 'button-active' : ''}" @click="${() => $f7.theming.changeMode('system')}">System</button>
-                                                <span class="segmented-highlight"></span>
+                                            <div class="item-inner">
+                                                <div class="item-title">Proxy Status</div>
+                                                <div class="item-after">${state.proxyOnline ? 'Online' : 'Offline'}</div>
                                             </div>
                                         </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-40 bg-color-blue">
+                                                    <i class="icon material-icons color-white">wifi</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">Listen Address</div>
+                                                <div class="item-after">${state.config ? state.config.listen.host : '127.0.0.1'}:${state.config ? state.config.listen.port : 8000}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-40 bg-color-purple">
+                                                    <i class="icon material-icons color-white">apps</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">Services</div>
+                                                <div class="item-after">${state.config ? Object.keys(state.config.services).length : 0}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                    <li>
+                                        <div class="item-content">
+                                            <div class="item-media">
+                                                <span class="shape-container shape-auto size-40 bg-color-gray">
+                                                    <i class="icon material-icons color-white">vpn_lock</i>
+                                                </span>
+                                            </div>
+                                            <div class="item-inner">
+                                                <div class="item-title">Corporate Proxy</div>
+                                                <div class="item-after">${state.config && state.config.corporate_proxy && state.config.corporate_proxy.enabled ? 'Enabled' : 'Disabled'}</div>
+                                            </div>
+                                        </div>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            <div class="block-title margin-vertical">Quick Actions</div>
+                            <div class="block margin-vertical">
+                                <div class="row">
+                                    <div class="col-50">
+                                        <button class="button button-fill button-raised" @click="${loadConfig}">
+                                            <i class="icon material-icons">refresh</i> Reload
+                                        </button>
+                                    </div>
+                                    <div class="col-50">
+                                        <button class="button button-fill button-raised color-red" @click="${testServices}">
+                                            <i class="icon material-icons">speed</i> Test
+                                        </button>
                                     </div>
                                 </div>
-                            </li>
-                        </ul>
-                    </div>
-                    `}
+                            </div>
+                        </div>
 
-                    ${$f7.i18n.config.enabled && $h`
-                    <div class="list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <a href="#" class="item-link smart-select smart-select-init" data-open-in="popover" data-close-on-select="true" data-searchbar="false">
-                                    <div class="item-content">
-                                        <select name="language" @change="${(event) => $f7.i18n.changeLanguage(event.target.value)}">
-                                            ${Object.keys($f7.i18n.config.languages).map((code) => $h`
-                                            <option value="${$f7.i18n.config.languages[code].code}" data-i18n="${$f7.i18n.config.languages[code].slug}" selected="${$f7.i18n.config.languages[code].code == $f7.i18n.currentLanguage().code}">${$f7.i18n.config.languages[code].name}</option>
-                                            `)}
-                                        </select>
-                                        <div class="item-media">
-                                            <span class="shape-container shape-auto size-40 bg-color-blue">
-                                                <i class="icon material-icons color-white">language</i>
-                                            </span>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Language</div>
-                                            <div class="item-after" data-i18n="${$f7.i18n.currentLanguage().slug}"></div>
-                                        </div>
-                                    </div>
+                        <!-- Tab Services -->
+                        <div id="tab-services" class="tab">
+                            <div class="block-title margin-vertical">
+                                Configured Services
+                                <a href="#" class="button button-small button-fill button-raised" style="float: right;" @click="${() => openServiceDialog()}">
+                                    <i class="icon material-icons">add</i> Add
                                 </a>
-                            </li>
-                        </ul>
-                    </div>
-                    `}
+                            </div>
 
-                    ${$f7.zooming.config.enabled && $h`
-                    <div class="list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <a href="#" class="item-link smart-select smart-select-init" data-open-in="popover" data-close-on-select="true" data-searchbar="false">
-                                    <div class="item-content">
-                                        <select name="zooming" @change="${(event) => $f7.zooming.changeLevel(event.target.value)}">
-                                            ${Object.keys($f7.zooming.config.levels).map((level) => $h`
-                                            <option value="${level}" data-i18n="${$f7.zooming.config.levels[level].slug}" selected="${$f7.zooming.config.levels[level].value == $f7.zooming.currentLevel().value}">${$f7.zooming.config.levels[level].name}</option>
-                                            `)}
-                                        </select>
-                                        <div class="item-media">
-                                            <span class="shape-container shape-auto size-40 bg-color-pink">
-                                                <i class="icon material-icons color-white">format_size</i>
-                                            </span>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Text Size</div>
-                                            <div class="item-after" data-i18n="${$f7.zooming.currentLevel().slug}"></div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-                    `}
+                            <div class="list inset margin-vertical">
+                                <ul id="services-list">
+                                </ul>
+                            </div>
+                        </div>
 
-                    <div class="block-title margin-vertical">Connected Accounts</div>
-                    <div class="list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <div class="item-content">
-                                    <div class="item-media">
-                                        <span class="shape-container shape-auto size-40 bg-color-mono">
-                                            <i class="icon fa-brands fa-apple font-size-18 color-mono-invert"></i>
-                                        </span>
-                                    </div>
-                                    <div class="item-inner">
-                                        <div class="item-title">Apple</div>
-                                        <div class="item-after">
-                                            <label class="toggle toggle-init">
-                                                <input type="checkbox" checked />
-                                                <span class="toggle-icon"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="item-content">
-                                    <div class="item-media">
-                                        <span class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-google));">
-                                            <i class="icon fa-brands fa-google font-size-18 color-white"></i>
-                                        </span>
-                                    </div>
-                                    <div class="item-inner">
-                                        <div class="item-title">Google</div>
-                                        <div class="item-after">
-                                            <label class="toggle toggle-init">
-                                                <input type="checkbox" checked />
-                                                <span class="toggle-icon"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <div class="item-content">
-                                    <div class="item-media">
-                                        <span class="shape-container shape-auto size-40" style="background-color: rgb(var(--brand-color-facebook));">
-                                            <i class="icon fa-brands fa-facebook-f font-size-18 color-white"></i>
-                                        </span>
-                                    </div>
-                                    <div class="item-inner">
-                                        <div class="item-title">Facebook</div>
-                                        <div class="item-after">
-                                            <label class="toggle toggle-init">
-                                                <input type="checkbox" checked />
-                                                <span class="toggle-icon"></span>
-                                            </label>
-                                        </div>
-                                    </div>
-                                </div>
-                            </li>
-                        </ul>
-                    </div>
+                        <!-- Tab Proxy -->
+                        <div id="tab-proxy" class="tab">
+                            <div class="block-title margin-vertical">Corporate Proxy Settings</div>
+                            <div class="list inset margin-vertical" id="proxy-settings-list">
+                            </div>
 
-                    <div class="block-title margin-vertical">${$f7.config.app.title}</div>
-                    <div class="list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <div class="item-content">
-                                    <div class="item-media">
-                                        <span class="shape-container shape-auto size-40 bg-color-blue">
-                                            <i class="icon material-icons color-white">info</i>
-                                        </span>
-                                    </div>
-                                    <div class="item-inner">
-                                        <div class="item-title">Version</div>
-                                        <div class="item-after">${$f7.getAppVersion()}</div>
-                                    </div>
-                                </div>
-                            </li>
-                            <li>
-                                <a href="#" class="item-link">
-                                    <div class="item-content">
-                                        <div class="item-media">
-                                            <span class="shape-container shape-auto size-40 bg-color-amber">
-                                                <i class="icon material-icons color-white">star</i>
-                                            </span>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Rate App</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="#" class="item-link">
-                                    <div class="item-content">
-                                        <div class="item-media">
-                                            <span class="shape-container shape-auto size-40 bg-color-green">
-                                                <i class="icon material-icons color-white">share</i>
-                                            </span>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Share App</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                            <li>
-                                <a href="/feedback/" class="item-link">
-                                    <div class="item-content">
-                                        <div class="item-media">
-                                            <span class="shape-container shape-auto size-40 bg-color-pink">
-                                                <i class="icon material-icons color-white">message</i>
-                                            </span>
-                                        </div>
-                                        <div class="item-inner">
-                                            <div class="item-title">Leave Feedback</div>
-                                        </div>
-                                    </div>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
+                            <div class="block-title margin-vertical">Listen Settings</div>
+                            <div class="list inset margin-vertical" id="listen-settings-list">
+                            </div>
+                        </div>
 
-                    <div class="block-title margin-vertical">Help</div>
-                    <div class="list links-list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <a href="/about/">About</a>
-                            </li>
-                            <li>
-                                <a href="/faq/">FAQ</a>
-                            </li>
-                            <li>
-                                <a href="/careers/">Careers</a>
-                            </li>
-                            <li>
-                                <a href="/contact/">Contact</a>
-                            </li>
-                        </ul>
-                    </div>
+                        <!-- Tab Security -->
+                        <div id="tab-security" class="tab">
+                            <div class="block-title margin-vertical">Security Settings</div>
+                            <div class="list inset margin-vertical" id="security-settings-list">
+                            </div>
 
-                    <div class="block-title margin-vertical">Legal</div>
-                    <div class="list links-list inset margin-vertical">
-                        <ul>
-                            <li>
-                                <a href="/terms/">Terms</a>
-                            </li>
-                            <li>
-                                <a href="/privacy-policy/">Privacy Policy</a>
-                            </li>
-                            <li>
-                                <a href="/cookie-policy/">Cookie Policy</a>
-                            </li>
-                        </ul>
-                    </div>
+                            <div class="block-title margin-vertical">Allowed Origins</div>
+                            <div class="list inset margin-vertical" id="origins-list">
+                            </div>
 
-                    ${$store.getters.isUserLoggedIn.value ? $h`
-                    <div class="list links-list inset no-chevron margin-vertical">
-                        <ul>
-                            <li>
-                                <a href="#" class="list-button font-size-14 font-weight-600 letter-spacing-1 text-uppercase color-red text-color-red" @click="${() => $store.dispatch('logoutUser')}">Logout</a>
-                            </li>
-                        </ul>
+                            <div class="block-title margin-vertical">Allowed Headers</div>
+                            <div class="list inset margin-vertical" id="headers-list">
+                            </div>
+
+                            <div class="block-title margin-vertical">Whitelist Hosts</div>
+                            <div class="list inset margin-vertical" id="whitelist-list">
+                            </div>
+                        </div>
+
                     </div>
-                    ` : $h` `}
 
                 </div>
             </div>
-
         </div>
 
     </div>
@@ -321,40 +179,992 @@
 <script>
     export default function(props, {$, $el, $f7, $f7route, $f7router, $h, $on, $store, $theme, $update}) {
 
-        let themeColorPicker = null;
+        const PROXY_URL = 'http://127.0.0.1:8000';
 
-        let initializeThemeColorPicker = function() {
-            themeColorPicker = $f7.colorPicker.create({
-                targetEl: $el.value.find('#theme-color-selector'),
-                modules: ['rgb-sliders', 'hex', 'initial-current-colors'],
-                openIn: 'popover',
-                sliderLabel: true,
-                sliderValue: true,
-                sliderValueEditable: true,
-                hexValueEditable: true,
-                value: {
-                    hex: $f7.theming.currentColor()
-                },
+        // Available providers
+        const PROVIDERS = ['confluence', 'folder', 'mysim', 'jira', 'weather', 'generic'];
+
+        // Available auth types
+        const AUTH_TYPES = [
+            { value: 'none', label: 'None' },
+            { value: 'basic', label: 'Basic Auth' },
+            { value: 'bearer_token', label: 'Bearer Token' },
+            { value: 'api_key_header', label: 'API Key (Header)' },
+            { value: 'api_key_query', label: 'API Key (Query)' },
+            { value: 'passthrough_header', label: 'Passthrough Header' }
+        ];
+
+        let state = {
+            config: null,
+            proxyOnline: false,
+        };
+
+        // Helper to get element
+        const getEl = function(selector) {
+            try {
+                if ($el && $el[0] && $el[0].querySelector) {
+                    return $el[0].querySelector(selector);
+                }
+                if ($el && $el.value && $el.value.querySelector) {
+                    return $el.value.querySelector(selector);
+                }
+                return document.querySelector(selector);
+            } catch (e) {
+                console.warn('getEl error:', e);
+                return document.querySelector(selector);
+            }
+        };
+
+        // Load configuration from proxy
+        const loadConfig = async function() {
+            try {
+                const response = await fetch(`${PROXY_URL}/_admin/config`);
+                if (!response.ok) throw new Error('Failed to load config');
+
+                state.config = await response.json();
+                state.proxyOnline = true;
+                $update();
+
+                setTimeout(() => {
+                    renderServices();
+                    renderProxySettings();
+                    renderListenSettings();
+                    renderSecuritySettings();
+                    renderOrigins();
+                    renderAllowedHeaders();
+                    renderWhitelist();
+                }, 100);
+
+                $f7.toast.create({
+                    text: 'Configuration loaded',
+                    icon: '<i class="material-icons">check_circle</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            } catch (error) {
+                console.error('Error loading config:', error);
+                state.proxyOnline = false;
+                $update();
+                $f7.toast.create({
+                    text: 'Error loading config: ' + error.message,
+                    icon: '<i class="material-icons">error</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            }
+        };
+
+        // Get provider icon
+        const getProviderIcon = function(provider) {
+            const icons = {
+                'confluence': 'article',
+                'folder': 'folder',
+                'mysim': 'flight',
+                'jira': 'bug_report',
+                'weather': 'cloud',
+                'generic': 'cloud'
+            };
+            return icons[provider] || 'cloud';
+        };
+
+        // Get provider color
+        const getProviderColor = function(provider) {
+            const colors = {
+                'confluence': 'blue',
+                'folder': 'orange',
+                'mysim': 'teal',
+                'jira': 'green',
+                'weather': 'lightblue',
+                'generic': 'gray'
+            };
+            return colors[provider] || 'blue';
+        };
+
+        // Render services list
+        const renderServices = function() {
+            const servicesList = getEl('#services-list');
+            if (!servicesList || !state.config || !state.config.services) return;
+
+            let html = '';
+            for (const [name, service] of Object.entries(state.config.services)) {
+                const isEncrypted = service.auth && (
+                    (service.auth.password && service.auth.password.startsWith('ENC::')) ||
+                    (service.auth.token && service.auth.token.startsWith('ENC::'))
+                );
+                const provider = service.provider || 'generic';
+                const icon = getProviderIcon(provider);
+                const color = getProviderColor(provider);
+
+                html += `
+                    <li>
+                        <a href="#" class="item-link service-item" data-service="${name}">
+                            <div class="item-content">
+                                <div class="item-media">
+                                    <span class="shape-container shape-auto size-40 bg-color-${color}">
+                                        <i class="icon material-icons color-white">${icon}</i>
+                                    </span>
+                                </div>
+                                <div class="item-inner">
+                                    <div class="item-title">
+                                        ${name}
+                                        ${isEncrypted ? '<span class="badge color-blue">ENCRYPTED</span>' : ''}
+                                    </div>
+                                    <div class="item-after">
+                                        <div class="item-subtitle">${provider}</div>
+                                        <div class="item-text">${service.base_url || ''}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </a>
+                    </li>
+                `;
+            }
+            servicesList.innerHTML = html;
+
+            servicesList.querySelectorAll('.service-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const serviceName = item.dataset.service;
+                    const serviceData = state.config.services[serviceName];
+                    openServiceDialog(serviceName, serviceData);
+                });
+            });
+        };
+
+        // Render proxy settings
+        const renderProxySettings = function() {
+            const container = getEl('#proxy-settings-list');
+            if (!container) return;
+
+            const cp = state.config ? state.config.corporate_proxy || {} : {};
+
+            container.innerHTML = `
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-auto size-40 bg-color-green">
+                                    <i class="icon material-icons color-white">vpn_lock</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">Enable Corporate Proxy</div>
+                                <div class="item-after">
+                                    <label class="toggle toggle-init">
+                                        <input type="checkbox" id="proxy-enabled-toggle" ${cp.enabled ? 'checked' : ''}>
+                                        <span class="toggle-icon"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-blue">
+                                <i class="icon material-icons color-white">link</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Proxy URL</div>
+                            <div class="item-input-wrap">
+                                <input type="text" id="proxy-url-input" placeholder="http://proxy:3128" value="${cp.url || ''}">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-purple">
+                                <i class="icon material-icons color-white">person</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Username</div>
+                            <div class="item-input-wrap">
+                                <input type="text" id="proxy-username-input" value="${cp.username || ''}">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-red">
+                                <i class="icon material-icons color-white">lock</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Password ${cp.password && cp.password.startsWith('ENC::') ? '<span class="badge color-blue">ENCRYPTED</span>' : ''}</div>
+                            <div class="item-input-wrap">
+                                <input type="password" id="proxy-password-input" placeholder="Enter new to change">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-orange">
+                                <i class="icon material-icons color-white">description</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Certificate Path</div>
+                            <div class="item-input-wrap">
+                                <input type="text" id="proxy-cert-input" placeholder="Path to CA certificate" value="${cp.cert_path || ''}">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Render listen settings
+        const renderListenSettings = function() {
+            const container = getEl('#listen-settings-list');
+            if (!container) return;
+
+            const listen = state.config ? state.config.listen || {} : {};
+
+            container.innerHTML = `
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-teal">
+                                <i class="icon material-icons color-white">computer</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Host</div>
+                            <div class="item-input-wrap">
+                                <input type="text" id="listen-host-input" value="${listen.host || '127.0.0.1'}">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-indigo">
+                                <i class="icon material-icons color-white">settings_ethernet</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Port</div>
+                            <div class="item-input-wrap">
+                                <input type="number" id="listen-port-input" value="${listen.port || 8000}">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Render security settings
+        const renderSecuritySettings = function() {
+            const container = getEl('#security-settings-list');
+            if (!container) return;
+
+            const security = state.config ? state.config.security || {} : {};
+
+            container.innerHTML = `
+                <ul>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-auto size-40 bg-color-green">
+                                    <i class="icon material-icons color-white">verified_user</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">Verify SSL</div>
+                                <div class="item-after">
+                                    <label class="toggle toggle-init">
+                                        <input type="checkbox" id="security-verify-ssl" ${security.verify_ssl !== false ? 'checked' : ''}>
+                                        <span class="toggle-icon"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li>
+                        <div class="item-content">
+                            <div class="item-media">
+                                <span class="shape-container shape-auto size-40 bg-color-blue">
+                                    <i class="icon material-icons color-white">cookie</i>
+                                </span>
+                            </div>
+                            <div class="item-inner">
+                                <div class="item-title">Allow Credentials</div>
+                                <div class="item-after">
+                                    <label class="toggle toggle-init">
+                                        <input type="checkbox" id="security-allow-credentials" ${security.allow_credentials ? 'checked' : ''}>
+                                        <span class="toggle-icon"></span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-orange">
+                                <i class="icon material-icons color-white">data_usage</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">Max Body Size (MB)</div>
+                            <div class="item-input-wrap">
+                                <input type="number" id="security-max-body" value="${security.max_body_size_mb || 10}">
+                            </div>
+                        </div>
+                    </li>
+                    <li class="item-content item-input">
+                        <div class="item-media">
+                            <span class="shape-container shape-auto size-40 bg-color-purple">
+                                <i class="icon material-icons color-white">schedule</i>
+                            </span>
+                        </div>
+                        <div class="item-inner">
+                            <div class="item-title item-label">CORS Max Age</div>
+                            <div class="item-input-wrap">
+                                <input type="number" id="security-max-age" value="${security.max_age || 600}">
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Render allowed origins
+        const renderOrigins = function() {
+            const container = getEl('#origins-list');
+            if (!container) return;
+
+            const security = state.config ? state.config.security || {} : {};
+            const origins = (security.allow_origins || []).join('\n');
+
+            container.innerHTML = `
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-input-wrap">
+                                <textarea id="security-allow-origins" placeholder="One origin per line" class="resizable">${origins}</textarea>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Render allowed headers
+        const renderAllowedHeaders = function() {
+            const container = getEl('#headers-list');
+            if (!container) return;
+
+            const security = state.config ? state.config.security || {} : {};
+            const headers = (security.allow_headers || []).join('\n');
+
+            container.innerHTML = `
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-input-wrap">
+                                <textarea id="security-allow-headers" placeholder="One header per line" class="resizable">${headers}</textarea>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Render whitelist hosts
+        const renderWhitelist = function() {
+            const container = getEl('#whitelist-list');
+            if (!container) return;
+
+            const security = state.config ? state.config.security || {} : {};
+            const hosts = (security.whitelist_hosts || []).join('\n');
+
+            container.innerHTML = `
+                <ul>
+                    <li class="item-content item-input">
+                        <div class="item-inner">
+                            <div class="item-input-wrap">
+                                <textarea id="security-whitelist-hosts" placeholder="One host per line (empty = allow all)" class="resizable">${hosts}</textarea>
+                            </div>
+                        </div>
+                    </li>
+                </ul>
+            `;
+        };
+
+        // Collect form values before saving
+        const collectFormValues = function() {
+            if (!state.config) state.config = {};
+
+            // Corporate proxy
+            if (!state.config.corporate_proxy) state.config.corporate_proxy = {};
+            const proxyEnabled = getEl('#proxy-enabled-toggle');
+            if (proxyEnabled) state.config.corporate_proxy.enabled = proxyEnabled.checked;
+
+            const proxyUrl = getEl('#proxy-url-input');
+            if (proxyUrl) state.config.corporate_proxy.url = proxyUrl.value;
+
+            const proxyUser = getEl('#proxy-username-input');
+            if (proxyUser) state.config.corporate_proxy.username = proxyUser.value;
+
+            const proxyPass = getEl('#proxy-password-input');
+            if (proxyPass && proxyPass.value) state.config.corporate_proxy.password = proxyPass.value;
+
+            const proxyCert = getEl('#proxy-cert-input');
+            if (proxyCert) state.config.corporate_proxy.cert_path = proxyCert.value || null;
+
+            // Listen
+            if (!state.config.listen) state.config.listen = {};
+            const listenHost = getEl('#listen-host-input');
+            if (listenHost) state.config.listen.host = listenHost.value;
+
+            const listenPort = getEl('#listen-port-input');
+            if (listenPort) state.config.listen.port = parseInt(listenPort.value) || 8000;
+
+            // Security
+            if (!state.config.security) state.config.security = {};
+            const verifySsl = getEl('#security-verify-ssl');
+            if (verifySsl) state.config.security.verify_ssl = verifySsl.checked;
+
+            const allowCreds = getEl('#security-allow-credentials');
+            if (allowCreds) state.config.security.allow_credentials = allowCreds.checked;
+
+            const maxBody = getEl('#security-max-body');
+            if (maxBody) state.config.security.max_body_size_mb = parseInt(maxBody.value) || 10;
+
+            const maxAge = getEl('#security-max-age');
+            if (maxAge) state.config.security.max_age = parseInt(maxAge.value) || 600;
+
+            const allowOrigins = getEl('#security-allow-origins');
+            if (allowOrigins) state.config.security.allow_origins = allowOrigins.value.split('\n').filter(x => x.trim());
+
+            const allowHeaders = getEl('#security-allow-headers');
+            if (allowHeaders) state.config.security.allow_headers = allowHeaders.value.split('\n').filter(x => x.trim());
+
+            const whitelistHosts = getEl('#security-whitelist-hosts');
+            if (whitelistHosts) state.config.security.whitelist_hosts = whitelistHosts.value.split('\n').filter(x => x.trim());
+        };
+
+        // Save configuration
+        const saveConfig = async function() {
+            collectFormValues();
+
+            try {
+                const response = await fetch(`${PROXY_URL}/_admin/config`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(state.config)
+                });
+
+                if (!response.ok) throw new Error('Failed to save config');
+
+                $f7.toast.create({
+                    text: 'Configuration saved!',
+                    icon: '<i class="material-icons">check_circle</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+
+                await loadConfig();
+            } catch (error) {
+                console.error('Error saving config:', error);
+                $f7.toast.create({
+                    text: 'Error saving config: ' + error.message,
+                    icon: '<i class="material-icons">error</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            }
+        };
+
+        // Test services
+        const testServices = async function() {
+            try {
+                const response = await fetch(`${PROXY_URL}/_services`);
+                const data = await response.json();
+                $f7.toast.create({
+                    text: `${data.services.length} services available`,
+                    icon: '<i class="material-icons">check_circle</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            } catch (error) {
+                $f7.toast.create({
+                    text: 'Connection test failed',
+                    icon: '<i class="material-icons">error</i>',
+                    position: 'center',
+                    closeTimeout: 2000,
+                }).open();
+            }
+        };
+
+        // Build provider options HTML
+        const buildProviderOptions = function(selected) {
+            return PROVIDERS.map(p =>
+                `<option value="${p}" ${selected === p ? 'selected' : ''}>${p}</option>`
+            ).join('');
+        };
+
+        // Build auth type options HTML
+        const buildAuthTypeOptions = function(selected) {
+            return AUTH_TYPES.map(t =>
+                `<option value="${t.value}" ${selected === t.value ? 'selected' : ''}>${t.label}</option>`
+            ).join('');
+        };
+
+        // Open service dialog (CON POPUP)
+        const openServiceDialog = function(serviceName = null, serviceData = null) {
+            const isEdit = serviceName !== null;
+            const provider = serviceData ? serviceData.provider || 'generic' : 'generic';
+            const authType = serviceData && serviceData.auth ? serviceData.auth.type || 'none' : 'none';
+
+            // Parse folder paths
+            let folderPaths = '';
+            if (serviceData && serviceData.folder_path) {
+                if (Array.isArray(serviceData.folder_path)) {
+                    folderPaths = serviceData.folder_path.join('\n');
+                } else {
+                    folderPaths = serviceData.folder_path;
+                }
+            }
+
+            // Parse headers
+            let headersStr = '';
+            if (serviceData && serviceData.headers && Object.keys(serviceData.headers).length > 0) {
+                headersStr = Object.entries(serviceData.headers)
+                    .map(([k, v]) => `${k}: ${v}`)
+                    .join('\n');
+            }
+
+            const popupHTML = `
+                <div class="popup popup-service-edit">
+                    <div class="page">
+                        <div class="navbar">
+                            <div class="navbar-bg"></div>
+                            <div class="navbar-inner">
+                                <div class="left">
+                                    <a href="#" class="link popup-close">
+                                        <i class="icon icon-back"></i>
+                                        <span class="if-not-md">Close</span>
+                                    </a>
+                                </div>
+                                <div class="title">${isEdit ? `Edit: ${serviceName}` : 'Add New Service'}</div>
+                                <div class="right">
+                                    <span class="link" id="save-service-btn" style="cursor: pointer;">
+                                        <i class="icon material-icons">save</i>
+                                        <span class="if-not-md">Save</span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="page-content">
+                            <div class="row justify-content-center">
+                                <div class="col-100 medium-80 large-70">
+
+                                    <!-- Basic Info -->
+                                    <div class="block-title">Basic Information</div>
+                                    <div class="list inset margin-vertical">
+                                        <ul>
+                                            ${!isEdit ? `
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Service Name</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-name" placeholder="myservice">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            ` : ''}
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Provider</div>
+                                                    <div class="item-input-wrap">
+                                                        <select id="service-provider">
+                                                            ${buildProviderOptions(provider)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input" id="base-url-row">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Base URL</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-base-url" value="${serviceData ? serviceData.base_url || '' : ''}" placeholder="https://api.example.com">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Description</div>
+                                                    <div class="item-input-wrap">
+                                                        <textarea id="service-description" placeholder="Service description" class="resizable">${serviceData ? serviceData.description || '' : ''}</textarea>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Timeout (seconds)</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="number" id="service-timeout" value="${serviceData ? serviceData.timeout_s || 30 : 30}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Authentication -->
+                                    <div class="block-title">Authentication</div>
+                                    <div class="list inset margin-vertical">
+                                        <ul>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Auth Type</div>
+                                                    <div class="item-input-wrap">
+                                                        <select id="service-auth-type">
+                                                            ${buildAuthTypeOptions(authType)}
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input" id="auth-username-row">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Username / API Key</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-auth-username" value="${serviceData && serviceData.auth ? serviceData.auth.username || serviceData.auth.api_key || '' : ''}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input" id="auth-password-row">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">
+                                                        Password / Token
+                                                        ${serviceData && serviceData.auth && ((serviceData.auth.password && serviceData.auth.password.startsWith('ENC::')) || (serviceData.auth.token && serviceData.auth.token.startsWith('ENC::'))) ? '<span class="badge color-blue">ENCRYPTED</span>' : ''}
+                                                    </div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="password" id="service-auth-password" placeholder="Enter new to change">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input" id="auth-header-row">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Header Name (for API Key)</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-auth-header" value="${serviceData && serviceData.auth ? serviceData.auth.header_name || 'x-api-key' : 'x-api-key'}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Folder Settings -->
+                                    <div class="block-title" id="folder-section-title">Folder Settings</div>
+                                    <div class="list inset margin-vertical" id="folder-section">
+                                        <ul>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Folder Paths (one per line)</div>
+                                                    <div class="item-input-wrap">
+                                                        <textarea id="service-folder-paths" placeholder="C:\\path\\to\\folder&#10;\\\\server\\share" class="resizable" style="min-height: 100px;">${folderPaths}</textarea>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Collection Name</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-collection-name" value="${serviceData ? serviceData.collection_name || 'default' : 'default'}" placeholder="default">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Vector DB Path</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="text" id="service-vector-db-path" value="${serviceData ? serviceData.vector_db_path || './chroma_db' : './chroma_db'}" placeholder="./chroma_db">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Chunk Size</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="number" id="service-chunk-size" value="${serviceData ? serviceData.chunk_size || 1000 : 1000}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Chunk Overlap</div>
+                                                    <div class="item-input-wrap">
+                                                        <input type="number" id="service-chunk-overlap" value="${serviceData ? serviceData.chunk_overlap || 200 : 200}">
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Custom Headers -->
+                                    <div class="block-title">Custom Headers</div>
+                                    <div class="list inset margin-vertical">
+                                        <ul>
+                                            <li class="item-content item-input">
+                                                <div class="item-inner">
+                                                    <div class="item-title item-label">Headers (one per line, format: Name: Value)</div>
+                                                    <div class="item-input-wrap">
+                                                        <textarea id="service-headers" placeholder="X-Custom-Header: value" class="resizable" style="min-height: 100px;">${headersStr}</textarea>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                        </ul>
+                                    </div>
+
+                                    <!-- Delete Button (only for edit) -->
+                                    ${isEdit ? `
+                                    <div class="block margin-vertical">
+                                        <button class="button button-fill color-red button-raised" id="delete-service-btn">
+                                            <i class="icon material-icons">delete</i> Delete Service
+                                        </button>
+                                    </div>
+                                    ` : ''}
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `;
+
+            const popup = $f7.popup.create({
+                content: popupHTML,
                 on: {
-                    change: function(colorPicker, value) {
-                        $f7.theming.changeColor(value.hex);
+                    opened: function() {
+                        // Toggle folder fields visibility based on provider
+                        const toggleFolderFields = function() {
+                            const providerVal = popup.$el.find('#service-provider').val();
+                            const showFolder = providerVal === 'folder';
+
+                            if (showFolder) {
+                                popup.$el.find('#folder-section-title').show();
+                                popup.$el.find('#folder-section').show();
+                            } else {
+                                popup.$el.find('#folder-section-title').hide();
+                                popup.$el.find('#folder-section').hide();
+                            }
+
+                            // Hide base URL for folder provider (doesn't need it)
+                            const showBaseUrl = providerVal !== 'folder';
+                            if (showBaseUrl) {
+                                popup.$el.find('#base-url-row').show();
+                            } else {
+                                popup.$el.find('#base-url-row').hide();
+                            }
+                        };
+
+                        // Toggle auth fields visibility based on auth type
+                        const toggleAuthFields = function() {
+                            const authTypeVal = popup.$el.find('#service-auth-type').val();
+
+                            // Hide all by default
+                            popup.$el.find('#auth-username-row').hide();
+                            popup.$el.find('#auth-password-row').hide();
+                            popup.$el.find('#auth-header-row').hide();
+
+                            // Show fields based on auth type
+                            if (authTypeVal === 'basic') {
+                                popup.$el.find('#auth-username-row').show();
+                                popup.$el.find('#auth-password-row').show();
+                                // Update labels
+                                popup.$el.find('#auth-username-row .item-label').text('Username');
+                                popup.$el.find('#auth-password-row .item-label').html('Password ' +
+                                    (serviceData && serviceData.auth && serviceData.auth.password && serviceData.auth.password.startsWith('ENC::') ?
+                                        '<span class="badge color-blue">ENCRYPTED</span>' : ''));
+                            } else if (authTypeVal === 'api_key_header') {
+                                popup.$el.find('#auth-username-row').show();
+                                popup.$el.find('#auth-header-row').show();
+                                // Update labels
+                                popup.$el.find('#auth-username-row .item-label').text('API Key');
+                                popup.$el.find('#auth-header-row .item-label').text('Header Name');
+                            } else if (authTypeVal === 'bearer_token') {
+                                popup.$el.find('#auth-password-row').show();
+                                // Update labels
+                                popup.$el.find('#auth-password-row .item-label').html('Bearer Token ' +
+                                    (serviceData && serviceData.auth && serviceData.auth.token && serviceData.auth.token.startsWith('ENC::') ?
+                                        '<span class="badge color-blue">ENCRYPTED</span>' : ''));
+                            } else if (authTypeVal === 'api_key_query') {
+                                popup.$el.find('#auth-username-row').show();
+                                popup.$el.find('#auth-header-row').show();
+                                // Update labels
+                                popup.$el.find('#auth-username-row .item-label').text('API Key');
+                                popup.$el.find('#auth-header-row .item-label').text('Query Parameter Name');
+                            } else if (authTypeVal === 'passthrough_header') {
+                                popup.$el.find('#auth-header-row').show();
+                                // Update labels
+                                popup.$el.find('#auth-header-row .item-label').text('Header Name to Forward');
+                            }
+                            // 'none' shows nothing
+                        };
+
+                        // Initial toggles
+                        toggleFolderFields();
+                        toggleAuthFields();
+
+                        // Listen for changes
+                        popup.$el.find('#service-provider').on('change', toggleFolderFields);
+                        popup.$el.find('#service-auth-type').on('change', toggleAuthFields);
+
+                        // Save button handler
+                        popup.$el.find('#save-service-btn').on('click', function(e) {
+                            e.preventDefault();
+                            e.stopPropagation();
+
+                            console.log('Save button clicked'); // Debug
+
+                            const name = isEdit ? serviceName : popup.$el.find('#service-name').val();
+                            const selectedProvider = popup.$el.find('#service-provider').val();
+                            const base_url = popup.$el.find('#service-base-url').val();
+                            const description = popup.$el.find('#service-description').val();
+                            const timeout_s = parseInt(popup.$el.find('#service-timeout').val()) || 30;
+                            const auth_type = popup.$el.find('#service-auth-type').val();
+                            const auth_username = popup.$el.find('#service-auth-username').val();
+                            const auth_password = popup.$el.find('#service-auth-password').val();
+                            const auth_header = popup.$el.find('#service-auth-header').val();
+
+                            // Folder specific
+                            const folderPathsRaw = popup.$el.find('#service-folder-paths').val();
+                            const collectionName = popup.$el.find('#service-collection-name').val();
+                            const vectorDbPath = popup.$el.find('#service-vector-db-path').val();
+                            const chunkSize = parseInt(popup.$el.find('#service-chunk-size').val()) || 1000;
+                            const chunkOverlap = parseInt(popup.$el.find('#service-chunk-overlap').val()) || 200;
+
+                            // Headers
+                            const headersRaw = popup.$el.find('#service-headers').val();
+
+                            console.log('Collected values:', { name, selectedProvider, base_url }); // Debug
+
+                            if (!name) {
+                                $f7.dialog.alert('Service name is required');
+                                return;
+                            }
+
+                            // Build auth object
+                            const auth = { type: auth_type };
+                            if (auth_type === 'basic') {
+                                auth.username = auth_username;
+                                if (auth_password) auth.password = auth_password;
+                                else if (serviceData && serviceData.auth) auth.password = serviceData.auth.password;
+                            } else if (auth_type === 'api_key_header') {
+                                auth.api_key = auth_username;
+                                auth.header_name = auth_header;
+                            } else if (auth_type === 'api_key_query') {
+                                auth.api_key = auth_username;
+                                auth.query_param_name = auth_header;
+                            } else if (auth_type === 'bearer_token') {
+                                if (auth_password) auth.token = auth_password;
+                                else if (serviceData && serviceData.auth) auth.token = serviceData.auth.token;
+                            } else if (auth_type === 'passthrough_header') {
+                                auth.header_name = auth_header;
+                            }
+
+                            // Parse headers
+                            const headers = {};
+                            if (headersRaw) {
+                                headersRaw.split('\n').forEach(line => {
+                                    const idx = line.indexOf(':');
+                                    if (idx > 0) {
+                                        const key = line.substring(0, idx).trim();
+                                        const val = line.substring(idx + 1).trim();
+                                        if (key) headers[key] = val;
+                                    }
+                                });
+                            }
+
+                            // Build service object
+                            const service = {
+                                base_url,
+                                provider: selectedProvider,
+                                description: description || null,
+                                timeout_s,
+                                auth,
+                                headers,
+                                rate_limit: serviceData ? serviceData.rate_limit : null,
+                                strip_prefix: serviceData ? serviceData.strip_prefix : null,
+                            };
+
+                            // Add folder-specific fields
+                            if (selectedProvider === 'folder') {
+                                service.folder_path = folderPathsRaw.split('\n').map(p => p.trim()).filter(p => p);
+                                service.collection_name = collectionName || 'default';
+                                service.vector_db_path = vectorDbPath || './chroma_db';
+                                service.chunk_size = chunkSize;
+                                service.chunk_overlap = chunkOverlap;
+                            }
+
+                            console.log('Service object created:', service); // Debug
+
+                            if (!state.config.services) state.config.services = {};
+                            state.config.services[name] = service;
+                            renderServices();
+
+                            $f7.toast.create({
+                                text: isEdit ? 'Service updated' : 'Service added',
+                                icon: '<i class="material-icons">check_circle</i>',
+                                position: 'center',
+                                closeTimeout: 2000,
+                            }).open();
+
+                            popup.close();
+                        });
+
+                        // Delete button handler (only for edit)
+                        if (isEdit) {
+                            popup.$el.find('#delete-service-btn').on('click', function() {
+                                $f7.dialog.confirm(
+                                    `Are you sure you want to delete service "${serviceName}"?`,
+                                    'Delete Service',
+                                    () => {
+                                        delete state.config.services[serviceName];
+                                        renderServices();
+                                        $f7.toast.create({
+                                            text: 'Service deleted',
+                                            icon: '<i class="material-icons">delete</i>',
+                                            position: 'center',
+                                            closeTimeout: 2000,
+                                        }).open();
+                                        popup.close();
+                                    }
+                                );
+                            });
+                        }
                     }
                 }
             });
-        }
 
-        $on('languageChanged', function(language) {
-            $f7.i18n.localize();
-        });
+            popup.open();
+        };
 
-        $on('pageBeforeIn', function() {
-            initializeThemeColorPicker();
-        });
-
-        $on('tabInit', function() {
-            initializeThemeColorPicker();
+        // Initialize
+        $on('pageInit', function() {
+            loadConfig();
         });
 
         return $render;
     }
 </script>
+
+<style>
+    .badge {
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 8px;
+    }
+
+    .item-divider {
+        background: var(--f7-list-item-divider-bg-color);
+        padding: 8px 16px;
+        font-weight: 600;
+        font-size: 12px;
+        text-transform: uppercase;
+        color: var(--f7-theme-color);
+    }
+</style>

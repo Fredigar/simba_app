@@ -471,7 +471,7 @@
 
         let loadAgenda = function () {
             var currentDate = new Date().toISOString().slice(0,10);
-            currentDate = '2024-05-16'
+            currentDate = '2025-11-05'
             $f7.request({
                 url: window.config.api_urlbase + 'myeyes/get?entity=wsAgenda&extraQuery='+btoa("date(t.date)='"+currentDate+"'")+'&orderType=ASC&orderBy='+btoa('t.initTime'),
                 method: 'GET',

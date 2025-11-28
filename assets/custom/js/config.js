@@ -346,6 +346,7 @@ window.config.domain = "https://survey.simeng.es"
 window.config.api_url = "https://survey.simeng.es/api/v1/assistant/";
 window.config.api_urlbase = "https://survey.simeng.es/api/v1/";
 window.config.token = "acec116fe48e1f788e76afbebc678e52a1bb3dfc";//localStorage.getItem('Jobify_User_Access_Token') || null;
+window.config.models = "https://survey.simeng.es/api/v1/assistant/get-models";
 window.config.completion = {
     url:  'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/chat/completions',//'https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus-v.corp/api/v1/chat/completions',//https://daisei-api.ad6d-daiseicloudlab.aws.cloud.airbus.corp/api/v1/chat/completions',
     apiKey: "sk-9532ebabfd8aff986fc36657f87512ef",//"sk-9532ebabfd8aff986fc36657f87512ef"//"sk-663592038ca171795e3226b441628922"
